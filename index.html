@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>강의 목록</title>
+  <title>이윤임 - 컴퓨터공학과 게임콘텐츠전공</title>
   <style>
     * {
       margin: 0;
@@ -12,86 +12,135 @@
     }
 
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f0f2f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      background: #f8f9fa;
+      color: #212529;
       min-height: 100vh;
-      gap: 24px;
-      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
     }
 
     .card {
-      background-color: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      width: 200px;
-      padding: 32px 20px 24px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .card h2 {
-      font-size: 18px;
-      color: #2c3e50;
-      text-align: center;
-    }
-
-    .card .links {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 3rem 2.5rem;
+      max-width: 600px;
       width: 100%;
-    }
-
-    .card .links a {
-      display: block;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
       text-align: center;
-      padding: 8px 12px;
-      border-radius: 6px;
-      background-color: #4a90e2;
-      color: #ffffff;
-      text-decoration: none;
-      font-size: 14px;
     }
 
-    .card .links a:hover {
-      background-color: #357abd;
+    .avatar {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #4f6ef7, #6c8cff);
+      border-radius: 50%;
+      margin: 0 auto 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: white;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      color: #1a1a2e;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: #6c757d;
+      margin-bottom: 1.5rem;
+    }
+
+    .email {
+      display: inline-block;
+      font-size: 0.9rem;
+      color: #4f6ef7;
+      text-decoration: none;
+      background: #eef0ff;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      margin-bottom: 2.5rem;
+      transition: background 0.2s;
+    }
+
+    .email:hover {
+      background: #dde1ff;
+    }
+
+    .section-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #adb5bd;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 1rem;
+    }
+
+    .lecture-link {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 12px;
+      padding: 1.1rem 1.4rem;
+      text-decoration: none;
+      color: #212529;
+      transition: all 0.2s;
+    }
+
+    .lecture-link:hover {
+      background: #eef0ff;
+      border-color: #4f6ef7;
+      color: #4f6ef7;
+    }
+
+    .lecture-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .lecture-text {
+      text-align: left;
+    }
+
+    .lecture-text strong {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .lecture-text span {
+      font-size: 0.8rem;
+      color: #6c757d;
     }
   </style>
 </head>
 <body>
-
-  <!-- 카드 1: C#기초 -->
   <div class="card">
-    <h2>C#기초</h2>
-    <div class="links">
-      <!-- 여기에 링크를 추가하세요 -->
-      <a href="http://luriluan.dothome.co.kr/csharpBasic/csharp_class_guide.html">
-        클래스와 객체 이해하기</a>
-    </div>
-  </div>
+    <div class="avatar">👩‍💻</div>
 
-  <!-- 카드 2: HTML5 -->
-  <div class="card">
-    <h2>HTML5</h2>
-    <div class="links">
-      <!-- 여기에 링크를 추가하세요 -->
-      <!-- <a href="링크주소">링크 텍스트</a> -->
-    </div>
-  </div>
+    <h1>이윤임</h1>
+    <p class="subtitle">유한대학교 컴퓨터공학과 게임콘텐츠전공</p>
 
-  <!-- 카드 3: 취창업멘토링 -->
-  <div class="card">
-    <h2>취창업멘토링</h2>
-    <div class="links">
-      <!-- 여기에 링크를 추가하세요 -->
-      <!-- <a href="링크주소">링크 텍스트</a> -->
-    </div>
-  </div>
+    <a class="email" href="mailto:luriluan@naver.com">luriluan@naver.com</a>
 
+    <p class="section-title">특강 자료</p>
+    <a class="lecture-link" href="01_ai_literacy.html">
+      <span class="lecture-icon">🤖</span>
+      <div class="lecture-text">
+        <strong>AI 리터러시 가이드</strong>
+        <span>AI는 눈치가 없다</span>
+      </div>
+    </a>
+  </div>
 </body>
 </html>
