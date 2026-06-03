@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C# 프로퍼티 — Auto-Implemented Property</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:       #1a1a2e;
+    --ink2:      #2d2d44;
+    --muted:     #6b7280;
+    --dim:       #9ca3af;
+    --bg:        #fafaf8;
+    --bg2:       #f3f3ef;
+    --bg3:       #eaeae4;
+    --border:    #e2e2da;
+    --border2:   #d1d1c7;
+    --accent:    #2563eb;
+    --accent-bg: #eff6ff;
+    --green:     #16a34a;
+    --green-bg:  #f0fdf4;
+    --green-br:  #bbf7d0;
+    --red:       #dc2626;
+    --red-bg:    #fef2f2;
+    --red-br:    #fecaca;
+    --orange:    #d97706;
+    --orange-bg: #fffbeb;
+    --purple:    #7c3aed;
+    --purple-bg: #f5f3ff;
+    --mono:      'Fira Code', monospace;
+    --sans:      'Noto Sans KR', sans-serif;
+    --serif:     'Playfair Display', serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 40px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: .06em;
+  }
+  .topbar-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #febc2e; }
+  .dot-g { background: #28c840; }
+  .topbar-file { color: #9ca3af; margin-left: 12px; }
+  .topbar-file span { color: #e5e7eb; }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--ink);
+    color: #fff;
+    padding: 64px 40px 56px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '{ }';
+    position: absolute;
+    right: 60px; top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--mono);
+    font-size: 140px;
+    font-weight: 600;
+    color: rgba(255,255,255,.04);
+    pointer-events: none;
+    letter-spacing: -.04em;
+  }
+  .hero-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #6ee7b7;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    max-width: 640px;
+  }
+  .hero h1 em { font-style: normal; color: #93c5fd; }
+  .hero-sub {
+    color: #9ca3af;
+    font-size: 15px;
+    max-width: 520px;
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+
+  /* hero code pill */
+  .hero-code {
+    display: inline-block;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 8px;
+    padding: 14px 24px;
+    font-family: var(--mono);
+    font-size: 15px;
+    line-height: 1.5;
+    color: #e2e8f0;
+  }
+  .hkw  { color: #93c5fd; }
+  .htp  { color: #6ee7b7; }
+  .hprop{ color: #fde68a; }
+  .hacc { color: #f9a8d4; font-size: 13px; }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 860px; margin: 0 auto; padding: 0 40px; }
+
+  /* ── SECTION ── */
+  .section { padding: 52px 0; border-bottom: 1px solid var(--border); }
+  .section:last-child { border-bottom: none; }
+
+  .sec-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .sec-title {
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+  .sec-desc {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 28px;
+    max-width: 600px;
+    line-height: 1.75;
+  }
+
+  /* ── ANATOMY ── */
+  .anatomy {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 32px;
+    margin-bottom: 28px;
+    font-family: var(--mono);
+    font-size: 18px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .anatomy-code { display: flex; gap: 6px; justify-content: center; align-items: center; flex-wrap: wrap; margin-bottom: 28px; }
+  .apiece {
+    padding: 4px 2px;
+    position: relative;
+    cursor: default;
+    transition: transform .15s;
+  }
+  .apiece:hover { transform: translateY(-2px); }
+  .apiece .alabel {
+    position: absolute;
+    bottom: -26px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--muted);
+    font-family: var(--sans);
+  }
+
+  .a-pub   { color: #2563eb; }
+  .a-type  { color: #16a34a; }
+  .a-name  { color: #d97706; }
+  .a-brace { color: var(--muted); }
+  .a-get   { color: #7c3aed; }
+  .a-set   { color: #dc2626; }
+  .a-prv   { color: #dc2626; font-size: 14px; }
+
+  .anatomy-table { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-top: 16px; }
+  .at-item {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    text-align: left;
+  }
+  .at-part { font-family: var(--mono); font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+  .at-desc { font-size: 11px; color: var(--muted); line-height: 1.5; font-family: var(--sans); }
+
+  /* ── COMPARE ── */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+
+  .cmp-card {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .cmp-head {
+    padding: 10px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    letter-spacing: .04em;
+  }
+  .cmp-head.bad  { background: var(--red-bg);   color: var(--red);   border-bottom: 1px solid var(--red-br); }
+  .cmp-head.good { background: var(--green-bg); color: var(--green); border-bottom: 1px solid var(--green-br); }
+  .cmp-body { padding: 18px 20px; background: #fff; }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: #1e1e2e;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    border: 1px solid #2d2d44;
+  }
+  .cb-head {
+    background: #2d2d44;
+    padding: 10px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .cb-fname { font-family: var(--mono); font-size: 12px; color: #9ca3af; }
+  .cb-lang  { font-family: var(--mono); font-size: 10px; background: #1e1e2e; color: #6b7280; padding: 2px 8px; border-radius: 4px; letter-spacing: .06em; }
+  .cb-body  { padding: 20px 24px; overflow-x: auto; }
+  pre { font-family: var(--mono); font-size: 13px; line-height: 1.8; white-space: pre; }
+  .kw  { color: #89b4fa; }
+  .tp  { color: #a6e3a1; }
+  .st  { color: #f9e2af; }
+  .cm  { color: #585b70; font-style: italic; }
+  .fn  { color: #cba6f7; }
+  .ok  { color: #a6e3a1; }
+  .ng  { color: #f38ba8; }
+  .str { color: #f9e2af; }
+
+  /* ── ACCESS TABLE ── */
+  .access-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+  .access-table th {
+    background: var(--bg2);
+    padding: 12px 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .access-table td {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    vertical-align: middle;
+  }
+  .access-table tr:last-child td { border-bottom: none; }
+  .access-table tr:hover td { background: var(--bg2); }
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-family: var(--mono);
+    font-weight: 500;
+  }
+  .tag-o { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-br); }
+  .tag-x { background: var(--red-bg);   color: var(--red);   border: 1px solid var(--red-br); }
+
+  /* ── VARIANTS ── */
+  .variants { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .vcard {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    transition: border-color .15s, transform .15s;
+  }
+  .vcard:hover { border-color: var(--border2); transform: translateY(-2px); }
+  .vcard-label { font-size: 11px; color: var(--muted); font-family: var(--mono); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 6px; }
+  .vcard-code  { font-family: var(--mono); font-size: 12px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; margin-bottom: 8px; line-height: 1.6; }
+  .vcard-desc  { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+  /* ── INFO / TIP BOX ── */
+  .info-box {
+    background: var(--accent-bg);
+    border: 1px solid #bfdbfe;
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: #1e40af;
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+  .info-box strong { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: .06em; margin-bottom: 4px; color: var(--accent); }
+
+  .tip-box {
+    background: var(--green-bg);
+    border: 1px solid var(--green-br);
+    border-left: 3px solid var(--green);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: #14532d;
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+  .tip-box strong { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: .06em; margin-bottom: 4px; color: var(--green); }
+
+  /* ── SUMMARY ── */
+  .summary {
+    background: var(--ink);
+    color: #fff;
+    border-radius: 16px;
+    padding: 36px 40px;
+    margin-bottom: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  .summary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 90% 50%, rgba(37,99,235,.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .summary h3 { font-family: var(--serif); font-size: 20px; margin-bottom: 16px; color: #e2e8f0; }
+  .summary-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .summary-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: #9ca3af; line-height: 1.6; }
+  .summary-list li::before { content: '→'; color: #60a5fa; font-family: var(--mono); flex-shrink: 0; margin-top: 1px; }
+  .summary-list li strong { color: #e2e8f0; font-weight: 500; }
+
+  /* ── FOOTER ── */
+  .footer { padding: 28px 40px; text-align: center; font-size: 12px; color: var(--dim); font-family: var(--mono); border-top: 1px solid var(--border); }
+
+  /* ── ANIMATE ── */
+  @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+  .hero, .section { animation: fadeUp .4s ease both; }
+  .section:nth-child(2) { animation-delay: .05s; }
+  .section:nth-child(3) { animation-delay: .10s; }
+  .section:nth-child(4) { animation-delay: .15s; }
+  .section:nth-child(5) { animation-delay: .20s; }
+
+  code { font-family: var(--mono); font-size: 13px; background: var(--bg2); padding: 1px 6px; border-radius: 4px; color: var(--purple); }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <span class="topbar-dot dot-r"></span>
+  <span class="topbar-dot dot-y"></span>
+  <span class="topbar-dot dot-g"></span>
+  <span class="topbar-file">C# / <span>Property.cs</span></span>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="container">
+    <div class="hero-tag">// C# 핵심 개념</div>
+    <h1>자동 구현 속성<br><em>Auto-Implemented Property</em></h1>
+    <p class="hero-sub">클래스의 데이터를 외부로부터 안전하게 보호하면서도 읽기를 허용하는 C#의 캡슐화 패턴입니다.</p>
+    <div class="hero-code">
+      <span class="hkw">public</span>&nbsp;
+      <span class="htp">string</span>&nbsp;
+      <span class="hprop">Title</span>&nbsp;
+      <span class="a-brace">{</span>&nbsp;
+      <span class="hkw">get</span>;&nbsp;
+      <span class="hacc">private</span>&nbsp;<span class="hkw">set</span>;&nbsp;
+      <span class="a-brace">}</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="container">
+
+  <!-- 1. 구조 분석 -->
+  <div class="section">
+    <div class="sec-label">01 — Anatomy</div>
+    <div class="sec-title">코드 구조 해부</div>
+    <p class="sec-desc">한 줄짜리 코드지만 각 키워드가 서로 다른 역할을 합니다.</p>
+
+    <div class="anatomy">
+      <div class="anatomy-code">
+        <span class="apiece a-pub">public<span class="alabel">접근 제한자</span></span>
+        <span style="color:var(--muted); font-size:14px;">&nbsp;</span>
+        <span class="apiece a-type">string<span class="alabel">타입</span></span>
+        <span style="color:var(--muted); font-size:14px;">&nbsp;</span>
+        <span class="apiece a-name">Title<span class="alabel">이름</span></span>
+        <span style="color:var(--muted);">&nbsp;{&nbsp;</span>
+        <span class="apiece a-get">get<span class="alabel">읽기</span></span>
+        <span style="color:var(--muted);">;&nbsp;</span>
+        <span class="apiece a-prv">private<span class="alabel">내부전용</span></span>
+        <span style="color:var(--muted);">&nbsp;</span>
+        <span class="apiece a-set">set<span class="alabel">쓰기</span></span>
+        <span style="color:var(--muted);">;&nbsp;}</span>
+      </div>
+      <div style="height: 20px;"></div>
+      <div class="anatomy-table">
+        <div class="at-item">
+          <div class="at-part" style="color:#2563eb;">public</div>
+          <div class="at-desc">외부에서 이 프로퍼티에 접근 가능</div>
+        </div>
+        <div class="at-item">
+          <div class="at-part" style="color:#16a34a;">string</div>
+          <div class="at-desc">저장되는 데이터의 타입</div>
+        </div>
+        <div class="at-item">
+          <div class="at-part" style="color:#d97706;">Title</div>
+          <div class="at-desc">프로퍼티의 이름 (PascalCase)</div>
+        </div>
+        <div class="at-item">
+          <div class="at-part" style="color:#7c3aed;">get;</div>
+          <div class="at-desc">값을 읽는 접근자. 누구나 가능</div>
+        </div>
+        <div class="at-item">
+          <div class="at-part" style="color:#dc2626;">private set;</div>
+          <div class="at-desc">값을 쓰는 접근자. 클래스 내부만 가능</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 필드 vs 프로퍼티 -->
+  <div class="section">
+    <div class="sec-label">02 — Comparison</div>
+    <div class="sec-title">필드 vs 프로퍼티</div>
+    <p class="sec-desc">단순 필드와 비교했을 때 프로퍼티가 왜 더 안전한지 확인합니다.</p>
+
+    <div class="compare">
+      <div class="cmp-card">
+        <div class="cmp-head bad">✗ &nbsp;필드 (Field) — 위험</div>
+        <div class="cmp-body">
+          <div class="code-block" style="margin:0;">
+            <div class="cb-body">
+<pre><span class="kw">class</span> <span class="tp">Book</span>
+{
+    <span class="ng">// 외부에서 직접 수정 가능!</span>
+    <span class="kw">public string</span> Title;
+}
+
+<span class="kw">var</span> b = <span class="kw">new</span> <span class="tp">Book</span>();
+b.Title = <span class="str">"C# 입문"</span>;  <span class="cm">// ← 아무나 변경 가능</span>
+b.Title = <span class="str">""</span>;        <span class="cm">// ← 빈 값도 가능</span>
+b.Title = <span class="kw">null</span>;     <span class="cm">// ← null도 가능</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cmp-card">
+        <div class="cmp-head good">✓ &nbsp;프로퍼티 — 안전</div>
+        <div class="cmp-body">
+          <div class="code-block" style="margin:0;">
+            <div class="cb-body">
+<pre><span class="kw">class</span> <span class="tp">Book</span>
+{
+    <span class="ok">// 외부: 읽기만 / 내부: 읽고 쓰기</span>
+    <span class="kw">public string</span> Title
+        { <span class="kw">get</span>; <span class="kw">private set</span>; }
+}
+
+<span class="kw">var</span> b = <span class="kw">new</span> <span class="tp">Book</span>();
+b.Title = <span class="str">"C# 입문"</span>;
+<span class="ng">// ↑ 컴파일 오류! 외부에서 set 불가</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 실제 동작 예시 -->
+  <div class="section">
+    <div class="sec-label">03 — Example</div>
+    <div class="sec-title">실제 동작 예시</div>
+    <p class="sec-desc">클래스 내부에서는 자유롭게 수정하고, 외부에서는 읽기만 허용하는 패턴입니다.</p>
+
+    <div class="code-block">
+      <div class="cb-head">
+        <span class="cb-fname">Book.cs</span>
+        <span class="cb-lang">C#</span>
+      </div>
+      <div class="cb-body">
+<pre><span class="kw">class</span> <span class="tp">Book</span>
+{
+    <span class="kw">public string</span> Title  { <span class="kw">get</span>; <span class="kw">private set</span>; }
+    <span class="kw">public string</span> Author { <span class="kw">get</span>; <span class="kw">private set</span>; }
+    <span class="kw">public int</span>    Pages  { <span class="kw">get</span>; <span class="kw">private set</span>; }
+
+    <span class="cm">// 생성자: 클래스 내부 → set 가능 ✓</span>
+    <span class="kw">public</span> <span class="fn">Book</span>(<span class="kw">string</span> title, <span class="kw">string</span> author, <span class="kw">int</span> pages)
+    {
+        Title  = title;
+        Author = author;
+        Pages  = pages;
+    }
+
+    <span class="cm">// 메서드: 클래스 내부 → set 가능 ✓</span>
+    <span class="kw">public void</span> <span class="fn">UpdateTitle</span>(<span class="kw">string</span> newTitle)
+    {
+        Title = newTitle;   <span class="ok">// ✓ 내부에서는 수정 가능</span>
+    }
+}
+
+<span class="cm">// ── 외부에서 사용 ──</span>
+<span class="kw">var</span> book = <span class="kw">new</span> <span class="tp">Book</span>(<span class="str">"C# 입문"</span>, <span class="str">"홍길동"</span>, <span class="st">320</span>);
+
+Console.<span class="fn">WriteLine</span>(book.Title);    <span class="ok">// ✓ "C# 입문" — get 가능</span>
+Console.<span class="fn">WriteLine</span>(book.Author);   <span class="ok">// ✓ "홍길동"  — get 가능</span>
+
+book.Title = <span class="str">"다른 제목"</span>;          <span class="ng">// ✗ 컴파일 오류! private set</span>
+book.<span class="fn">UpdateTitle</span>(<span class="str">"개정판"</span>);      <span class="ok">// ✓ 메서드를 통해서만 변경 가능</span></pre>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <strong>✓ 핵심 규칙</strong>
+      <code>private set</code>이 붙으면 클래스 <strong>내부(생성자·메서드)</strong>에서는 값을 자유롭게 변경할 수 있지만,
+      클래스 <strong>외부</strong>에서는 읽기(<code>get</code>)만 가능합니다.
+    </div>
+  </div>
+
+  <!-- 4. 접근 권한 표 -->
+  <div class="section">
+    <div class="sec-label">04 — Access Control</div>
+    <div class="sec-title">접근 권한 정리</div>
+    <p class="sec-desc">위치(내부/외부)에 따라 읽기·쓰기 가능 여부가 달라집니다.</p>
+
+    <table class="access-table">
+      <thead>
+        <tr>
+          <th>위치</th>
+          <th>읽기 (get)</th>
+          <th>쓰기 (set)</th>
+          <th>비고</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>클래스 내부</code> (생성자, 메서드)</td>
+          <td><span class="tag tag-o">✓ 가능</span></td>
+          <td><span class="tag tag-o">✓ 가능</span></td>
+          <td style="color:var(--muted); font-size:12px;">private set이므로 내부는 자유롭게</td>
+        </tr>
+        <tr>
+          <td><code>클래스 외부</code> (다른 클래스, Main)</td>
+          <td><span class="tag tag-o">✓ 가능</span></td>
+          <td><span class="tag tag-x">✗ 불가</span></td>
+          <td style="color:var(--muted); font-size:12px;">컴파일 오류 발생</td>
+        </tr>
+        <tr>
+          <td><code>상속받은 자식 클래스</code></td>
+          <td><span class="tag tag-o">✓ 가능</span></td>
+          <td><span class="tag tag-x">✗ 불가</span></td>
+          <td style="color:var(--muted); font-size:12px;">private은 자식도 접근 불가</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="info-box">
+      <strong>💡 protected set vs private set</strong>
+      자식 클래스에서도 수정이 필요하다면 <code>private set</code> 대신 <code>protected set</code>을 사용하면 됩니다.
+      자식 클래스는 허용되지만 외부는 여전히 차단됩니다.
+    </div>
+  </div>
+
+  <!-- 5. 변형 패턴 -->
+  <div class="section">
+    <div class="sec-label">05 — Variants</div>
+    <div class="sec-title">다양한 프로퍼티 패턴</div>
+    <p class="sec-desc">상황에 따라 선택할 수 있는 프로퍼티 변형들입니다.</p>
+
+    <div class="variants">
+      <div class="vcard">
+        <div class="vcard-label">읽기 전용 (C# 6.0+)</div>
+        <div class="vcard-code"><span style="color:#89b4fa;">public string</span> <span style="color:#f9e2af;">Title</span> { <span style="color:#89b4fa;">get</span>; }</div>
+        <div class="vcard-desc">생성자에서만 초기화 가능. 이후 완전히 변경 불가. 불변 객체에 적합.</div>
+      </div>
+      <div class="vcard">
+        <div class="vcard-label">init 접근자 (C# 9.0+)</div>
+        <div class="vcard-code"><span style="color:#89b4fa;">public string</span> <span style="color:#f9e2af;">Title</span> { <span style="color:#89b4fa;">get</span>; <span style="color:#cba6f7;">init</span>; }</div>
+        <div class="vcard-desc">객체 초기화 시에만 값 설정 가능. 이후 변경 불가. record 타입에서 자주 사용.</div>
+      </div>
+      <div class="vcard">
+        <div class="vcard-label">완전 공개</div>
+        <div class="vcard-code"><span style="color:#89b4fa;">public string</span> <span style="color:#f9e2af;">Title</span> { <span style="color:#89b4fa;">get</span>; <span style="color:#89b4fa;">set</span>; }</div>
+        <div class="vcard-desc">누구나 읽고 쓸 수 있음. DTO나 단순 데이터 모델에 사용.</div>
+      </div>
+      <div class="vcard">
+        <div class="vcard-label">완전 차단</div>
+        <div class="vcard-code"><span style="color:#89b4fa;">public string</span> <span style="color:#f9e2af;">Title</span> { <span style="color:#89b4fa;">get</span>; <span style="color:#f38ba8;">private set</span>; }</div>
+        <div class="vcard-desc">외부는 읽기만, 내부에서만 수정. 가장 일반적인 캡슐화 패턴.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="section" style="border-bottom:none;">
+    <div class="summary">
+      <h3>한 줄 요약</h3>
+      <ul class="summary-list">
+        <li><strong>프로퍼티</strong>는 클래스 데이터를 안전하게 노출하는 C#의 핵심 기능입니다.</li>
+        <li><strong>private set</strong>은 "밖에서는 읽기만, 안에서는 읽고 쓰기 모두 가능"을 의미합니다.</li>
+        <li>외부에서 <code style="color:#93c5fd;">obj.Title = "값"</code>을 시도하면 <strong>컴파일 오류</strong>가 발생합니다.</li>
+        <li>이것이 바로 객체지향의 <strong>캡슐화(Encapsulation)</strong> 원칙입니다.</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  C# Auto-Implemented Property &nbsp;·&nbsp; public string Title { get; private set; }
+</div>
+
+</body>
+</html>
