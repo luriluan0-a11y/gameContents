@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 리터러시 — 명시적 취소의 원칙</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700;900&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1208;
+    --paper: #f5f0e8;
+    --cream: #ede7d5;
+    --accent: #c84b2f;
+    --accent2: #2f6bc8;
+    --muted: #8a7d6a;
+    --line: #c8bfaa;
+    --human: #2f6bc8;
+    --agent: #c84b2f;
+    --success: #2a7a4b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Serif KR', serif;
+    line-height: 1.8;
+    overflow-x: hidden;
+  }
+
+  /* Grain texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.5;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 80px 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    position: relative;
+  }
+
+  .hero-left::after {
+    content: '';
+    position: absolute;
+    top: 0; right: -1px; bottom: 0;
+    width: 2px;
+    background: var(--accent);
+  }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.2s forwards;
+  }
+
+  .hero-title {
+    font-size: clamp(48px, 5vw, 80px);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.4s forwards;
+  }
+
+  .hero-title em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .hero-subtitle {
+    font-size: 16px;
+    font-weight: 300;
+    color: rgba(245,240,232,0.6);
+    max-width: 360px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.6s forwards;
+  }
+
+  .hero-right {
+    background: var(--cream);
+    padding: 80px 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+
+  .concept-badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 6px 14px;
+    margin-bottom: 40px;
+    width: fit-content;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.8s forwards;
+  }
+
+  .key-concepts {
+    list-style: none;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 1s forwards;
+  }
+
+  .key-concepts li {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    font-size: 14px;
+  }
+
+  .key-concepts li:last-child { border-bottom: none; }
+
+  .concept-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    min-width: 24px;
+    padding-top: 2px;
+  }
+
+  .concept-name {
+    font-weight: 700;
+    margin-bottom: 4px;
+    font-size: 15px;
+  }
+
+  .concept-desc {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  /* ─── TIMELINE SECTION ─── */
+  .section {
+    padding: 120px 80px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 60px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .timeline-title {
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 80px;
+    letter-spacing: -0.02em;
+  }
+
+  .timeline {
+    position: relative;
+    padding-left: 120px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 56px;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: var(--line);
+  }
+
+  .timeline-entry {
+    position: relative;
+    margin-bottom: 0;
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: all 0.6s ease;
+  }
+
+  .timeline-entry.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .timeline-dot {
+    position: absolute;
+    left: -72px;
+    top: 24px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--ink);
+    background: var(--paper);
+    transform: translateX(-5px);
+  }
+
+  .timeline-dot.human { border-color: var(--human); background: var(--human); }
+  .timeline-dot.agent { border-color: var(--agent); background: var(--paper); }
+  .timeline-dot.agent-send { border-color: var(--agent); background: var(--agent); }
+
+  .timeline-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+
+  .chat-bubble {
+    background: white;
+    border: 1px solid var(--line);
+    padding: 24px 28px;
+    margin-bottom: 8px;
+    position: relative;
+    max-width: 680px;
+  }
+
+  .chat-bubble::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px;
+    height: 100%;
+  }
+
+  .chat-bubble.human::before { background: var(--human); }
+  .chat-bubble.agent::before { background: var(--agent); }
+
+  .chat-sender {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    color: var(--muted);
+  }
+
+  .chat-sender.human { color: var(--human); }
+  .chat-sender.agent { color: var(--agent); }
+
+  .chat-text {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+
+  .annotation {
+    background: #fff8e1;
+    border: 1px solid #f0d060;
+    border-left: 4px solid #e6a800;
+    padding: 18px 24px;
+    margin-bottom: 48px;
+    max-width: 680px;
+  }
+
+  .annotation-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: #a07800;
+    margin-bottom: 8px;
+  }
+
+  .annotation-text {
+    font-size: 13px;
+    color: #6b5200;
+    line-height: 1.6;
+  }
+
+  .divider-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    background: var(--cream);
+    display: inline-block;
+    padding: 6px 16px;
+    border: 1px solid var(--line);
+    margin: 24px 0 32px -120px;
+  }
+
+  /* final alert bubble */
+  .final-alert {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 28px 32px;
+    max-width: 680px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+
+  .final-alert::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--accent);
+  }
+
+  .final-alert .chat-sender { color: var(--accent); }
+  .final-alert .chat-text { color: var(--paper); }
+
+  /* ─── INSIGHT SECTION ─── */
+  .insight-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    background: var(--line);
+    margin-top: 40px;
+  }
+
+  .insight-cell {
+    background: var(--paper);
+    padding: 48px 40px;
+  }
+
+  .insight-cell.dark {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .insight-icon {
+    font-size: 40px;
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  .insight-heading {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+
+  .insight-body {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--muted);
+  }
+
+  .insight-cell.dark .insight-body {
+    color: rgba(245,240,232,0.6);
+  }
+
+  /* ─── PRINCIPLE BOX ─── */
+  .principle-section {
+    background: var(--ink);
+    padding: 120px 80px;
+    text-align: center;
+  }
+
+  .principle-section .section-label {
+    color: rgba(245,240,232,0.4);
+    justify-content: center;
+  }
+
+  .principle-section .section-label::after,
+  .principle-section .section-label::before {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(245,240,232,0.15);
+  }
+
+  .principle-quote {
+    font-size: clamp(28px, 3.5vw, 48px);
+    font-weight: 300;
+    color: var(--paper);
+    line-height: 1.4;
+    max-width: 800px;
+    margin: 40px auto 0;
+    letter-spacing: -0.01em;
+  }
+
+  .principle-quote strong {
+    font-weight: 900;
+    color: var(--accent);
+  }
+
+  /* ─── RULES SECTION ─── */
+  .rules-section {
+    padding: 120px 80px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .rules-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    margin-top: 60px;
+  }
+
+  .rule-card {
+    border-top: 3px solid var(--ink);
+    padding-top: 32px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease;
+  }
+
+  .rule-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .rule-card:nth-child(2) { transition-delay: 0.1s; }
+  .rule-card:nth-child(3) { transition-delay: 0.2s; }
+
+  .rule-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--line);
+    line-height: 1;
+    margin-bottom: 20px;
+  }
+
+  .rule-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+
+  .rule-body {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .rule-example {
+    margin-top: 20px;
+    background: var(--cream);
+    border-left: 3px solid var(--accent);
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1.6;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 40px 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  footer .logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+  }
+
+  footer .tagline {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-left { min-height: 60vh; }
+    .insight-grid { grid-template-columns: 1fr; }
+    .rules-grid { grid-template-columns: 1fr; }
+    .section, .rules-section { padding: 80px 32px; }
+    .timeline { padding-left: 60px; }
+    .timeline::before { left: 20px; }
+    .timeline-dot { left: -36px; }
+    .divider-date { margin-left: -60px; }
+    footer { flex-direction: column; gap: 12px; text-align: center; padding: 32px; }
+    .principle-section { padding: 80px 32px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="eyebrow">AI 리터러시 가이드</div>
+    <h1 class="hero-title">AI는<br><em>눈치</em>가<br>없다</h1>
+    <p class="hero-subtitle">AI 에이전트는 명시적으로 지시받은 것만 실행합니다. 인간의 상식적 추론을 기대하는 순간, 예상치 못한 일이 벌어집니다.</p>
+  </div>
+  <div class="hero-right">
+    <div class="concept-badge">핵심 개념</div>
+    <ul class="key-concepts">
+      <li>
+        <span class="concept-num">01</span>
+        <div>
+          <div class="concept-name">명령 리터럴리즘</div>
+          <div class="concept-desc">AI는 받은 명령을 문자 그대로 실행합니다. 맥락을 읽어 스스로 판단하지 않습니다.</div>
+        </div>
+      </li>
+      <li>
+        <span class="concept-num">02</span>
+        <div>
+          <div class="concept-name">프레임 문제</div>
+          <div class="concept-desc">변화가 생겼을 때 "지금 하지 않아도 되는 것"을 AI 스스로 추론하지 못하는 고전적 한계입니다.</div>
+        </div>
+      </li>
+      <li>
+        <span class="concept-num">03</span>
+        <div>
+          <div class="concept-name">명시적 취소 요건</div>
+          <div class="concept-desc">상태를 변경하려면 반드시 명시적인 취소/변경 명령이 필요합니다.</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ─── TIMELINE ─── -->
+<section class="section">
+  <div class="section-label">실제 사례</div>
+  <h2 class="timeline-title">무슨 일이<br>일어났는가</h2>
+
+  <div class="timeline">
+
+    <!-- Day 1 -->
+    <div class="divider-date">5월 30일 (목)</div>
+
+    <div class="timeline-entry">
+      <div class="timeline-dot human"></div>
+      <div class="timeline-time">19:49 — 사용자</div>
+      <div class="chat-bubble human">
+        <div class="chat-sender human">사용자</div>
+        <div class="chat-text">내일 OOO에 기부금을 내야 하는데 5월이 지나기 전에 낼 수 있도록 알림 좀 도와줘.</div>
+      </div>
+    </div>
+
+    <div class="timeline-entry">
+      <div class="timeline-dot agent"></div>
+      <div class="timeline-time">19:49 — 에이전트</div>
+      <div class="chat-bubble agent">
+        <div class="chat-sender agent">에이전트</div>
+        <div class="chat-text">내일 오후 5시에 문자 메시지로 "XXX, 5월 31일까지 기부금을 내셔야 합니다. 가볍게 확인하시기 바랍니다." 라고 발송하도록 하겠습니다.</div>
+      </div>
+      <div class="annotation">
+        <div class="annotation-label">⚙️ 내부 상태</div>
+        <div class="annotation-text"><strong>알림 예약 완료.</strong> 다음날 17:00 문자 발송 등록됨.</div>
+      </div>
+    </div>
+
+    <!-- Day 2 -->
+    <div class="divider-date">5월 31일 (금)</div>
+
+    <div class="timeline-entry">
+      <div class="timeline-dot human"></div>
+      <div class="timeline-time">09:05 — 사용자</div>
+      <div class="chat-bubble human">
+        <div class="chat-sender human">사용자</div>
+        <div class="chat-text">어제 기부금 냈는지 확인해 달라는 메시지를 보냈던 기억이 나서 기부금을 보냈어.</div>
+      </div>
+    </div>
+
+    <div class="timeline-entry">
+      <div class="timeline-dot agent"></div>
+      <div class="timeline-time">09:05 — 에이전트</div>
+      <div class="chat-bubble agent">
+        <div class="chat-sender agent">에이전트</div>
+        <div class="chat-text">기부금을 보낸 것을 확인하셨다니 다행입니다. 기부금을 내신 것으로 기록해 두겠습니다.</div>
+      </div>
+      <div class="annotation">
+        <div class="annotation-label">⚠️ 문제 발생 지점</div>
+        <div class="annotation-text">에이전트가 "기록"은 했지만, <strong>17:00 알림을 자동으로 취소하지 않았습니다.</strong> 인간이라면 "이미 냈으니 알림은 필요 없겠다"고 판단하겠지만, 에이전트는 취소 명령을 받지 않았습니다.</div>
+      </div>
+    </div>
+
+    <div class="timeline-entry">
+      <div class="timeline-dot agent-send"></div>
+      <div class="timeline-time">17:00 — 에이전트 (자동 발송)</div>
+      <div class="final-alert">
+        <div class="chat-sender agent">에이전트 — 예약 알림</div>
+        <div class="chat-text">XXX, 5월 31일까지 기부금을 내셔야 합니다. 가볍게 확인하시기 바랍니다.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── PRINCIPLE ─── -->
+<div class="principle-section">
+  <div class="section-label">핵심 원칙</div>
+  <p class="principle-quote">
+    AI는 <strong>맥락을 이해하지 않습니다.</strong><br>
+    오직 <strong>명령을 실행</strong>할 뿐입니다.
+  </p>
+</div>
+
+<!-- ─── INSIGHTS ─── -->
+<div class="insight-grid">
+  <div class="insight-cell">
+    <span class="insight-icon">🧠</span>
+    <h3 class="insight-heading">인간의 사고</h3>
+    <p class="insight-body">"기부금을 냈다고 하니까, 알림은 이제 필요 없겠네. 취소해야지." — 상식적 맥락 추론으로 행동이 자동으로 조정됩니다.</p>
+  </div>
+  <div class="insight-cell dark">
+    <span class="insight-icon">🤖</span>
+    <h3 class="insight-heading">AI의 사고</h3>
+    <p class="insight-body">"17:00 알림 발송 명령이 활성화되어 있음. 취소 명령 없음. → 17:00에 발송." — 명령 상태만을 추적하며, 맥락을 통한 추론은 하지 않습니다.</p>
+  </div>
+</div>
+
+<!-- ─── RULES ─── -->
+<section class="rules-section">
+  <div class="section-label">AI 리터러시 실천</div>
+  <h2 class="timeline-title">AI를 올바르게<br>쓰는 3가지 원칙</h2>
+
+  <div class="rules-grid">
+    <div class="rule-card">
+      <div class="rule-num">01</div>
+      <h3 class="rule-title">상태 변화는 명시적으로 알려라</h3>
+      <p class="rule-body">상황이 바뀌었을 때, AI가 알아서 이전 명령을 취소할 것이라고 기대하지 마세요. 변화가 생기면 반드시 직접 말해야 합니다.</p>
+      <div class="rule-example">❌ "기부금 냈어" (기록만 됨)<br>✅ "기부금 냈어. 오늘 알림 취소해줘."</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">02</div>
+      <h3 class="rule-title">취소는 별도 명령이다</h3>
+      <p class="rule-body">예약된 작업, 반복 알림, 자동화된 흐름은 별도의 취소 명령이 없으면 계속 실행됩니다. "완료됐다"는 보고는 취소가 아닙니다.</p>
+      <div class="rule-example">✅ "내일 알림 취소해줘"<br>✅ "이 작업 중단해줘"<br>✅ "예약 삭제해줘"</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">03</div>
+      <h3 class="rule-title">AI의 현재 상태를 확인하라</h3>
+      <p class="rule-body">중요한 작업 전후에는 AI에게 현재 예약된 작업이나 활성화된 명령을 확인하는 습관을 갖는 것이 좋습니다.</p>
+      <div class="rule-example">✅ "현재 예약된 알림 목록 보여줘"<br>✅ "진행 중인 작업 뭐 있어?"</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="logo">AI LITERACY GUIDE</div>
+  <div class="tagline">AI와 협업하는 방식을 이해하는 것이 새로운 리터러시입니다.</div>
+</footer>
+
+<script>
+  // Intersection Observer for scroll animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.timeline-entry, .rule-card').forEach(el => {
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
