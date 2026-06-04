@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C# 제네릭 완전 가이드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0d1117;
+    --bg2:       #161b22;
+    --bg3:       #21262d;
+    --bg4:       #30363d;
+    --border:    #30363d;
+    --border2:   #484f58;
+    --text:      #e6edf3;
+    --muted:     #8b949e;
+    --dim:       #6e7681;
+    --accent:    #58a6ff;
+    --accent2:   #3fb950;
+    --accent3:   #d2a8ff;
+    --accent4:   #ffa657;
+    --accent5:   #ff7b72;
+    --accent6:   #79c0ff;
+    --tag-bg:    rgba(88,166,255,0.1);
+    --tag-fg:    #58a6ff;
+    --mono:      'JetBrains Mono', monospace;
+    --sans:      'Noto Sans KR', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    padding: 80px 40px 60px;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 80% 20%, rgba(88,166,255,.08) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 10% 80%, rgba(210,168,255,.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    width: 24px; height: 1px;
+    background: var(--accent);
+    display: inline-block;
+  }
+  .hero h1 {
+    font-family: var(--mono);
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -.02em;
+    margin-bottom: 20px;
+  }
+  .hero h1 span { color: var(--accent3); }
+  .hero-desc {
+    max-width: 560px;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+  .hero-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+  .badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid;
+    letter-spacing: .04em;
+  }
+  .badge-blue  { border-color: rgba(88,166,255,.4);  color: var(--accent);  background: rgba(88,166,255,.08); }
+  .badge-green { border-color: rgba(63,185,80,.4);   color: var(--accent2); background: rgba(63,185,80,.08); }
+  .badge-purple{ border-color: rgba(210,168,255,.4); color: var(--accent3); background: rgba(210,168,255,.08); }
+  .badge-orange{ border-color: rgba(255,166,87,.4);  color: var(--accent4); background: rgba(255,166,87,.08); }
+
+  /* ── LAYOUT ── */
+  .page { display: flex; max-width: 1200px; margin: 0 auto; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    padding: 32px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
+  }
+  .sidebar-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--dim);
+    padding: 0 20px 12px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: all .15s;
+    cursor: pointer;
+  }
+  .nav-item:hover { color: var(--text); background: rgba(255,255,255,.03); }
+  .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(88,166,255,.06); }
+  .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+    opacity: .5;
+  }
+  .nav-item.active .nav-dot { opacity: 1; }
+
+  /* ── CONTENT ── */
+  .content {
+    flex: 1;
+    min-width: 0;
+    padding: 40px 48px;
+  }
+
+  .section {
+    display: none;
+    animation: fadeIn .2s ease;
+  }
+  .section.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-number {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: .1em;
+    margin-bottom: 6px;
+  }
+  .section-title {
+    font-family: var(--mono);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .section-title .hl { color: var(--accent3); }
+  .section-desc { color: var(--muted); font-size: 15px; max-width: 600px; }
+
+  /* ── CARDS ── */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    transition: border-color .15s;
+  }
+  .card:hover { border-color: var(--border2); }
+  .card-icon { font-size: 22px; margin-bottom: 10px; }
+  .card h3 { font-family: var(--mono); font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+  .card p  { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .card.accent-blue  { border-top: 2px solid var(--accent); }
+  .card.accent-green { border-top: 2px solid var(--accent2); }
+  .card.accent-purple{ border-top: 2px solid var(--accent3); }
+
+  /* ── COMPARE ── */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+  .compare-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    padding: 6px 12px;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .compare-label.bad  { background: rgba(255,123,114,.12); color: var(--accent5); }
+  .compare-label.good { background: rgba(63,185,80,.12);   color: var(--accent2); }
+  .compare-box {
+    border-radius: 0 0 10px 10px;
+    overflow: hidden;
+  }
+
+  /* ── CODE BLOCK ── */
+  .code-wrap {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+  }
+  .code-filename { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .code-lang {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--dim);
+    background: var(--bg4);
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+  .code-body { padding: 20px 24px; overflow-x: auto; }
+  pre {
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.7;
+    white-space: pre;
+  }
+  .code-wrap.no-header .code-body { padding: 16px 20px; }
+
+  /* syntax */
+  .kw  { color: #ff7b72; }   /* keyword */
+  .tp  { color: #79c0ff; }   /* type */
+  .gp  { color: #d2a8ff; }   /* generic param */
+  .cm  { color: #6e7681; font-style: italic; }
+  .st  { color: #a5d6ff; }   /* string/number */
+  .fn  { color: #d2a8ff; }   /* function */
+  .prop{ color: #79c0ff; }   /* property */
+  .op  { color: #8b949e; }   /* operator */
+
+  /* ── CONSTRAINT TABLE ── */
+  .constraint-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+  .constraint-table th {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--dim);
+    padding: 8px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .constraint-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    font-size: 13px;
+  }
+  .constraint-table tr:last-child td { border-bottom: none; }
+  .constraint-table tr:hover td { background: rgba(255,255,255,.02); }
+  .ct-keyword { font-family: var(--mono); font-size: 12px; color: var(--accent3); white-space: nowrap; }
+  .ct-desc { color: var(--muted); line-height: 1.6; }
+  .ct-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  /* ── COLLECTION CARDS ── */
+  .coll-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .coll-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color .15s;
+  }
+  .coll-card:hover { border-color: var(--border2); }
+  .coll-header {
+    padding: 14px 18px 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .coll-name { font-family: var(--mono); font-size: 14px; font-weight: 500; color: var(--accent6); }
+  .coll-tag  { font-family: var(--mono); font-size: 10px; color: var(--dim); background: var(--bg4); padding: 2px 8px; border-radius: 4px; }
+  .coll-desc { padding: 10px 18px 4px; font-size: 12px; color: var(--muted); }
+  .coll-code { padding: 4px 18px 14px; }
+  .coll-code pre { font-size: 12px; line-height: 1.6; }
+
+  /* ── ADVANCED SECTION ── */
+  .adv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 28px; }
+
+  /* ── INFO BOX ── */
+  .info-box {
+    background: rgba(88,166,255,.06);
+    border: 1px solid rgba(88,166,255,.2);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .info-box strong { color: var(--accent); font-family: var(--mono); font-size: 12px; display: block; margin-bottom: 4px; }
+
+  .tip-box {
+    background: rgba(63,185,80,.06);
+    border: 1px solid rgba(63,185,80,.2);
+    border-left: 3px solid var(--accent2);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .tip-box strong { color: var(--accent2); font-family: var(--mono); font-size: 12px; display: block; margin-bottom: 4px; }
+
+  /* ── SUBHEADING ── */
+  .sub { font-family: var(--mono); font-size: 15px; font-weight: 500; color: var(--text); margin: 28px 0 12px; display: flex; align-items: center; gap: 8px; }
+  .sub::before { content: '//'; color: var(--dim); font-size: 13px; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .hero { padding: 48px 20px 40px; }
+    .page { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); padding: 16px 0; display: flex; overflow-x: auto; }
+    .sidebar-title { display: none; }
+    .nav-item { white-space: nowrap; border-left: none; border-bottom: 2px solid transparent; padding: 8px 16px; }
+    .nav-item.active { border-left: none; border-bottom-color: var(--accent); }
+    .content { padding: 24px 20px; }
+    .compare { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-eyebrow">C# 핵심 개념</div>
+  <h1>제네릭<br><span>Generics</span></h1>
+  <p class="hero-desc">
+    타입을 매개변수로 받아 재사용 가능하고 타입 안전한 코드를 작성하는 C#의 핵심 기능.<br>
+    컴파일 타임에 타입을 결정하여 런타임 오류와 박싱 비용을 줄입니다.
+  </p>
+  <div class="hero-badges">
+    <span class="badge badge-blue">타입 안전성</span>
+    <span class="badge badge-green">코드 재사용</span>
+    <span class="badge badge-purple">성능 향상</span>
+    <span class="badge badge-orange">C# 2.0+</span>
+  </div>
+</div>
+
+<div class="page">
+  <nav class="sidebar">
+    <div class="sidebar-title">목차</div>
+    <a class="nav-item active" onclick="show('intro')"><span class="nav-dot"></span>개념 소개</a>
+    <a class="nav-item" onclick="show('syntax')"><span class="nav-dot"></span>문법과 선언</a>
+    <a class="nav-item" onclick="show('constraint')"><span class="nav-dot"></span>제약 조건</a>
+    <a class="nav-item" onclick="show('collections')"><span class="nav-dot"></span>제네릭 컬렉션</a>
+    <a class="nav-item" onclick="show('advanced')"><span class="nav-dot"></span>고급 패턴</a>
+  </nav>
+
+  <main class="content">
+
+    <!-- ① 개념 소개 -->
+    <section id="s-intro" class="section active">
+      <div class="section-header">
+        <div class="section-number">01 / 05</div>
+        <div class="section-title"><span class="hl">#</span> 개념 소개</div>
+        <p class="section-desc">제네릭이 왜 필요한지, 어떤 문제를 해결하는지 알아봅니다.</p>
+      </div>
+
+      <div class="sub">제네릭 없이 (문제점)</div>
+      <div class="compare">
+        <div>
+          <div class="compare-label bad">✗ &nbsp;Before — object 사용</div>
+          <div class="compare-box">
+            <div class="code-wrap no-header" style="border-radius:0 0 10px 10px; margin:0;">
+              <div class="code-body">
+<pre><span class="kw">public class</span> <span class="tp">Box</span>
+{
+    <span class="kw">public</span> <span class="tp">object</span> Value { <span class="kw">get</span>; <span class="kw">set</span>; }
+}
+
+<span class="kw">var</span> box = <span class="kw">new</span> <span class="tp">Box</span>();
+box.Value = <span class="st">42</span>;         <span class="cm">// 박싱 비용!</span>
+
+<span class="cm">// 런타임 오류 위험</span>
+<span class="kw">string</span> s = (<span class="kw">string</span>)box.Value;
+<span class="cm">// InvalidCastException ↑</span></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="compare-label good">✓ &nbsp;After — 제네릭 사용</div>
+          <div class="compare-box">
+            <div class="code-wrap no-header" style="border-radius:0 0 10px 10px; margin:0;">
+              <div class="code-body">
+<pre><span class="kw">public class</span> <span class="tp">Box</span>&lt;<span class="gp">T</span>&gt;
+{
+    <span class="kw">public</span> <span class="gp">T</span> Value { <span class="kw">get</span>; <span class="kw">set</span>; }
+}
+
+<span class="kw">var</span> box = <span class="kw">new</span> <span class="tp">Box</span>&lt;<span class="kw">int</span>&gt;();
+box.Value = <span class="st">42</span>;         <span class="cm">// 박싱 없음</span>
+
+<span class="cm">// 컴파일 타임 타입 검사</span>
+<span class="kw">int</span> n = box.Value;       <span class="cm">// ✓ 안전</span></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sub">제네릭의 세 가지 핵심 장점</div>
+      <div class="card-grid">
+        <div class="card accent-blue">
+          <div class="card-icon">🛡</div>
+          <h3>타입 안전성</h3>
+          <p>잘못된 타입 사용 시 런타임이 아닌 컴파일 타임에 오류를 발견합니다. 예외 없이 안전합니다.</p>
+        </div>
+        <div class="card accent-green">
+          <div class="card-icon">♻</div>
+          <h3>코드 재사용</h3>
+          <p>하나의 클래스·메서드로 int, string, 사용자 정의 타입 등 모든 타입을 처리합니다.</p>
+        </div>
+        <div class="card accent-purple">
+          <div class="card-icon">⚡</div>
+          <h3>성능 향상</h3>
+          <p>값 타입의 박싱·언박싱이 제거됩니다. 메모리 할당과 GC 부담이 크게 줄어듭니다.</p>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <strong>💡 타입 매개변수 관례</strong>
+        단일 타입은 <code style="color:var(--accent3);">T</code>, 키-값 쌍은 <code style="color:var(--accent3);">TKey / TValue</code>,
+        입출력은 <code style="color:var(--accent3);">TIn / TOut</code>, 요소는 <code style="color:var(--accent3);">TElement</code>로 명명하는 것이 C# 관례입니다.
+      </div>
+    </section>
+
+    <!-- ② 문법과 선언 -->
+    <section id="s-syntax" class="section">
+      <div class="section-header">
+        <div class="section-number">02 / 05</div>
+        <div class="section-title"><span class="hl">#</span> 문법과 선언</div>
+        <p class="section-desc">제네릭 클래스, 메서드, 인터페이스를 선언하는 방법입니다.</p>
+      </div>
+
+      <div class="sub">제네릭 클래스</div>
+      <div class="code-wrap">
+        <div class="code-header">
+          <span class="code-filename">Repository.cs</span>
+          <span class="code-lang">C#</span>
+        </div>
+        <div class="code-body">
+<pre><span class="kw">public class</span> <span class="tp">Repository</span>&lt;<span class="gp">T</span>&gt;
+{
+    <span class="kw">private readonly</span> <span class="tp">List</span>&lt;<span class="gp">T</span>&gt; _items = <span class="kw">new</span>();
+
+    <span class="kw">public void</span> <span class="fn">Add</span>(<span class="gp">T</span> item)            =&gt; _items.<span class="fn">Add</span>(item);
+    <span class="kw">public</span> <span class="gp">T</span>    <span class="fn">Get</span>(<span class="kw">int</span> index)          =&gt; _items[index];
+    <span class="kw">public int</span>  <span class="fn">Count</span>()                  =&gt; _items.Count;
+    <span class="kw">public</span> <span class="tp">IEnumerable</span>&lt;<span class="gp">T</span>&gt; <span class="fn">GetAll</span>()     =&gt; _items;
+}
+
+<span class="cm">// 사용 — 타입 인수를 꺾쇠괄호로 지정</span>
+<span class="kw">var</span> repo = <span class="kw">new</span> <span class="tp">Repository</span>&lt;<span class="kw">string</span>&gt;();
+repo.<span class="fn">Add</span>(<span class="st">"홍길동"</span>);
+repo.<span class="fn">Add</span>(<span class="st">"이순신"</span>);
+<span class="kw">string</span> first = repo.<span class="fn">Get</span>(<span class="st">0</span>); <span class="cm">// "홍길동"</span></pre>
+        </div>
+      </div>
+
+      <div class="sub">제네릭 메서드</div>
+      <div class="code-wrap">
+        <div class="code-header">
+          <span class="code-filename">Utils.cs</span>
+          <span class="code-lang">C#</span>
+        </div>
+        <div class="code-body">
+<pre><span class="kw">public static</span> <span class="tp">T</span> <span class="fn">Max</span>&lt;<span class="gp">T</span>&gt;(<span class="gp">T</span> a, <span class="gp">T</span> b)
+    <span class="kw">where</span> <span class="gp">T</span> : <span class="tp">IComparable</span>&lt;<span class="gp">T</span>&gt;
+{
+    <span class="kw">return</span> a.<span class="fn">CompareTo</span>(b) &gt;= <span class="st">0</span> ? a : b;
+}
+
+<span class="cm">// 컴파일러가 T를 자동으로 추론 (타입 추론)</span>
+<span class="kw">int</span>    m1 = <span class="fn">Max</span>(<span class="st">3</span>, <span class="st">7</span>);               <span class="cm">// T = int    → 7</span>
+<span class="kw">string</span> m2 = <span class="fn">Max</span>(<span class="st">"apple"</span>, <span class="st">"mango"</span>);   <span class="cm">// T = string → "mango"</span>
+<span class="kw">double</span> m3 = <span class="fn">Max</span>(<span class="st">3.14</span>, <span class="st">2.71</span>);          <span class="cm">// T = double → 3.14</span></pre>
+        </div>
+      </div>
+
+      <div class="sub">다중 타입 매개변수</div>
+      <div class="code-wrap">
+        <div class="code-header">
+          <span class="code-filename">Pair.cs</span>
+          <span class="code-lang">C#</span>
+        </div>
+        <div class="code-body">
+<pre><span class="kw">public class</span> <span class="tp">Pair</span>&lt;<span class="gp">TFirst</span>, <span class="gp">TSecond</span>&gt;
+{
+    <span class="kw">public</span> <span class="gp">TFirst</span>  First  { <span class="kw">get</span>; }
+    <span class="kw">public</span> <span class="gp">TSecond</span> Second { <span class="kw">get</span>; }
+
+    <span class="kw">public</span> <span class="tp">Pair</span>(<span class="gp">TFirst</span> first, <span class="gp">TSecond</span> second)
+        => (First, Second) = (first, second);
+
+    <span class="kw">public override string</span> <span class="fn">ToString</span>()
+        => <span class="st">$"({First}, {Second})"</span>;
+}
+
+<span class="kw">var</span> p1 = <span class="kw">new</span> <span class="tp">Pair</span>&lt;<span class="kw">string</span>, <span class="kw">int</span>&gt;(<span class="st">"나이"</span>, <span class="st">25</span>);    <span class="cm">// (나이, 25)</span>
+<span class="kw">var</span> p2 = <span class="kw">new</span> <span class="tp">Pair</span>&lt;<span class="kw">bool</span>, <span class="kw">double</span>&gt;(<span class="kw">true</span>, <span class="st">3.14</span>);  <span class="cm">// (True, 3.14)</span></pre>
+        </div>
+      </div>
+
+      <div class="tip-box">
+        <strong>✓ 타입 추론 (Type Inference)</strong>
+        메서드 호출 시 인수의 타입으로 T를 추론할 수 있으면 꺾쇠괄호를 생략할 수 있습니다.
+        클래스 인스턴스 생성에는 적용되지 않으므로 반드시 명시해야 합니다.
+      </div>
+    </section>
+
+    <!-- ③ 제약 조건 -->
+    <section id="s-constraint" class="section">
+      <div class="section-header">
+        <div class="section-number">03 / 05</div>
+        <div class="section-title"><span class="hl">#</span> 제약 조건</div>
+        <p class="section-desc"><code style="color:var(--accent3);">where</code> 키워드로 타입 매개변수가 만족해야 할 조건을 지정합니다.</p>
+      </div>
+
+      <div class="sub">제약 조건 종류</div>
+      <table class="constraint-table">
+        <thead>
+          <tr>
+            <th>제약 조건</th>
+            <th>설명</th>
+            <th>비고</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="ct-keyword">where T : class</code></td>
+            <td class="ct-desc">T는 참조 타입이어야 합니다. (class, interface, delegate, array)</td>
+            <td><span class="ct-badge badge-blue">null 허용</span></td>
+          </tr>
+          <tr>
+            <td><code class="ct-keyword">where T : struct</code></td>
+            <td class="ct-desc">T는 값 타입이어야 합니다. (int, bool, struct 등)</td>
+            <td><span class="ct-badge badge-purple">Nullable 제외</span></td>
+          </tr>
+          <tr>
+            <td><code class="ct-keyword">where T : new()</code></td>
+            <td class="ct-desc">T는 매개변수 없는 기본 생성자를 가져야 합니다. <code>new T()</code> 호출이 가능해집니다.</td>
+            <td><span class="ct-badge badge-green">항상 마지막</span></td>
+          </tr>
+          <tr>
+            <td><code class="ct-keyword">where T : BaseClass</code></td>
+            <td class="ct-desc">T는 지정한 클래스를 상속해야 합니다. 해당 클래스의 멤버 사용이 가능해집니다.</td>
+            <td><span class="ct-badge badge-orange">단일 클래스</span></td>
+          </tr>
+          <tr>
+            <td><code class="ct-keyword">where T : IFoo</code></td>
+            <td class="ct-desc">T는 지정한 인터페이스를 구현해야 합니다. 여러 인터페이스를 쉼표로 나열할 수 있습니다.</td>
+            <td><span class="ct-badge badge-blue">다중 가능</span></td>
+          </tr>
+          <tr>
+            <td><code class="ct-keyword">where T : notnull</code></td>
+            <td class="ct-desc">T는 null을 허용하지 않는 타입이어야 합니다. (C# 8.0+)</td>
+            <td><span class="ct-badge badge-purple">C# 8.0+</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="sub">복합 제약 조건</div>
+      <div class="code-wrap">
+        <div class="code-header">
+          <span class="code-filename">Shelter.cs</span>
+          <span class="code-lang">C#</span>
+        </div>
+        <div class="code-body">
+<pre><span class="cm">// T는 Animal을 상속하고, IComparable을 구현하며, 기본 생성자가 있어야 함</span>
+<span class="kw">public class</span> <span class="tp">Shelter</span>&lt;<span class="gp">T</span>&gt;
+    <span class="kw">where</span> <span class="gp">T</span> : <span class="tp">Animal</span>, <span class="tp">IComparable</span>&lt;<span class="gp">T</span>&gt;, <span class="kw">new</span>()
+{
+    <span class="kw">private</span> <span class="tp">List</span>&lt;<span class="gp">T</span>&gt; _residents = <span class="kw">new</span>();
+
+    <span class="kw">public</span> <span class="gp">T</span> <span class="fn">CreateAndAdopt</span>()
+    {
+        <span class="gp">T</span> animal = <span class="kw">new</span> <span class="gp">T</span>();  <span class="cm">// new() 제약 덕분에 가능</span>
+        animal.<span class="fn">Feed</span>();        <span class="cm">// Animal 멤버 사용 가능</span>
+        _residents.<span class="fn">Add</span>(animal);
+        <span class="kw">return</span> animal;
+    }
+
+    <span class="kw">public</span> <span class="gp">T</span> <span class="fn">FindSmallest</span>()
+    {
+        _residents.<span class="fn">Sort</span>();  <span class="cm">// IComparable 덕분에 가능</span>
+        <span class="kw">return</span> _residents[<span class="st">0</span>];
+    }
+}</pre>
+        </div>
+      </div>
+
+      <div class="sub">다중 타입 매개변수에 각각 제약</div>
+      <div class="code-wrap">
+        <div class="code-header">
+          <span class="code-filename">Mapper.cs</span>
+          <span class="code-lang">C#</span>
+        </div>
+        <div class="code-body">
+<pre><span class="kw">public class</span> <span class="tp">Mapper</span>&lt;<span class="gp">TSource</span>, <span class="gp">TDest</span>&gt;
+    <span class="kw">where</span> <span class="gp">TSource</span> : <span class="kw">class</span>
+    <span class="kw">where</span> <span class="gp">TDest</span>   : <span class="kw">class</span>, <span class="kw">new</span>()
+{
+    <span class="kw">public</span> <span class="gp">TDest</span> <span class="fn">Map</span>(<span class="gp">TSource</span> source)
+    {
+        <span class="kw">var</span> dest = <span class="kw">new</span> <span class="gp">TDest</span>();
+        <span class="cm">// 리플렉션이나 AutoMapper 등으로 속성 복사</span>
+        <span class="kw">return</span> dest;
+    }
+}</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ④ 제네릭 컬렉션 -->
+    <section id="s-collections" class="section">
+      <div class="section-header">
+        <div class="section-number">04 / 05</div>
+        <div class="section-title"><span class="hl">#</span> 제네릭 컬렉션</div>
+        <p class="section-desc"><code style="color:var(--accent3);">System.Collections.Generic</code> 네임스페이스의 주요 컬렉션 클래스들입니다.</p>
+      </div>
+
+      <div class="info-box">
+        <strong>📦 using System.Collections.Generic;</strong>
+        모든 제네릭 컬렉션을 사용하려면 이 네임스페이스를 추가해야 합니다. .NET 6+의 global using 설정에는 이미 포함되어 있습니다.
+      </div>
+
+      <div class="coll-grid">
+        <div class="coll-card">
+          <div class="coll-header">
+            <span class="coll-name">List&lt;T&gt;</span>
+            <span class="coll-tag">동적 배열</span>
+          </div>
+          <div class="coll-desc">인덱스 접근 O(1), 검색·정렬 지원. 가장 범용적인 컬렉션.</div>
+          <div class="coll-code">
+<pre><span class="kw">var</span> nums = <span class="kw">new</span> <span class="tp">List</span>&lt;<span class="kw">int</span>&gt; { <span class="st">1</span>, <span class="st">2</span>, <span class="st">3</span> };
+nums.<span class="fn">Add</span>(<span class="st">4</span>);
+nums.<span class="fn">Remove</span>(<span class="st">2</span>);
+nums.<span class="fn">Sort</span>();
+<span class="kw">int</span> n = nums[<span class="st">0</span>];</pre>
+          </div>
+        </div>
+
+        <div class="coll-card">
+          <div class="coll-header">
+            <span class="coll-name">Dictionary&lt;TKey, TValue&gt;</span>
+            <span class="coll-tag">해시맵</span>
+          </div>
+          <div class="coll-desc">키-값 쌍 저장. 조회·추가·삭제 평균 O(1) 성능.</div>
+          <div class="coll-code">
+<pre><span class="kw">var</span> map = <span class="kw">new</span> <span class="tp">Dictionary</span>&lt;<span class="kw">string</span>, <span class="kw">int</span>&gt;();
+map[<span class="st">"apple"</span>] = <span class="st">3</span>;
+<span class="kw">if</span> (map.<span class="fn">TryGetValue</span>(<span class="st">"apple"</span>, <span class="kw">out int</span> v))
+    Console.<span class="fn">WriteLine</span>(v); <span class="cm">// 3</span></pre>
+          </div>
+        </div>
+
+        <div class="coll-card">
+          <div class="coll-header">
+            <span class="coll-name">Queue&lt;T&gt;</span>
+            <span class="coll-tag">FIFO</span>
+          </div>
+          <div class="coll-desc">선입선출. 작업 대기열, BFS 탐색 등에 사용.</div>
+          <div class="coll-code">
+<pre><span class="kw">var</span> q = <span class="kw">new</span> <span class="tp">Queue</span>&lt;<span class="kw">string</span>&gt;();
+q.<span class="fn">Enqueue</span>(<span class="st">"first"</span>);
+q.<span class="fn">Enqueue</span>(<span class="st">"second"</span>);
+<span class="kw">string</span> s = q.<span class="fn">Dequeue</span>(); <span class="cm">// "first"</span></pre>
+          </div>
+        </div>
+
+        <div class="coll-card">
+          <div class="coll-header">
+            <span class="coll-name">Stack&lt;T&gt;</span>
+            <span class="coll-tag">LIFO</span>
+          </div>
+          <div class="coll-desc">후입선출. 실행 취소, DFS 탐색, 괄호 검사 등에 사용.</div>
+          <div class="coll-code">
+<pre><span class="kw">var</span> stack = <span class="kw">new</span> <span class="tp">Stack</span>&lt;<span class="kw">int</span>&gt;();
+stack.<span class="fn">Push</span>(<span class="st">10</span>);
+stack.<span class="fn">Push</span>(<span class="st">20</span>);
+<span class="kw">int</span> top = stack.<span class="fn">Pop</span>(); <span class="cm">// 20</span></pre>
+          </div>
+        </div>
+
+        <div class="coll-card">
+          <div class="coll-header">
+            <span class="coll-name">HashSet&lt;T&gt;</span>
+            <span class="coll-tag">집합</span>
+          </div>
+          <div class="coll-desc">중복 없는 집합. 합집합·교집합·차집합 연산 지원.</div>
+          <div class="coll-code">
+<pre><span class="kw">var</span> a = <span class="kw">new</span> <span class="tp">HashSet</span>&lt;<span class="kw">int</span>&gt; { <span class="st">1</span>, <span class="st">2</span>, <span class="st">3</span> };
+<span class="kw">var</span> b = <span class="kw">new</span> <span class="tp">HashSet</span>&lt;<span class="kw">int</span>&gt; { <span class="st">2</span>, <span class="st">3</span>, <span class="st">4</span> };
+a.<span class="fn">IntersectWith</span>(b); <span class="cm">// {2, 3}</span>
+a.<span class="fn">UnionWith</span>(b);     <span class="cm">// {1,2,3,4}</span></pre>
+          </div>
+        </div>
+
+        <div class="coll-card">
+          <div class="coll-header">
+            <span class="coll-name">LinkedList&lt;T&gt;</span>
+            <span class="coll-tag">연결 리스트</span>
+          </div>
+          <div class="coll-desc">노드 기반 이중 연결 리스트. 삽입·삭제 O(1), 인덱스 접근 없음.</div>
+          <div class="coll-code">
+<pre><span class="kw">var</span> ll = <span class="kw">new</span> <span class="tp">LinkedList</span>&lt;<span class="kw">string</span>&gt;();
+ll.<span class="fn">AddFirst</span>(<span class="st">"A"</span>);
+ll.<span class="fn">AddLast</span>(<span class="st">"B"</span>);
+ll.<span class="fn">AddAfter</span>(ll.First, <span class="st">"X"</span>);</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip-box">
+        <strong>✓ 선택 기준</strong>
+        순서 있는 데이터 → <code>List&lt;T&gt;</code> &nbsp;|&nbsp;
+        키로 찾기 → <code>Dictionary&lt;TKey,TValue&gt;</code> &nbsp;|&nbsp;
+        중복 제거 → <code>HashSet&lt;T&gt;</code> &nbsp;|&nbsp;
+        작업 대기열 → <code>Queue&lt;T&gt;</code> &nbsp;|&nbsp;
+        되돌리기 → <code>Stack&lt;T&gt;</code>
+      </div>
+    </section>
+
+    <!-- ⑤ 고급 패턴 -->
+    <section id="s-advanced" class="section">
+      <div class="section-header">
+        <div class="section-number">05 / 05</div>
+        <div class="section-title"><span class="hl">#</span> 고급 패턴</div>
+        <p class="section-desc">공변성·반공변성, 제네릭 인터페이스, LINQ 활용 등 심화 내용입니다.</p>
+      </div>
+
+      <div class="sub">공변성 (out) / 반공변성 (in)</div>
+      <div class="code-wrap">
+        <div class="code-header">
+          <span class="code-filename">Variance.cs</span>
+          <span class="code-lang">C#</span>
+        </div>
+        <div class="code-body">
+<pre><span class="cm">// out → 공변성: 더 파생된 타입으로 대입 가능</span>
+<span class="cm">// IEnumerable&lt;out T&gt; 이므로 string → object 대입 허용</span>
+<span class="tp">IEnumerable</span>&lt;<span class="kw">string</span>&gt; strings = <span class="kw">new</span> <span class="tp">List</span>&lt;<span class="kw">string</span>&gt;();
+<span class="tp">IEnumerable</span>&lt;<span class="kw">object</span>&gt; objects = strings; <span class="cm">// ✓ OK</span>
+
+<span class="cm">// in → 반공변성: 더 일반적인 타입을 받는 대리자에 대입 가능</span>
+<span class="cm">// Action&lt;in T&gt; 이므로 object → string 대입 허용</span>
+<span class="tp">Action</span>&lt;<span class="kw">object</span>&gt; actObj = o =&gt; Console.<span class="fn">WriteLine</span>(o);
+<span class="tp">Action</span>&lt;<span class="kw">string</span>&gt; actStr = actObj; <span class="cm">// ✓ OK</span>
+
+<span class="cm">// 사용자 정의 공변/반공변 인터페이스</span>
+<span class="kw">public interface</span> <span class="tp">IProducer</span>&lt;<span class="kw">out</span> <span class="gp">T</span>&gt; { <span class="gp">T</span> <span class="fn">Produce</span>(); }
+<span class="kw">public interface</span> <span class="tp">IConsumer</span>&lt;<span class="kw">in</span>  <span class="gp">T</span>&gt; { <span class="kw">void</span> <span class="fn">Consume</span>(<span class="gp">T</span> item); }</pre>
+        </div>
+      </div>
+
+      <div class="sub">제네릭 인터페이스 구현</div>
+      <div class="code-wrap">
+        <div class="code-header">
+          <span class="code-filename">ITransformer.cs</span>
+          <span class="code-lang">C#</span>
+        </div>
+        <div class="code-body">
+<pre><span class="kw">public interface</span> <span class="tp">ITransformer</span>&lt;<span class="gp">TIn</span>, <span class="gp">TOut</span>&gt;
+{
+    <span class="gp">TOut</span> <span class="fn">Transform</span>(<span class="gp">TIn</span> input);
+}
+
+<span class="kw">public class</span> <span class="tp">StringToInt</span> : <span class="tp">ITransformer</span>&lt;<span class="kw">string</span>, <span class="kw">int</span>&gt;
+{
+    <span class="kw">public int</span> <span class="fn">Transform</span>(<span class="kw">string</span> input) =&gt; <span class="kw">int</span>.<span class="fn">Parse</span>(input);
+}
+
+<span class="kw">public class</span> <span class="tp">IntToString</span> : <span class="tp">ITransformer</span>&lt;<span class="kw">int</span>, <span class="kw">string</span>&gt;
+{
+    <span class="kw">public string</span> <span class="fn">Transform</span>(<span class="kw">int</span> input) =&gt; input.<span class="fn">ToString</span>(<span class="st">"D4"</span>);
+}
+
+<span class="tp">ITransformer</span>&lt;<span class="kw">string</span>, <span class="kw">int</span>&gt; t1 = <span class="kw">new</span> <span class="tp">StringToInt</span>();
+<span class="kw">int</span> result = t1.<span class="fn">Transform</span>(<span class="st">"42"</span>); <span class="cm">// 42</span>
+
+<span class="tp">ITransformer</span>&lt;<span class="kw">int</span>, <span class="kw">string</span>&gt; t2 = <span class="kw">new</span> <span class="tp">IntToString</span>();
+<span class="kw">string</span> s = t2.<span class="fn">Transform</span>(<span class="st">7</span>); <span class="cm">// "0007"</span></pre>
+        </div>
+      </div>
+
+      <div class="sub">제네릭 + LINQ 조합</div>
+      <div class="code-wrap">
+        <div class="code-header">
+          <span class="code-filename">LinqExtensions.cs</span>
+          <span class="code-lang">C#</span>
+        </div>
+        <div class="code-body">
+<pre><span class="cm">// 사용자 정의 제네릭 필터 — yield return으로 지연 실행</span>
+<span class="kw">public static</span> <span class="tp">IEnumerable</span>&lt;<span class="gp">T</span>&gt; <span class="fn">Filter</span>&lt;<span class="gp">T</span>&gt;(
+    <span class="tp">IEnumerable</span>&lt;<span class="gp">T</span>&gt; source,
+    <span class="tp">Func</span>&lt;<span class="gp">T</span>, <span class="kw">bool</span>&gt; predicate)
+{
+    <span class="kw">foreach</span> (<span class="kw">var</span> item <span class="kw">in</span> source)
+        <span class="kw">if</span> (predicate(item)) <span class="kw">yield return</span> item;
+}
+
+<span class="cm">// 제네릭 변환 메서드</span>
+<span class="kw">public static</span> <span class="tp">IEnumerable</span>&lt;<span class="gp">TResult</span>&gt; <span class="fn">Map</span>&lt;<span class="gp">TSource</span>, <span class="gp">TResult</span>&gt;(
+    <span class="tp">IEnumerable</span>&lt;<span class="gp">TSource</span>&gt; source,
+    <span class="tp">Func</span>&lt;<span class="gp">TSource</span>, <span class="gp">TResult</span>&gt; selector)
+{
+    <span class="kw">foreach</span> (<span class="kw">var</span> item <span class="kw">in</span> source)
+        <span class="kw">yield return</span> selector(item);
+}
+
+<span class="cm">// 활용</span>
+<span class="kw">var</span> evens  = <span class="fn">Filter</span>(<span class="kw">new</span>[] { <span class="st">1</span>,<span class="st">2</span>,<span class="st">3</span>,<span class="st">4</span>,<span class="st">5</span> }, n => n % <span class="st">2</span> == <span class="st">0</span>);  <span class="cm">// [2, 4]</span>
+<span class="kw">var</span> labels = <span class="fn">Map</span>(<span class="kw">new</span>[] { <span class="st">1</span>,<span class="st">2</span>,<span class="st">3</span> }, n => <span class="st">$"#{n}"</span>);              <span class="cm">// ["#1","#2","#3"]</span></pre>
+        </div>
+      </div>
+
+      <div class="tip-box">
+        <strong>✓ 핵심 정리</strong>
+        제네릭은 C#에서 타입 안전성·성능·재사용성을 동시에 얻는 가장 강력한 도구입니다.
+        <code>List&lt;T&gt;</code>와 <code>Dictionary&lt;TKey,TValue&gt;</code>는 이미 제네릭으로 만들어진 표준 라이브러리이며,
+        직접 제네릭 클래스·메서드를 설계하면 중복 없는 우아한 코드를 작성할 수 있습니다.
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  function show(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('s-' + id).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+</script>
+</body>
+</html>
