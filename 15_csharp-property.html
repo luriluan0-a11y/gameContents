@@ -533,13 +533,13 @@ b.Title = <span class="str">"C# 입문"</span>;
 }
     </span>
 <span class="cm">// ── 외부에서 사용 ──</span>
-<span class="kw">var</span> book = <span class="kw">new</span> <span class="tp">Book</span>(<span class="str">"C# 입문"</span>, <span class="str">"홍길동"</span>, <span class="st">320</span>);
+<span class="kw">var</span> <span class="black">book =</span> <span class="kw">new</span> <span class="tp">Book</span>(<span class="str">"C# 입문"</span>, <span class="str">"홍길동"</span>, <span class="st">320</span>);
 
-Console.<span class="fn">WriteLine</span>(book.Title);    <span class="ok">// ✓ "C# 입문" — get 가능</span>
-Console.<span class="fn">WriteLine</span>(book.Author);   <span class="ok">// ✓ "홍길동"  — get 가능</span>
+<span class="black">Console.</span><span class="fn">WriteLine</span><span class="black">(book.Title);</span>    <span class="ok">// ✓ "C# 입문" — get 가능</span>
+<span class="black">Console.</span><span class="fn">WriteLine</span><span class="black">(book.Author);</span>   <span class="ok">// ✓ "홍길동"  — get 가능</span>
 
-book.Title = <span class="str">"다른 제목"</span>;          <span class="ng">// ✗ 컴파일 오류! private set</span>
-book.<span class="fn">UpdateTitle</span>(<span class="str">"개정판"</span>);      <span class="ok">// ✓ 메서드를 통해서만 변경 가능</span></pre>
+<span class="black">book.Title =</span> <span class="str">"다른 제목"</span><span class="black">;</span>          <span class="ng">// ✗ 컴파일 오류! private set</span>
+<span class="black">book.</span><span class="fn">UpdateTitle</span>(<span class="str">"개정판"</span>)<span class="black">;</span>      <span class="ok">// ✓ 메서드를 통해서만 변경 가능</span></pre>
       </div>
     </div>
 
