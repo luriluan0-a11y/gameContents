@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마크다운 사용법 완벽 가이드</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-light: #eff6ff;
+    --primary-dark: #1d4ed8;
+    --accent: #7c3aed;
+    --success: #059669;
+    --warning: #d97706;
+    --danger: #dc2626;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --code-bg: #1e1e2e;
+    --code-text: #cdd6f4;
+    --sidebar-w: 260px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-800);
+    line-height: 1.7;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── 사이드바 ── */
+  #sidebar {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    background: white;
+    border-right: 1px solid var(--gray-200);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-header {
+    padding: 24px 20px 16px;
+    border-bottom: 1px solid var(--gray-100);
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+  }
+
+  .sidebar-header .logo {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+
+  .sidebar-header .sub {
+    font-size: 11px;
+    opacity: 0.85;
+    margin-top: 4px;
+  }
+
+  .sidebar-header .badge-md {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 4px;
+    font-size: 11px;
+    padding: 1px 7px;
+    font-family: monospace;
+    margin-top: 8px;
+  }
+
+  .toc { padding: 12px 0; flex: 1; }
+
+  .toc-section {
+    padding: 6px 20px 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-top: 8px;
+  }
+
+  .toc a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 20px;
+    font-size: 13px;
+    color: var(--gray-600);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+  }
+
+  .toc a:hover, .toc a.active {
+    background: var(--primary-light);
+    color: var(--primary);
+    border-left-color: var(--primary);
+  }
+
+  .toc a .num {
+    font-size: 11px;
+    color: var(--gray-400);
+    font-family: monospace;
+    min-width: 18px;
+  }
+
+  .toc a.active .num { color: var(--primary); }
+
+  /* ── 메인 콘텐츠 ── */
+  #main {
+    flex: 1;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    color: white;
+    padding: 60px 64px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '#';
+    position: absolute;
+    right: 80px;
+    top: 20px;
+    font-size: 200px;
+    font-weight: 900;
+    opacity: 0.08;
+    font-family: monospace;
+    line-height: 1;
+  }
+
+  .hero h1 {
+    font-size: 36px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    margin-bottom: 12px;
+  }
+
+  .hero p {
+    font-size: 16px;
+    opacity: 0.9;
+    max-width: 520px;
+    line-height: 1.6;
+  }
+
+  .hero-tags {
+    display: flex;
+    gap: 8px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+
+  .hero-tag {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 12px;
+    font-family: monospace;
+  }
+
+  /* ── 섹션 ── */
+  .content { padding: 0 64px 80px; max-width: 960px; }
+
+  section {
+    margin-top: 56px;
+    scroll-margin-top: 24px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--gray-100);
+  }
+
+  .section-num {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: monospace;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--gray-900);
+    letter-spacing: -0.5px;
+  }
+
+  /* ── 카드 ── */
+  .card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .card-title {
+    padding: 12px 20px;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-600);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+  }
+
+  /* ── 코드 & 프리뷰 나란히 ── */
+  .split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .split-code {
+    background: var(--code-bg);
+    padding: 20px 24px;
+    border-right: 1px solid #313244;
+  }
+
+  .split-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-family: monospace;
+  }
+
+  .split-code .split-label { color: #6c7086; }
+  .split-preview .split-label { color: var(--gray-400); }
+
+  .split-preview {
+    padding: 20px 24px;
+    background: white;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--code-text);
+    white-space: pre;
+    display: block;
+  }
+
+  /* 인라인 코드 */
+  .inline-code {
+    background: var(--gray-100);
+    color: var(--accent);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 13px;
+  }
+
+  /* ── 프리뷰 안 마크다운 결과물 스타일 ── */
+  .md-preview { font-size: 14px; line-height: 1.7; }
+  .md-preview h1 { font-size: 22px; font-weight: 800; margin-bottom: 6px; color: var(--gray-900); }
+  .md-preview h2 { font-size: 18px; font-weight: 700; margin-bottom: 5px; color: var(--gray-800); }
+  .md-preview h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; color: var(--gray-700); }
+  .md-preview h4 { font-size: 14px; font-weight: 600; margin-bottom: 3px; color: var(--gray-600); }
+  .md-preview h5 { font-size: 13px; font-weight: 600; color: var(--gray-600); }
+  .md-preview h6 { font-size: 12px; font-weight: 600; color: var(--gray-500); }
+  .md-preview p { margin-bottom: 8px; }
+  .md-preview strong { font-weight: 700; }
+  .md-preview em { font-style: italic; color: var(--gray-700); }
+  .md-preview del { text-decoration: line-through; color: var(--gray-400); }
+  .md-preview ul { padding-left: 20px; margin-bottom: 8px; }
+  .md-preview ol { padding-left: 20px; margin-bottom: 8px; }
+  .md-preview li { margin-bottom: 3px; }
+  .md-preview blockquote {
+    border-left: 3px solid var(--primary);
+    padding: 8px 14px;
+    background: var(--primary-light);
+    border-radius: 0 6px 6px 0;
+    color: var(--gray-700);
+    font-size: 13px;
+    margin: 6px 0;
+  }
+  .md-preview code {
+    background: var(--gray-100);
+    color: var(--accent);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 12px;
+    white-space: normal;
+    display: inline;
+  }
+  .md-preview pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 6px 0;
+  }
+  .md-preview pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+    font-size: 12.5px;
+    display: block;
+    white-space: pre;
+  }
+  .md-preview table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 8px 0;
+  }
+  .md-preview th {
+    background: var(--gray-100);
+    padding: 7px 12px;
+    text-align: left;
+    font-weight: 600;
+    border: 1px solid var(--gray-200);
+  }
+  .md-preview td {
+    padding: 7px 12px;
+    border: 1px solid var(--gray-200);
+  }
+  .md-preview tr:nth-child(even) td { background: var(--gray-50); }
+  .md-preview hr {
+    border: none;
+    border-top: 2px solid var(--gray-200);
+    margin: 10px 0;
+  }
+  .md-preview a { color: var(--primary); text-decoration: underline; }
+  .md-preview img { max-width: 100%; border-radius: 6px; }
+  .md-preview input[type="checkbox"] { margin-right: 6px; }
+  .md-preview .task-item { list-style: none; margin-left: -16px; }
+
+  /* ── 신택스 컬러링 ── */
+  .kw { color: #cba6f7; }  /* keyword / 기호 */
+  .str { color: #a6e3a1; } /* string / 텍스트 */
+  .cm { color: #6c7086; }  /* comment */
+  .hd { color: #89b4fa; }  /* heading */
+  .lk { color: #89dceb; }  /* link */
+  .em { color: #f9e2af; }  /* emphasis */
+  .tg { color: #f38ba8; }  /* tag */
+  .nb { color: #fab387; }  /* number */
+
+  /* ── 팁 박스 ── */
+  .tip, .warn, .info, .danger-box {
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    margin: 16px 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    line-height: 1.6;
+  }
+
+  .tip { background: #ecfdf5; border-left: 3px solid var(--success); color: #065f46; }
+  .warn { background: #fffbeb; border-left: 3px solid var(--warning); color: #78350f; }
+  .info { background: var(--primary-light); border-left: 3px solid var(--primary); color: #1e40af; }
+  .danger-box { background: #fef2f2; border-left: 3px solid var(--danger); color: #991b1b; }
+
+  .tip-icon { font-size: 16px; flex-shrink: 0; }
+
+  /* ── 비교 테이블 ── */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13.5px;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--gray-200);
+  }
+
+  .compare-table th {
+    background: var(--gray-800);
+    color: white;
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+
+  .compare-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: top;
+  }
+
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table tr:nth-child(even) td { background: var(--gray-50); }
+  .compare-table .syntax { font-family: monospace; color: var(--accent); font-size: 13px; }
+  .compare-table .result { color: var(--gray-700); }
+
+  /* ── 헤딩 비주얼 ── */
+  .heading-demo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 20px;
+  }
+
+  .hd-row {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--gray-100);
+  }
+
+  .hd-row:last-child { border-bottom: none; }
+  .hd-syntax { font-family: monospace; font-size: 12px; color: var(--gray-400); min-width: 80px; }
+  .hd-result { font-weight: 700; color: var(--gray-900); }
+  .hd-1 { font-size: 28px; }
+  .hd-2 { font-size: 22px; }
+  .hd-3 { font-size: 18px; }
+  .hd-4 { font-size: 15px; }
+  .hd-5 { font-size: 13px; }
+  .hd-6 { font-size: 12px; color: var(--gray-500); }
+
+  /* ── 단축키 뱃지 ── */
+  kbd {
+    background: var(--gray-200);
+    border: 1px solid var(--gray-300);
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-family: monospace;
+    font-size: 12px;
+    color: var(--gray-700);
+    box-shadow: 0 1px 0 var(--gray-400);
+  }
+
+  /* ── 플랫폼 배지 ── */
+  .platform-badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .badge-github { background: #24292e; color: white; }
+  .badge-obsidian { background: #7c3aed; color: white; }
+  .badge-notion { background: #000; color: white; }
+  .badge-common { background: var(--gray-200); color: var(--gray-700); }
+
+  /* ── 진행 바 (섹션 수 표시) ── */
+  .progress-bar {
+    display: flex;
+    gap: 3px;
+    margin-top: 20px;
+  }
+
+  .progress-seg {
+    height: 3px;
+    flex: 1;
+    background: rgba(255,255,255,0.3);
+    border-radius: 2px;
+  }
+
+  .progress-seg.done { background: rgba(255,255,255,0.9); }
+
+  /* ── 푸터 ── */
+  footer {
+    background: var(--gray-800);
+    color: var(--gray-400);
+    text-align: center;
+    padding: 32px;
+    font-size: 13px;
+    margin-top: 64px;
+  }
+
+  footer strong { color: white; }
+
+  /* ── 반응형 ── */
+  @media (max-width: 768px) {
+    #sidebar { display: none; }
+    .content { padding: 0 24px 60px; }
+    .hero { padding: 40px 24px; }
+    .split { grid-template-columns: 1fr; }
+    .split-code { border-right: none; border-bottom: 1px solid #313244; }
+  }
+
+  /* ── 스크롤바 ── */
+  #sidebar::-webkit-scrollbar { width: 4px; }
+  #sidebar::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- 사이드바 -->
+<nav id="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">Markdown Guide</div>
+    <div class="sub">마크다운 사용법 완벽 가이드</div>
+    <div class="badge-md"># .md</div>
+  </div>
+  <div class="toc">
+    <div class="toc-section">기초</div>
+    <a href="#intro"><span class="num">01</span>마크다운이란?</a>
+    <a href="#headings"><span class="num">02</span>제목 (Headings)</a>
+    <a href="#text"><span class="num">03</span>텍스트 강조</a>
+    <a href="#paragraph"><span class="num">04</span>단락과 줄바꿈</a>
+
+    <div class="toc-section">구조</div>
+    <a href="#lists"><span class="num">05</span>목록</a>
+    <a href="#links"><span class="num">06</span>링크</a>
+    <a href="#images"><span class="num">07</span>이미지</a>
+    <a href="#blockquote"><span class="num">08</span>인용문</a>
+    <a href="#hr"><span class="num">09</span>수평선</a>
+
+    <div class="toc-section">고급</div>
+    <a href="#code"><span class="num">10</span>코드</a>
+    <a href="#table"><span class="num">11</span>표</a>
+    <a href="#task"><span class="num">12</span>체크박스</a>
+    <a href="#escape"><span class="num">13</span>이스케이프</a>
+
+    <div class="toc-section">확장</div>
+    <a href="#gfm"><span class="num">14</span>GitHub 확장 문법</a>
+    <a href="#platform"><span class="num">15</span>플랫폼별 차이</a>
+    <a href="#cheatsheet"><span class="num">16</span>치트시트</a>
+  </div>
+</nav>
+
+<!-- 메인 -->
+<div id="main">
+
+  <!-- 히어로 -->
+  <div class="hero">
+    <h1>마크다운 사용법<br>완벽 가이드</h1>
+    <p>텍스트 파일 하나로 아름다운 문서를 만드는 방법. 기초 문법부터 플랫폼별 확장 기능까지 한 번에 정리합니다.</p>
+    <div class="hero-tags">
+      <span class="hero-tag"># 제목</span>
+      <span class="hero-tag">**굵게**</span>
+      <span class="hero-tag">*기울임*</span>
+      <span class="hero-tag">~~취소선~~</span>
+      <span class="hero-tag">`코드`</span>
+      <span class="hero-tag">[링크](url)</span>
+      <span class="hero-tag">![이미지](url)</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- 01. 마크다운이란? -->
+    <section id="intro">
+      <div class="section-header">
+        <div class="section-num">01</div>
+        <div class="section-title">마크다운이란?</div>
+      </div>
+
+      <div class="info">
+        <span class="tip-icon">💡</span>
+        <div><strong>마크다운(Markdown)</strong>은 2004년 존 그루버(John Gruber)가 만든 경량 마크업 언어입니다. 일반 텍스트로 서식이 있는 문서를 작성하고, HTML 등으로 쉽게 변환할 수 있습니다.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>마크다운의 특징</div>
+        <table class="compare-table">
+          <tr>
+            <th>특징</th>
+            <th>설명</th>
+          </tr>
+          <tr>
+            <td>읽기 쉬움</td>
+            <td class="result">변환 전 텍스트 상태에서도 내용이 직관적으로 이해됨</td>
+          </tr>
+          <tr>
+            <td>쓰기 쉬움</td>
+            <td class="result">특수 기호 몇 개만 알면 누구나 작성 가능</td>
+          </tr>
+          <tr>
+            <td>이식성</td>
+            <td class="result">어떤 편집기, 운영체제에서도 열 수 있는 .md 파일</td>
+          </tr>
+          <tr>
+            <td>광범위한 지원</td>
+            <td class="result">GitHub, Notion, Obsidian, VS Code, Slack 등 대부분의 플랫폼 지원</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>마크다운이 사용되는 곳</div>
+        <div style="padding:16px 20px; display:flex; gap:10px; flex-wrap:wrap;">
+          <span class="platform-badge badge-github">GitHub README</span>
+          <span class="platform-badge badge-obsidian">Obsidian 노트</span>
+          <span class="platform-badge badge-notion">Notion</span>
+          <span class="platform-badge badge-common">개발 문서</span>
+          <span class="platform-badge badge-common">블로그(Jekyll, Hugo)</span>
+          <span class="platform-badge badge-common">협업 툴(Slack, Discord)</span>
+          <span class="platform-badge badge-common">VS Code</span>
+          <span class="platform-badge badge-common">Jupyter Notebook</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02. 제목 -->
+    <section id="headings">
+      <div class="section-header">
+        <div class="section-num">02</div>
+        <div class="section-title">제목 (Headings)</div>
+      </div>
+
+      <p style="margin-bottom:16px; color:var(--gray-600); font-size:14px;"><span class="inline-code">#</span> 기호의 개수로 제목 레벨을 조정합니다. H1~H6까지 총 6단계가 있습니다.</p>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>제목 레벨 비교</div>
+        <div class="heading-demo">
+          <div class="hd-row"><span class="hd-syntax"># 제목</span><span class="hd-result hd-1">H1 제목 (가장 큼)</span></div>
+          <div class="hd-row"><span class="hd-syntax">## 제목</span><span class="hd-result hd-2">H2 제목</span></div>
+          <div class="hd-row"><span class="hd-syntax">### 제목</span><span class="hd-result hd-3">H3 제목</span></div>
+          <div class="hd-row"><span class="hd-syntax">#### 제목</span><span class="hd-result hd-4">H4 제목</span></div>
+          <div class="hd-row"><span class="hd-syntax">##### 제목</span><span class="hd-result hd-5">H5 제목</span></div>
+          <div class="hd-row"><span class="hd-syntax">###### 제목</span><span class="hd-result hd-6">H6 제목 (가장 작음)</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="split">
+          <div class="split-code">
+            <div class="split-label">📝 마크다운 입력</div>
+            <code><span class="hd"># 1장. 게임 기획의 이해</span>
+
+<span class="hd">## 1.1 게임이란 무엇인가</span>
+
+<span class="hd">### 1.1.1 게임의 정의</span>
+
+<span class="hd">#### 핵심 요소</span></code>
+          </div>
+          <div class="split-preview">
+            <div class="split-label">👁 렌더링 결과</div>
+            <div class="md-preview">
+              <h1>1장. 게임 기획의 이해</h1>
+              <h2>1.1 게임이란 무엇인가</h2>
+              <h3>1.1.1 게임의 정의</h3>
+              <h4>핵심 요소</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip">
+        <span class="tip-icon">✅</span>
+        <div><strong># 과 텍스트 사이에 공백을 반드시 넣어야 합니다.</strong><br>
+        <code style="background:#d1fae5;color:#065f46;padding:1px 5px;border-radius:3px;font-size:12px;display:inline;">#제목</code> → 인식 안 됨 &nbsp;|&nbsp; <code style="background:#d1fae5;color:#065f46;padding:1px 5px;border-radius:3px;font-size:12px;display:inline;"># 제목</code> → 정상 인식</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>대체 문법 (밑줄형) — H1, H2만 가능</div>
+        <div class="split">
+          <div class="split-code">
+            <div class="split-label">📝 마크다운 입력</div>
+            <code><span class="str">대제목 (H1)</span>
+<span class="kw">=========</span>
+
+<span class="str">중제목 (H2)</span>
+<span class="kw">---------</span></code>
+          </div>
+          <div class="split-preview">
+            <div class="split-label">👁 렌더링 결과</div>
+            <div class="md-preview">
+              <h1>대제목 (H1)</h1>
+              <h2>중제목 (H2)</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03. 텍스트 강조 -->
+    <section id="text">
+      <div class="section-header">
+        <div class="section-num">03</div>
+        <div class="section-title">텍스트 강조</div>
+      </div>
+
+      <table class="compare-table">
+        <tr>
+          <th>효과</th>
+          <th>문법</th>
+          <th>결과</th>
+        </tr>
+        <tr>
+          <td>굵게 (Bold)</td>
+          <td class="syntax">**텍스트** 또는 __텍스트__</td>
+          <td class="result"><strong>텍스트</strong></td>
+        </tr>
+        <tr>
+          <td>기울임 (Italic)</td>
+          <td class="syntax">*텍스트* 또는 _텍스트_</td>
+          <td class="result"><em>텍스트</em></td>
+        </tr>
+        <tr>
+          <td>굵게 + 기울임</td>
+          <td class="syntax">***텍스트*** 또는 ___텍스트___</td>
+          <td class="result"><strong><em>텍스트</em></strong></td>
+        </tr>
+        <tr>
+          <td>취소선 (Strikethrough)</td>
+          <td class="syntax">~~텍스트~~</td>
+          <td class="result"><del>텍스트</del></td>
+        </tr>
+        <tr>
+          <td>인라인 코드</td>
+          <td class="syntax">`코드`</td>
+          <td class="result"><code style="background:var(--gray-100);color:var(--accent);padding:1px 5px;border-radius:3px;font-size:13px;">코드</code></td>
+        </tr>
+      </table>
+
+      <div class="card">
+        <div class="split">
+          <div class="split-code">
+            <div class="split-label">📝 마크다운 입력</div>
+            <code>이것은 <span class="kw">**굵은 텍스트**</span>입니다.
+
+이것은 <span class="em">*기울임 텍스트*</span>입니다.
+
+이것은 <span class="kw">***굵고 기울임***</span>입니다.
+
+이것은 <span class="tg">~~취소선~~</span>입니다.
+
+중요한 명령어는 <span class="nb">`git commit`</span>입니다.</code>
+          </div>
+          <div class="split-preview">
+            <div class="split-label">👁 렌더링 결과</div>
+            <div class="md-preview">
+              <p>이것은 <strong>굵은 텍스트</strong>입니다.</p>
+              <p>이것은 <em>기울임 텍스트</em>입니다.</p>
+              <p>이것은 <strong><em>굵고 기울임</em></strong>입니다.</p>
+              <p>이것은 <del>취소선</del>입니다.</p>
+              <p>중요한 명령어는 <code>git commit</code>입니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="warn">
+        <span class="tip-icon">⚠️</span>
+        <div><strong>언더스코어(_) 주의:</strong> 단어 중간에 있는 언더스코어는 강조로 인식되지 않을 수 있습니다. 예: <code style="background:#fef3c7;color:#92400e;padding:1px 5px;border-radius:3px;font-size:12px;">file_name_here</code> → 의도치 않은 강조 발생 가능. 이 경우 별표(*)를 사용하세요.</div>
+      </div>
+    </section>
+
+    <!-- 04. 단락과 줄바꿈 -->
+    <section id="paragraph">
+      <div class="section-header">
+        <div class="section-num">04</div>
+        <div class="section-title">단락과 줄바꿈</div>
+      </div>
+
+      <div class="card">
+        <div class="split">
+          <div class="split-code">
+            <div class="split-label">📝 마크다운 입력</div>
+            <code><span class="str">첫 번째 단락입니다.
+이 줄은 같은 단락입니다.</span>
+<span class="cm">(빈 줄 없으면 같은 단락)</span>
+
+<span class="str">빈 줄이 있으면 새로운 단락입니다.</span>
+
+<span class="str">줄 끝에 공백 두 개 후 Enter하면</span><span class="kw">  </span>
+<span class="str">줄바꿈만 됩니다.</span></code>
+          </div>
+          <div class="split-preview">
+            <div class="split-label">👁 렌더링 결과</div>
+            <div class="md-preview">
+              <p>첫 번째 단락입니다. 이 줄은 같은 단락입니다.</p>
+              <p>빈 줄이 있으면 새로운 단락입니다.</p>
+              <p>줄 끝에 공백 두 개 후 Enter하면<br>줄바꿈만 됩니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info">
+        <span class="tip-icon">📌</span>
+        <div>
+          <strong>줄바꿈 방법 2가지</strong><br>
+          1. 줄 끝에 <strong>공백 2개</strong> + Enter → <code style="font-size:12px;background:var(--primary-light);color:var(--primary-dark);padding:1px 5px;border-radius:3px;">&lt;br&gt;</code> 태그와 동일한 줄바꿈<br>
+          2. <strong>빈 줄 삽입</strong> → 새로운 문단(단락) 시작
+        </div>
+      </div>
+    </section>
+
+    <!-- 05. 목록 -->
+    <section id="lists">
+      <div class="section-header">
+        <div class="section-num">05</div>
+        <div class="section-title">목록 (Lists)</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>순서 없는 목록 (Unordered List)</div>
+        <div class="split">
+          <div class="split-code">
+            <div class="split-label">📝 마크다운 입력</div>
+            <code><span class="kw">-</span> <span class="str">사과</span>
+<span class="kw">-</span> <span class="str">바나나</span>
+<span class="kw">-</span> <span class="str">포도</span>
+  <span class="kw">-</span> <span class="str">청포도 (들여쓰기 2칸)</span>
+  <span class="kw">-</span> <span class="str">적포도</span>
+    <span class="kw">-</span> <span class="str">캠벨 (들여쓰기 4칸)</span>
+
+<span class="cm">* 별표도 가능</span>
+<span class="kw">*</span> <span class="str">항목 1</span>
+<span class="kw">+</span> <span class="str">항목 2 (+ 기호도 가능)</span></code>
+          </div>
+          <div class="split-preview">
+            <div class="split-label">👁 렌더링 결과</div>
+            <div class="md-preview">
+              <ul>
+                <li>사과</li>
+                <li>바나나</li>
+                <li>포도
+                  <ul>
+                    <li>청포도 (들여쓰기 2칸)</li>
+                    <li>적포도
+                      <ul><li>캠벨 (들여쓰기 4칸)</li></ul>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+              <ul>
+                <li>항목 1</li>
+                <li>항목 2 (+ 기호도 가능)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>순서 있는 목록 (Ordered List)</div>
+        <div class="split">
+          <div class="split-code">
+            <div class="split-label">📝 마크다운 입력</div>
+            <code><span class="nb">1.</span> <span class="str">기획</span>
+<span class="nb">2.</span> <span class="str">디자인</span>
+<span class="nb">3.</span> <span class="str">개발</span>
+   <span class="nb">1.</span> <span class="str">프론트엔드</span>
+   <span class="nb">2.</span> <span class="str">백엔드</span>
+<span class="nb">4.</span> <span class="str">테스트</span>
+<span class="nb">5.</span> <span class="str">출시</span>
+
+<span class="cm"># 숫자가 틀려도 자동 정렬됨</span>
+<span class="nb">1.</span> <span class="str">첫 번째</span>
+<span class="nb">1.</span> <span class="str">두 번째 (1. 반복해도 됨)</span>
+<span class="nb">1.</span> <span class="str">세 번째</span></code>
+          </div>
+          <div class="split-preview">
+            <div class="split-label">👁 렌더링 결과</div>
+            <div class="md-preview">
+              <ol>
+                <li>기획</li>
+                <li>디자인</li>
+                <li>개발
+                  <ol>
+                    <li>프론트엔드</li>
+                    <li>백엔드</li>
+                  </ol>
+                </li>
+                <li>테스트</li>
+                <li>출시</li>
+              </ol>
+              <ol>
+                <li>첫 번째</li>
+                <li>두 번째 (1. 반복해도 됨)</li>
+                <li>세 번째</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip">
+        <span class="tip-icon">✅</span>
+        <div>중첩 목록은 <strong>공백 2칸 또는 4칸</strong>으로 들여쓰기하여 만듭니다. 탭(Tab) 키를 사용해도 됩니다.</div>
+      </div>
+    </section>
+
+    <!-- 06. 링크 -->
+    <section id="links">
+      <div class="section-header">
+        <div class="section-num">06</div>
+        <div class="section-title">링크 (Links)</div>
+      </div>
+
+      <table class="compare-table">
+        <tr>
+          <th>종류</th>
+          <th>문법</th>
+          <th>결과</th>
+        </tr>
+        <tr>
+          <td>인라인 링크</td>
+          <td class="syntax">[표시 텍스트](URL)</td>
+          <td class="result"><a href="#" style="color:var(--primary);">표시 텍스트</a></td>
+        </tr>
+        <tr>
+          <td>툴팁 있는 링크</td>
+          <td class="syntax">[텍스트](URL "툴팁")</td>
+          <td class="result"><a href="#" title="툴팁 내용" style="color:var(--primary);">텍스트</a> (호버 시 툴팁)</td>
+        </tr>
+        <tr>
+          <td>URL 자동 링크</td>
+          <td class="syntax">&lt;https://example.com&gt;</td>
+          <td class="result"><a href="#" style="color:var(--primary);">https://example.com</a></td>
+        </tr>
+        <tr>
+          <td>이메일 자동 링크</td>
+          <td class="syntax">&lt;user@example.com&gt;</td>
+          <td class="result"><a href="#" style="color:var(--primary);">user@example.com</a></td>
+        </tr>
+        <tr>
+          <td>참조 링크</td>
+          <td class="syntax">[텍스트][id]<br>[id]: URL</td>
+          <td class="result">문서 하단에 URL을 별도 정의</td>
+        </tr>
+      </table>
+
+      <div class="card">
+        <div class="split">
+          <div class="split-code">
+            <div class="split-label">📝 마크다운 입력</div>
+            <code><span class="cm"># 인라인 링크</span>
+[유한대학교]<span class="lk">(https://www.yuhan.ac.kr)</span>
+
+<span class="cm"># 툴팁 링크</span>
+[GitHub]<span class="lk">(https://github.com "깃허브로 이동")</span>
+
+<span class="cm"># 자동 링크</span>
+<span class="kw">&lt;https://www.google.com&gt;</span>
+
+<span class="cm"># 참조 링크</span>
+[네이버][naver]와 [구글][google]을 방문하세요.
+
+[naver]: <span class="lk">https://www.naver.com</span>
+[google]: <span class="lk">https://www.google.com</span></code>
+          </div>
+          <div class="split-preview">
+            <div class="split-label">👁 렌더링 결과</div>
+            <div class="md-preview">
+              <p><a href="#">유한대학교</a></p>
+              <p><a href="#" title="깃허브로 이동">GitHub</a></p>
+              <p><a href="#">https://www.google.com</a></p>
+              <p><a href="#">네이버</a>와 <a href="#">구글</a>을 방문하세요.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07. 이미지 -->
+    <section id="images">
+      <div class="section-header">
+        <div class="section-num">07</div>
+        <div class="section-title">이미지 (Images)</div>
+      </div>
+
+      <div class="info">
+        <span class="tip-icon">📌</span>
+        <div>링크 문법 앞에 <strong>느낌표(!)</strong>를 붙이면 이미지가 됩니다.</div>
+      </div>
+
+      <table class="compare-table">
+        <tr>
+          <th>종류</th>
+          <th>문법</th>
+        </tr>
+        <tr>
+          <td>기본 이미지</td>
+          <td class="syntax">![대체 텍스트](이미지 URL)</td>
+        </tr>
+        <tr>
+          <td>툴팁 있는 이미지</td>
+          <td class="syntax">![대체 텍스트](이미지 URL "툴팁")</td>
+        </tr>
+        <tr>
+          <td>이미지에 링크 걸기</td>
+          <td class="syntax">[![대체 텍스트](이미지 URL)](링크 URL)</td>
+        </tr>
+        <tr>
+          <td>참조 이미지</td>
+          <td class="syntax">![대체 텍스트][id]<br>[id]: 이미지 URL</td>
+        </tr>
+      </table>
+
+      <div class="card">
+        <div class="split">
+          <div class="split-code">
+            <div class="split-label">📝 마크다운 입력</div>
+            <code><span class="cm"># 기본 이미지</span>
+<span class="kw">!</span>[게임 로고]<span class="lk">(logo.png)</span>
+
+<span class="cm"># 툴팁 이미지</span>
+<span class="kw">!</span>[스크린샷]<span class="lk">(screen.jpg "게임 화면")</span>
+
+<span class="cm"># 클릭하면 링크로 이동</span>
+[<span class="kw">!</span>[배너]<span class="lk">(banner.png)</span>]<span class="lk">(https://example.com)</span>
+
+<span class="cm"># Obsidian 전용 (크기 지정)</span>
+<span class="kw">!</span>[[이미지.png|300]]</code>
+          </div>
+          <div class="split-preview">
+            <div class="split-label">👁 렌더링 결과 (이미지 자리)</div>
+            <div class="md-preview">
+              <div style="background:var(--gray-100);border:2px dashed var(--gray-300);border-radius:8px;padding:20px;text-align:center;color:var(--gray-400);font-size:13px;">
+                🖼 이미지가 표시되는 영역<br><small>alt="게임 로고"</small>
+              </div>
+              <p style="margin-top:8px;font-size:12px;color:var(--gray-500);">이미지 파일이 있으면 여기에 렌더링됩니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="warn">
+        <span class="tip-icon">⚠️</span>
+        <div><strong>대체 텍스트(alt text)는 반드시 작성하세요.</strong> 이미지가 로드되지 않을 때 표시되며, 시각 장애인용 스크린 리더에도 사용됩니다. 빈 괄호 <code style="background:#fef3c7;color:#92400e;font-size:12px;padding:1px 5px;border-radius:3px;">![ ]</code>도 허용되지만 접근성에 좋지 않습니다.</div>
+      </div>
+    </section>
+
+    <!-- 08. 인용문 -->
+    <section id="blockquote">
+      <div class="section-header">
+        <div class="section-num">08</div>
+        <div class="section-title">인용문 (Blockquote)</div>
+      </div>
+
+      <div class="card">
+        <div class="split">
+          <div class="split-code">
+            <div class="split-label">📝 마크다운 입력</div>
+            <code><span class="kw">&gt;</span> <span class="str">단순 인용문입니다.</span>
+
+<span class="kw">&gt;</span> <span class="str">여러 줄 인용문의 첫 번째 줄</span>
+<span class="kw">&gt;</span> <span class="str">여러 줄 인용문의 두 번째 줄</span>
+
+<span class="kw">&gt;</span> <span class="str">중첩 인용문 (외부)</span>
+<span class="kw">&gt;&gt;</span> <span class="str">중첩 인용문 (내부)</span>
+<span class="kw">&gt;&gt;&gt;</span> <span class="str">3단계 중첩</span>
+
+<span class="kw">&gt;</span> <span class="str">**굵게**와 `코드`도 사용 가능합니다.</span>
+<span class="kw">&gt;</span>
+<span class="kw">&gt;</span> <span class="str">— 출처: 작성자명</span></code>
+          </div>
+          <div class="split-preview">
+            <div class="split-label">👁 렌더링 결과</div>
+            <div class="md-preview">
+              <blockquote>단순 인용문입니다.</blockquote>
+              <blockquote>여러 줄 인용문의 첫 번째 줄 여러 줄 인용문의 두 번째 줄</blockquote>
+              <blockquote>중첩 인용문 (외부)
+                <blockquote>중첩 인용문 (내부)
+                  <blockquote>3단계 중첩</blockquote>
+                </blockquote>
+              </blockquote>
+              <blockquote><strong>굵게</strong>와 <code>코드</code>도 사용 가능합니다.<br><br>— 출처: 작성자명</blockquote>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 09. 수평선 -->
+    <section id="hr">
+      <div class="section-header">
+        <div class="section-num">09</div>
+        <div class="section-title">수평선 (Horizontal Rule)</div>
+      </div>
+
+      <div class="card">
+        <div class="split">
+          <div class="split-code">
+            <div class="split-label">📝 마크다운 입력 (모두 동일한 결과)</div>
+            <code><span class="kw">---</span>   <span class="cm"># 하이픈 3개 이상</span>
+
+<span class="kw">***</span>   <span class="cm"># 별표 3개 이상</span>
+
+<span class="kw">___</span>   <span class="cm"># 언더스코어 3개 이상</span>
+
+<span class="kw">- - -</span> <span class="cm"># 사이에 공백 허용</span></code>
+          </div>
+          <div class="split-preview">
+            <div class="split-label">👁 렌더링 결과</div>
+            <div class="md-preview">
+              <p>위 섹션</p>
+              <hr>
+              <p>아래 섹션 (수평선으로 구분)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="warn">
+        <span class="tip-icon">⚠️</span>
+        <div><code style="background:#fef3c7;color:#92400e;font-size:12px;padding:1px 5px;border-radius:3px;">---</code>는 수평선이지만, <strong>텍스트 바로 아래 줄에 오면 H2 제목으로 인식</strong>됩니다. 의도치 않은 제목이 되지 않도록 앞뒤에 빈 줄을 두세요.</div>
+      </div>
+    </section>
+
+    <!-- 10. 코드 -->
+    <section id="code">
+      <div class="section-header">
+        <div class="section-num">10</div>
+        <div class="section-title">코드 (Code)</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>인라인 코드 — 백틱(`) 1개로 감싸기</div>
+        <div class="split">
+          <div class="split-code">
+            <div class="split-label">📝 마크다운 입력</div>
+            <code>변수를 선언할 때는 <span class="nb">`int score = 0;`</span>처럼 씁니다.
+
+백틱이 포함된 코드: <span class="nb">``he said `hello` ``</span></code>
+          </div>
+          <div class="split-preview">
+            <div class="split-label">👁 렌더링 결과</div>
+            <div class="md-preview">
+              <p>변수를 선언할 때는 <code>int score = 0;</code>처럼 씁니다.</p>
+              <p>백틱이 포함된 코드: <code>he said `hello`</code></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>코드 블록 — 백틱 3개(```) 로 감싸기</div>
+        <div class="split">
+          <div class="split-code">
+            <div class="split-label">📝 마크다운 입력</div>
+            <code><span class="kw">```python</span>
+<span class="cm"># 언어명을 지정하면 문법 강조가 됩니다</span>
+<span class="str">def</span> <span class="nb">greet</span>(name):
+    print(<span class="str">f"안녕하세요, {name}!"</span>)
+
+greet(<span class="str">"유한대"</span>)
+<span class="kw">```</span>
+
+<span class="kw">```javascript</span>
+<span class="kw">const</span> score = <span class="nb">100</span>;
+console.log(<span class="str">`점수: ${score}`</span>);
+<span class="kw">```</span></code>
+          </div>
+          <div class="split-preview">
+            <div class="split-label">👁 렌더링 결과</div>
+            <div class="md-preview">
+              <pre><code># 언어명을 지정하면 문법 강조가 됩니다
+def greet(name):
+    print(f"안녕하세요, {name}!")
+
+greet("유한대")</code></pre>
+              <pre><code>const score = 100;
+console.log(`점수: ${score}`);</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>지원되는 주요 언어명</div>
+        <div style="padding:16px 20px;display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="platform-badge badge-github">python</span>
+          <span class="platform-badge badge-github">javascript</span>
+          <span class="platform-badge badge-github">typescript</span>
+          <span class="platform-badge badge-github">java</span>
+          <span class="platform-badge badge-github">c</span>
+          <span class="platform-badge badge-github">cpp</span>
+          <span class="platform-badge badge-github">csharp</span>
+          <span class="platform-badge badge-github">html</span>
+          <span class="platform-badge badge-github">css</span>
+          <span class="platform-badge badge-github">sql</span>
+          <span class="platform-badge badge-github">bash</span>
+          <span class="platform-badge badge-github">json</span>
+          <span class="platform-badge badge-github">yaml</span>
+          <span class="platform-badge badge-github">markdown</span>
+          <span class="platform-badge badge-common">plaintext (강조 없음)</span>
+        </div>
+      </div>
+
+      <div class="tip">
+        <span class="tip-icon">✅</span>
+        <div>공백 4칸 들여쓰기로도 코드 블록을 만들 수 있지만, 백틱(```) 방식이 언어 지정이 가능해 더 권장됩니다.</div>
+      </div>
+    </section>
+
+    <!-- 11. 표 -->
+    <section id="table">
+      <div class="section-header">
+        <div class="section-num">11</div>
+        <div class="section-title">표 (Tables)</div>
+      </div>
+
+      <div class="info">
+        <span class="tip-icon">📌</span>
+        <div>표는 <strong>파이프(|)</strong>와 <strong>하이픈(-)</strong>으로 만듭니다. 헤더 행과 데이터 행을 구분선으로 분리합니다.</div>
+      </div>
+
+      <div class="card">
+        <div class="split">
+          <div class="split-code">
+            <div class="split-label">📝 마크다운 입력</div>
+            <code><span class="kw">|</span> 이름   <span class="kw">|</span> 직책   <span class="kw">|</span> 점수 <span class="kw">|</span>
+<span class="kw">|--------|--------|------|</span>
+<span class="kw">|</span> 홍길동 <span class="kw">|</span> 기획자 <span class="kw">|</span> 95   <span class="kw">|</span>
+<span class="kw">|</span> 김철수 <span class="kw">|</span> 개발자 <span class="kw">|</span> 88   <span class="kw">|</span>
+<span class="kw">|</span> 이영희 <span class="kw">|</span> QA     <span class="kw">|</span> 92   <span class="kw">|</span>
+
+<span class="cm"># 정렬 지정</span>
+<span class="kw">|</span> 왼쪽 <span class="kw">|</span> 가운데 <span class="kw">|</span> 오른쪽 <span class="kw">|</span>
+<span class="kw">|:-----|:------:|------:|</span>
+<span class="kw">|</span> L    <span class="kw">|</span>   C    <span class="kw">|</span>      R <span class="kw">|</span></code>
+          </div>
+          <div class="split-preview">
+            <div class="split-label">👁 렌더링 결과</div>
+            <div class="md-preview">
+              <table>
+                <tr><th>이름</th><th>직책</th><th>점수</th></tr>
+                <tr><td>홍길동</td><td>기획자</td><td>95</td></tr>
+                <tr><td>김철수</td><td>개발자</td><td>88</td></tr>
+                <tr><td>이영희</td><td>QA</td><td>92</td></tr>
+              </table>
+              <br>
+              <table>
+                <tr><th style="text-align:left">왼쪽</th><th style="text-align:center">가운데</th><th style="text-align:right">오른쪽</th></tr>
+                <tr><td style="text-align:left">L</td><td style="text-align:center">C</td><td style="text-align:right">R</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <table class="compare-table">
+        <tr><th>구분선 기호</th><th>정렬 방향</th></tr>
+        <tr><td class="syntax">|---|</td><td>기본 (좌측 또는 플랫폼 기본)</td></tr>
+        <tr><td class="syntax">|:---|</td><td>왼쪽 정렬</td></tr>
+        <tr><td class="syntax">|:---:|</td><td>가운데 정렬</td></tr>
+        <tr><td class="syntax">|---:|</td><td>오른쪽 정렬</td></tr>
+      </table>
+
+      <div class="tip">
+        <span class="tip-icon">✅</span>
+        <div>표 안에서도 <strong>굵게</strong>, <em>기울임</em>, <code>코드</code>, <a href="#" style="color:var(--primary);">링크</a> 등 인라인 서식을 사용할 수 있습니다. 단, 줄바꿈이나 코드 블록은 사용 불가합니다.</div>
+      </div>
+    </section>
+
+    <!-- 12. 체크박스 -->
+    <section id="task">
+      <div class="section-header">
+        <div class="section-num">12</div>
+        <div class="section-title">체크박스 / 할 일 목록 (Task List)</div>
+      </div>
+
+      <div class="info">
+        <span class="tip-icon">📌</span>
+        <div>GFM(GitHub Flavored Markdown) 및 Obsidian 등에서 지원합니다. <span class="platform-badge badge-github">GitHub</span> <span class="platform-badge badge-obsidian">Obsidian</span> <span class="platform-badge badge-notion">Notion</span></div>
+      </div>
+
+      <div class="card">
+        <div class="split">
+          <div class="split-code">
+            <div class="split-label">📝 마크다운 입력</div>
+            <code><span class="cm"># - [ ] = 미완료, - [x] = 완료</span>
+
+<span class="kw">-</span> [<span class="str">x</span>] 마크다운 기초 학습
+<span class="kw">-</span> [<span class="str">x</span>] 제목 문법 익히기
+<span class="kw">-</span> [ ] 표 작성 연습
+<span class="kw">-</span> [ ] 코드 블록 작성
+<span class="kw">-</span> [ ] 실습 과제 제출
+
+<span class="cm"># 중첩도 가능</span>
+<span class="kw">-</span> [<span class="str">x</span>] 1주차 과제
+  <span class="kw">-</span> [<span class="str">x</span>] 이론 정리
+  <span class="kw">-</span> [ ] 실습 제출</code>
+          </div>
+          <div class="split-preview">
+            <div class="split-label">👁 렌더링 결과</div>
+            <div class="md-preview">
+              <ul style="list-style:none;padding-left:0;">
+                <li class="task-item"><input type="checkbox" checked disabled> 마크다운 기초 학습</li>
+                <li class="task-item"><input type="checkbox" checked disabled> 제목 문법 익히기</li>
+                <li class="task-item"><input type="checkbox" disabled> 표 작성 연습</li>
+                <li class="task-item"><input type="checkbox" disabled> 코드 블록 작성</li>
+                <li class="task-item"><input type="checkbox" disabled> 실습 과제 제출</li>
+              </ul>
+              <ul style="list-style:none;padding-left:0;">
+                <li class="task-item"><input type="checkbox" checked disabled> 1주차 과제
+                  <ul style="list-style:none;padding-left:16px;">
+                    <li class="task-item"><input type="checkbox" checked disabled> 이론 정리</li>
+                    <li class="task-item"><input type="checkbox" disabled> 실습 제출</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13. 이스케이프 -->
+    <section id="escape">
+      <div class="section-header">
+        <div class="section-num">13</div>
+        <div class="section-title">이스케이프 (Escape)</div>
+      </div>
+
+      <p style="margin-bottom:16px;color:var(--gray-600);font-size:14px;">마크다운 문법 기호를 <strong>글자 그대로</strong> 출력하고 싶을 때 역슬래시(<span class="inline-code">\</span>)를 앞에 붙입니다.</p>
+
+      <div class="card">
+        <div class="split">
+          <div class="split-code">
+            <div class="split-label">📝 마크다운 입력</div>
+            <code><span class="kw">\*</span>별표를 그대로 출력<span class="kw">\*</span>
+
+<span class="kw">\#</span> 이것은 제목이 아닙니다
+
+<span class="kw">\[</span>링크가 아닌 대괄호<span class="kw">\]</span>
+
+<span class="kw">\`</span>백틱 그대로<span class="kw">\`</span>
+
+1<span class="kw">\.</span> 순서 없는 목록처럼 안 보임</code>
+          </div>
+          <div class="split-preview">
+            <div class="split-label">👁 렌더링 결과</div>
+            <div class="md-preview">
+              <p>*별표를 그대로 출력*</p>
+              <p># 이것은 제목이 아닙니다</p>
+              <p>[링크가 아닌 대괄호]</p>
+              <p>`백틱 그대로`</p>
+              <p>1. 순서 없는 목록처럼 안 보임</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <table class="compare-table">
+        <tr><th colspan="2">이스케이프 가능한 특수문자</th></tr>
+        <tr>
+          <td style="font-size:18px;letter-spacing:8px;font-family:monospace;padding:12px 16px;">\ ` * _ { } [ ] ( ) # + - . ! |</td>
+          <td style="font-size:13px;color:var(--gray-500);">역슬래시(\)를 앞에 붙이면 그대로 출력됩니다.</td>
+        </tr>
+      </table>
+    </section>
+
+    <!-- 14. GFM -->
+    <section id="gfm">
+      <div class="section-header">
+        <div class="section-num">14</div>
+        <div class="section-title">GitHub 확장 문법 (GFM)</div>
+      </div>
+
+      <div class="info">
+        <span class="tip-icon">📌</span>
+        <div><strong>GFM(GitHub Flavored Markdown)</strong>은 GitHub가 표준 마크다운에 추가한 확장 문법입니다. GitHub, GitLab, VS Code 등에서 지원합니다.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>각주 (Footnotes) <span class="platform-badge badge-github" style="margin-left:6px;">GitHub</span></div>
+        <div class="split">
+          <div class="split-code">
+            <div class="split-label">📝 마크다운 입력</div>
+            <code>마크다운은 2004년에 만들어졌습니다.<span class="kw">[^1]</span>
+
+존 그루버가 개발했습니다.<span class="kw">[^gruber]</span>
+
+<span class="kw">[^1]</span>: <span class="str">정확히는 2004년 3월 19일입니다.</span>
+<span class="kw">[^gruber]</span>: <span class="str">Aaron Swartz와 공동 개발했습니다.</span></code>
+          </div>
+          <div class="split-preview">
+            <div class="split-label">👁 렌더링 결과</div>
+            <div class="md-preview">
+              <p>마크다운은 2004년에 만들어졌습니다.<sup style="color:var(--primary);cursor:pointer;">[1]</sup></p>
+              <p>존 그루버가 개발했습니다.<sup style="color:var(--primary);cursor:pointer;">[2]</sup></p>
+              <hr>
+              <p style="font-size:12px;color:var(--gray-500);">1. 정확히는 2004년 3월 19일입니다.<br>2. Aaron Swartz와 공동 개발했습니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>접기/펼치기 (Details/Summary) <span class="platform-badge badge-github" style="margin-left:6px;">GitHub</span></div>
+        <div class="split">
+          <div class="split-code">
+            <div class="split-label">📝 마크다운 입력</div>
+            <code><span class="tg">&lt;details&gt;</span>
+<span class="tg">&lt;summary&gt;</span><span class="str">클릭해서 펼치기</span><span class="tg">&lt;/summary&gt;</span>
+
+숨겨진 내용이 표시됩니다.
+
+<span class="kw">```python</span>
+print("코드도 넣을 수 있습니다")
+<span class="kw">```</span>
+
+<span class="tg">&lt;/details&gt;</span></code>
+          </div>
+          <div class="split-preview">
+            <div class="split-label">👁 렌더링 결과</div>
+            <div class="md-preview">
+              <details>
+                <summary style="cursor:pointer;color:var(--primary);font-weight:600;">클릭해서 펼치기</summary>
+                <div style="margin-top:8px;padding:8px;background:var(--gray-50);border-radius:6px;">
+                  <p>숨겨진 내용이 표시됩니다.</p>
+                  <pre><code>print("코드도 넣을 수 있습니다")</code></pre>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>수학 수식 (Math) <span class="platform-badge badge-github" style="margin-left:6px;">GitHub</span> <span class="platform-badge badge-obsidian">Obsidian</span></div>
+        <div class="split">
+          <div class="split-code">
+            <div class="split-label">📝 마크다운 입력</div>
+            <code><span class="cm"># 인라인 수식</span>
+피타고라스: <span class="kw">$a^2 + b^2 = c^2$</span>
+
+<span class="cm"># 블록 수식</span>
+<span class="kw">$$</span>
+E = mc^2
+<span class="kw">$$</span>
+
+<span class="kw">$$</span>
+\sum_{i=1}^{n} i = \frac{n(n+1)}{2}
+<span class="kw">$$</span></code>
+          </div>
+          <div class="split-preview">
+            <div class="split-label">👁 렌더링 결과</div>
+            <div class="md-preview">
+              <p>피타고라스: <em>a² + b² = c²</em></p>
+              <div style="text-align:center;padding:12px;background:var(--gray-50);border-radius:6px;margin:6px 0;font-style:italic;font-size:18px;">E = mc²</div>
+              <div style="text-align:center;padding:12px;background:var(--gray-50);border-radius:6px;font-style:italic;font-size:16px;">Σᵢ₌₁ⁿ i = n(n+1)/2</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15. 플랫폼별 차이 -->
+    <section id="platform">
+      <div class="section-header">
+        <div class="section-num">15</div>
+        <div class="section-title">플랫폼별 주요 차이점</div>
+      </div>
+
+      <table class="compare-table">
+        <tr>
+          <th>기능</th>
+          <th>기본 Markdown</th>
+          <th>GitHub (GFM)</th>
+          <th>Obsidian</th>
+          <th>Notion</th>
+        </tr>
+        <tr>
+          <td>표</td>
+          <td>❌</td>
+          <td>✅</td>
+          <td>✅</td>
+          <td>✅</td>
+        </tr>
+        <tr>
+          <td>체크박스</td>
+          <td>❌</td>
+          <td>✅</td>
+          <td>✅</td>
+          <td>✅</td>
+        </tr>
+        <tr>
+          <td>취소선(~~)</td>
+          <td>❌</td>
+          <td>✅</td>
+          <td>✅</td>
+          <td>✅</td>
+        </tr>
+        <tr>
+          <td>수학 수식($)</td>
+          <td>❌</td>
+          <td>✅</td>
+          <td>✅</td>
+          <td>❌</td>
+        </tr>
+        <tr>
+          <td>각주</td>
+          <td>❌</td>
+          <td>✅</td>
+          <td>✅</td>
+          <td>❌</td>
+        </tr>
+        <tr>
+          <td>내부 링크([[파일]])</td>
+          <td>❌</td>
+          <td>❌</td>
+          <td>✅</td>
+          <td>❌</td>
+        </tr>
+        <tr>
+          <td>이미지 크기([[img|300]])</td>
+          <td>❌</td>
+          <td>❌</td>
+          <td>✅</td>
+          <td>❌</td>
+        </tr>
+        <tr>
+          <td>Mermaid 다이어그램</td>
+          <td>❌</td>
+          <td>✅</td>
+          <td>✅ (플러그인)</td>
+          <td>❌</td>
+        </tr>
+        <tr>
+          <td>HTML 직접 삽입</td>
+          <td>✅ (일부)</td>
+          <td>✅ (제한적)</td>
+          <td>✅</td>
+          <td>❌</td>
+        </tr>
+      </table>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Obsidian 전용 문법</div>
+        <table class="compare-table">
+          <tr><th>기능</th><th>문법</th><th>설명</th></tr>
+          <tr>
+            <td>내부 링크</td>
+            <td class="syntax">[[다른 파일명]]</td>
+            <td>같은 Vault의 파일로 연결</td>
+          </tr>
+          <tr>
+            <td>내부 링크 + 별칭</td>
+            <td class="syntax">[[파일명|표시할 텍스트]]</td>
+            <td>링크 텍스트를 다르게 표시</td>
+          </tr>
+          <tr>
+            <td>섹션 링크</td>
+            <td class="syntax">[[파일명#헤딩명]]</td>
+            <td>특정 헤딩으로 링크</td>
+          </tr>
+          <tr>
+            <td>이미지 크기</td>
+            <td class="syntax">![[이미지.png|400]]</td>
+            <td>픽셀 너비 지정</td>
+          </tr>
+          <tr>
+            <td>파일 임베드</td>
+            <td class="syntax">![[다른 파일명]]</td>
+            <td>다른 노트의 내용을 현재 노트에 포함</td>
+          </tr>
+          <tr>
+            <td>태그</td>
+            <td class="syntax">#태그이름</td>
+            <td>노트 분류용 태그</td>
+          </tr>
+          <tr>
+            <td>하이라이트</td>
+            <td class="syntax">==하이라이트==</td>
+            <td><mark style="background:#fef08a;">하이라이트된 텍스트</mark></td>
+          </tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- 16. 치트시트 -->
+    <section id="cheatsheet">
+      <div class="section-header">
+        <div class="section-num">16</div>
+        <div class="section-title">치트시트 (Cheat Sheet)</div>
+      </div>
+
+      <div class="card">
+        <div style="background:var(--code-bg);padding:28px 32px;border-radius:0 0 10px 10px;">
+          <div class="split-label" style="color:#6c7086;margin-bottom:16px;">📋 빠른 참조표 — 마크다운 전체 문법 요약</div>
+          <code style="line-height:2;font-size:13px;">
+<span class="cm"># ── 제목 ─────────────────────────────────</span>
+<span class="hd"># H1  ## H2  ### H3  #### H4  ##### H5  ###### H6</span>
+
+<span class="cm"># ── 텍스트 강조 ──────────────────────────</span>
+<span class="kw">**굵게**</span>  <span class="em">*기울임*</span>  <span class="kw">***굵게+기울임***</span>  <span class="tg">~~취소선~~</span>  <span class="nb">`인라인코드`</span>
+
+<span class="cm"># ── 줄바꿈 · 수평선 ──────────────────────</span>
+줄 끝 공백 2칸 + Enter  →  &lt;br&gt;      빈 줄  →  새 단락
+<span class="kw">---</span>  또는  <span class="kw">***</span>  또는  <span class="kw">___</span>  →  수평선
+
+<span class="cm"># ── 목록 ─────────────────────────────────</span>
+<span class="kw">-</span> 항목    <span class="kw">*</span> 항목    <span class="kw">+</span> 항목    (순서 없음)
+<span class="nb">1.</span> 항목   <span class="nb">2.</span> 항목               (순서 있음)
+  <span class="kw">-</span> 들여쓰기 2칸 이상  →  중첩 목록
+<span class="kw">-</span> [<span class="str">x</span>] 완료   <span class="kw">-</span> [ ] 미완료         (체크박스)
+
+<span class="cm"># ── 링크 · 이미지 ────────────────────────</span>
+[<span class="str">링크 텍스트</span>](<span class="lk">URL</span>)               인라인 링크
+[<span class="str">텍스트</span>](<span class="lk">URL "툴팁"</span>)           툴팁 링크
+<span class="kw">&lt;</span><span class="lk">URL</span><span class="kw">&gt;</span>                           자동 링크
+<span class="kw">!</span>[<span class="str">대체 텍스트</span>](<span class="lk">이미지 URL</span>)       이미지
+
+<span class="cm"># ── 인용문 ───────────────────────────────</span>
+<span class="kw">&gt;</span> 인용문      <span class="kw">&gt;&gt;</span> 중첩 인용문
+
+<span class="cm"># ── 코드 ─────────────────────────────────</span>
+<span class="nb">`인라인 코드`</span>
+<span class="kw">```언어명</span>
+코드 블록 (언어명 생략 가능)
+<span class="kw">```</span>
+
+<span class="cm"># ── 표 ───────────────────────────────────</span>
+<span class="kw">|</span> 헤더1 <span class="kw">|</span> 헤더2 <span class="kw">|</span>
+<span class="kw">|:------|------:|</span>  ← :왼쪽 / 오른쪽: / :가운데:
+<span class="kw">|</span> 셀1   <span class="kw">|</span> 셀2   <span class="kw">|</span>
+
+<span class="cm"># ── 이스케이프 ───────────────────────────</span>
+<span class="kw">\</span>* <span class="kw">\</span># <span class="kw">\</span>[ <span class="kw">\</span>] <span class="kw">\</span>` <span class="kw">\</span>_ <span class="kw">\</span>{ <span class="kw">\</span>} <span class="kw">\</span>! <span class="kw">\</span>|   (기호 그대로 출력)
+
+<span class="cm"># ── GFM 확장 ─────────────────────────────</span>
+<span class="kw">$인라인 수식$</span>      <span class="kw">$$블록 수식$$</span>
+텍스트<span class="kw">[^1]</span>        <span class="kw">[^1]:</span> 각주 내용
+<span class="tg">&lt;details&gt;&lt;summary&gt;</span>제목<span class="tg">&lt;/summary&gt;</span>내용<span class="tg">&lt;/details&gt;</span>
+
+<span class="cm"># ── Obsidian 전용 ────────────────────────</span>
+[[<span class="lk">파일명</span>]]          [[<span class="lk">파일명</span>|<span class="str">별칭</span>]]
+![[<span class="lk">이미지.png</span>|<span class="nb">300</span>]]  ==<span class="em">하이라이트</span>==   #태그</code>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:20px;">
+        <div class="card-title"><span class="dot"></span>자주 하는 실수 TOP 5</div>
+        <table class="compare-table">
+          <tr><th>#</th><th>실수</th><th>올바른 방법</th></tr>
+          <tr>
+            <td>1</td>
+            <td class="syntax">#제목 (공백 없음)</td>
+            <td class="result"># 제목 (# 뒤 공백 필수)</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td class="syntax">텍스트 바로 아래 --- → 제목으로 인식됨</td>
+            <td class="result">수평선 앞뒤에 빈 줄 삽입</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td class="syntax">단순 Enter → 줄바꿈 안 됨</td>
+            <td class="result">줄 끝에 공백 2칸 또는 빈 줄 삽입</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td class="syntax">file_name → 의도치 않은 기울임</td>
+            <td class="result">file\_name 또는 `file_name`</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td class="syntax">표 헤더 구분선 없음</td>
+            <td class="result">헤더 행 바로 아래 | --- | 반드시 삽입</td>
+          </tr>
+        </table>
+      </div>
+    </section>
+
+  </div><!-- /content -->
+
+  <footer>
+    <p><strong>마크다운 사용법 완벽 가이드</strong></p>
+    <p style="margin-top:8px;">CommonMark 표준 + GFM 확장 + Obsidian 확장 기준 · 유한대학교 컴퓨터공학과 게임콘텐츠전공</p>
+  </footer>
+
+</div><!-- /main -->
+
+<script>
+  // 스크롤에 따른 TOC 활성화
+  const sections = document.querySelectorAll('section[id]');
+  const tocLinks = document.querySelectorAll('.toc a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const active = document.querySelector(`.toc a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3, rootMargin: '-10% 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+
+  // 부드러운 스크롤
+  tocLinks.forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+</body>
+</html>
