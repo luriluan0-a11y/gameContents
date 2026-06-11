@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>바이브 코딩으로 교육용 게임 만들기 | 안서중학교</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F5EFE7;
+      --surface: #FFFFFF;
+      --primary: #1E3A5F;
+      --primary-hover: #2D5986;
+      --secondary: #3D7E6B;
+      --accent: #C47B1A;
+      --text: #2A2A2A;
+      --text-muted: #6B6B6B;
+      --border: #E2D9CE;
+      --code-bg: #F0EBE3;
+      --shadow: 0 2px 16px rgba(0,0,0,0.08);
+      --shadow-hover: 0 6px 24px rgba(0,0,0,0.14);
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* ── Navigation ── */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: var(--primary);
+      z-index: 1000;
+      padding: 0 2rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    }
+
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      height: 60px;
+      gap: 0.25rem;
+    }
+
+    .nav-brand {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-right: auto;
+      white-space: nowrap;
+    }
+
+    nav a.nav-link {
+      color: rgba(255,255,255,0.75);
+      text-decoration: none;
+      font-size: 0.83rem;
+      font-weight: 500;
+      padding: 0.4rem 0.7rem;
+      border-radius: 6px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    nav a.nav-link:hover,
+    nav a.nav-link.active {
+      background: rgba(255,255,255,0.18);
+      color: #FFFFFF;
+    }
+
+    /* ── Main layout ── */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 2rem 4rem;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, #1E3A5F 0%, #2D5986 55%, #3D7E6B 100%);
+      border-radius: var(--radius);
+      padding: 4rem 3rem;
+      color: white;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .hero .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 50px;
+      padding: 0.3rem 1.2rem;
+      font-size: 0.88rem;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.04em;
+    }
+
+    .hero h1 {
+      font-size: 2.3rem;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+      line-height: 1.35;
+    }
+
+    .hero p {
+      font-size: 1rem;
+      opacity: 0.82;
+    }
+
+    /* ── Sections ── */
+    section {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 2.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+      scroll-margin-top: 76px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .section-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .icon-blue   { background: #E6EEF7; }
+    .icon-green  { background: #E6F3EE; }
+    .icon-amber  { background: #F5EDE0; }
+    .icon-purple { background: #EDE8F5; }
+
+    .section-header h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .subtitle {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    /* ── Info cards ── */
+    .info-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin: 0.75rem 0;
+    }
+
+    .card-highlight {
+      background: #EBF2FA;
+      border-color: #B5CEE5;
+      border-left: 4px solid var(--primary);
+    }
+
+    .card-note {
+      background: #F5F0E6;
+      border-color: #DDD0B8;
+      border-left: 4px solid var(--accent);
+    }
+
+    /* ── IDE grid ── */
+    .ide-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.85rem;
+      margin-top: 1rem;
+    }
+
+    .ide-card {
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 1.1rem 1.2rem;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+
+    .ide-card:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-2px);
+    }
+
+    .ide-name {
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 0.3rem;
+      font-size: 0.95rem;
+    }
+
+    .ide-desc {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.65rem 1.4rem;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: none;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--secondary);
+      color: white;
+    }
+    .btn-secondary:hover {
+      background: #2D6B5A;
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-accent {
+      background: var(--accent);
+      color: white;
+    }
+    .btn-accent:hover {
+      background: #A86A10;
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-copy {
+      background: var(--accent);
+      color: white;
+      padding: 0.45rem 1rem;
+      font-size: 0.85rem;
+    }
+    .btn-copy:hover { background: #A86A10; }
+    .btn-copy.copied { background: var(--secondary); }
+
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.25rem;
+    }
+
+    /* ── Prompt box ── */
+    .prompt-box {
+      background: #1C2A3E;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .prompt-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .prompt-label {
+      color: rgba(255,255,255,0.55);
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+    }
+
+    .prompt-text {
+      color: #E6D8BF;
+      font-size: 0.93rem;
+      line-height: 1.85;
+      white-space: pre-wrap;
+      word-break: keep-all;
+    }
+
+    /* ── Rule cards ── */
+    .rule-card {
+      display: flex;
+      gap: 1rem;
+      padding: 1.1rem 1.25rem;
+      background: var(--bg);
+      border-radius: 10px;
+      border-left: 4px solid var(--accent);
+      margin-bottom: 0.75rem;
+    }
+
+    .rule-number {
+      width: 30px;
+      height: 30px;
+      background: var(--accent);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .rule-title {
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+      font-size: 0.95rem;
+    }
+
+    .rule-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* ── File type grid ── */
+    .code-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .code-item {
+      background: var(--code-bg);
+      border-radius: 10px;
+      padding: 1.25rem;
+      border: 1px solid var(--border);
+    }
+
+    .file-ext {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      font-family: 'Courier New', monospace;
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .file-name {
+      font-weight: 600;
+      color: var(--accent);
+      font-family: 'Courier New', monospace;
+      font-size: 0.88rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .code-item p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* ── Single vs multi file ── */
+    .file-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1.25rem;
+    }
+
+    .file-box {
+      border-radius: 10px;
+      padding: 1.4rem;
+      text-align: center;
+    }
+
+    .file-box.multi {
+      background: #EBF2FA;
+      border: 2px solid #B5CEE5;
+    }
+
+    .file-box.single {
+      background: #E6F3EE;
+      border: 2px solid #A5CFC0;
+    }
+
+    .file-count {
+      font-size: 2.6rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 0.35rem;
+    }
+
+    .file-box.multi .file-count { color: var(--primary); }
+    .file-box.single .file-count { color: var(--secondary); }
+
+    .file-box strong { font-size: 0.95rem; }
+    .file-box p { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.4rem; }
+
+    /* ── Tip/warning box ── */
+    .tip-box {
+      display: flex;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      border-radius: 10px;
+      background: #F5F0E6;
+      border: 1px solid #DDD0B8;
+      margin: 1.25rem 0;
+      align-items: flex-start;
+    }
+
+    .tip-icon { font-size: 1.4rem; flex-shrink: 0; padding-top: 0.1rem; }
+
+    /* ── Two-col grid ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .feature-panel {
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+
+    .panel-blue  { background: #EBF2FA; }
+    .panel-green { background: #E6F3EE; }
+
+    .panel-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 0.85rem;
+    }
+
+    .panel-blue  .panel-title { color: var(--primary); }
+    .panel-green .panel-title { color: var(--secondary); }
+
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .feature-list li {
+      padding: 0.6rem 0.85rem;
+      background: rgba(255,255,255,0.65);
+      border-radius: 7px;
+      font-size: 0.88rem;
+      border-left: 3px solid;
+    }
+
+    .panel-blue  .feature-list li { border-left-color: var(--primary); }
+    .panel-green .feature-list li { border-left-color: var(--secondary); }
+
+    /* ── Image ── */
+    .image-container {
+      text-align: center;
+      margin: 1.5rem 0 0;
+    }
+
+    .image-container img {
+      max-width: 100%;
+      max-width: 820px;
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    /* ── Resource cards ── */
+    .resource-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .resource-card {
+      border-radius: 10px;
+      padding: 1.4rem;
+    }
+
+    .resource-card.card-blue  { background: var(--bg); border-left: 4px solid var(--primary);   border: 1px solid var(--border); border-left: 4px solid var(--primary); }
+    .resource-card.card-green { background: var(--bg); border-left: 4px solid var(--secondary); border: 1px solid var(--border); border-left: 4px solid var(--secondary); }
+
+    .resource-card strong {
+      display: block;
+      margin-bottom: 0.45rem;
+      font-size: 0.95rem;
+    }
+
+    .resource-card.card-blue  strong { color: var(--primary); }
+    .resource-card.card-green strong { color: var(--secondary); }
+
+    .resource-card p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.85rem;
+      line-height: 1.55;
+    }
+
+    hr.divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1.5rem 0;
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--primary);
+      color: rgba(255,255,255,0.65);
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.88rem;
+    }
+
+    footer .footer-title {
+      font-weight: 600;
+      color: white;
+      margin-bottom: 0.3rem;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      main { padding: 70px 1rem 3rem; }
+      .hero { padding: 2.5rem 1.5rem; }
+      .hero h1 { font-size: 1.65rem; }
+      nav a.nav-link { display: none; }
+      section { padding: 1.75rem 1.25rem; }
+      .code-grid { grid-template-columns: 1fr; }
+      .file-compare { grid-template-columns: 1fr; }
+      .two-col { grid-template-columns: 1fr; }
+      .resource-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navigation ── -->
+<nav>
+  <div class="nav-inner">
+    <span class="nav-brand">🏫 안서중학교 에듀테크 연수</span>
+    <a href="#install"  class="nav-link">프로그램 설치</a>
+    <a href="#game"     class="nav-link">교육용 게임</a>
+    <a href="#design"   class="nav-link">게임 설계</a>
+    <a href="#webapp"   class="nav-link">웹 앱 개발</a>
+    <a href="#markdown" class="nav-link">마크다운</a>
+    <a href="#resources" class="nav-link">자료</a>
+  </div>
+</nav>
+
+<main>
+
+  <!-- ── Hero ── -->
+  <div class="hero">
+    <div class="badge">2026 광명 아이랑(with AI) · 학교로 찾아가는 에듀테크 연수</div>
+    <h1>바이브 코딩으로<br>교육용 게임을 만들어 보자!</h1>
+    <p>안서중학교 · AI와 함께하는 교육용 앱 개발 체험</p>
+  </div>
+
+  <!-- ── 프로그램 설치 ── -->
+  <section id="install">
+    <div class="section-header">
+      <div class="section-icon icon-blue">💻</div>
+      <div>
+        <h2>프로그램 설치</h2>
+        <p class="subtitle">본격적으로 진행하기 전에 세팅을 먼저 해보겠습니다!</p>
+      </div>
+    </div>
+
+    <div class="info-card card-highlight">
+      <strong>✅ Google AI Studio</strong> — 별도 설치가 필요 없습니다.
+    </div>
+
+    <div class="info-card" style="border-left: 4px solid var(--accent);">
+      <strong>📦 Antigravity IDE</strong> — 설치가 필요합니다.
+    </div>
+
+    <div class="btn-group">
+      <a href="https://antigravity.google/" target="_blank" class="btn btn-primary">
+        🔗 Antigravity 설치 사이트 바로가기
+      </a>
+    </div>
+    <p class="subtitle" style="margin-top: 0.6rem; padding-left: 0.2rem;">
+      설치 후: Product &gt; Antigravity IDE 항목 선택
+    </p>
+
+    <hr class="divider">
+
+    <div style="margin-bottom: 1rem;">
+      <strong style="font-size: 1.05rem; color: var(--primary);">IDE란 무엇인가요?</strong>
+    </div>
+
+    <div class="info-card card-note">
+      <strong>IDE (Integrated Development Environment)</strong>란 '통합 개발 환경'을 말합니다.<br>
+      <span style="font-size: 0.9rem; color: var(--text-muted);">코드 작성 · 실행 · 디버깅을 하나의 프로그램 안에서 할 수 있게 해줍니다.</span>
+    </div>
+
+    <div class="ide-grid">
+      <div class="ide-card">
+        <div class="ide-name">Visual Studio</div>
+        <div class="ide-desc">마이크로소프트의 강력한 통합 개발 환경</div>
+      </div>
+      <div class="ide-card">
+        <div class="ide-name">IntelliJ IDEA ⭐</div>
+        <div class="ide-desc">Java 개발에 가장 많이 쓰이는 인기 IDE — 강추!</div>
+      </div>
+      <div class="ide-card">
+        <div class="ide-name">Xcode</div>
+        <div class="ide-desc">애플 기기용 앱을 만들 때 사용하는 IDE</div>
+      </div>
+      <div class="ide-card">
+        <div class="ide-name">Android Studio</div>
+        <div class="ide-desc">안드로이드 스마트폰 앱 개발을 위한 전용 IDE</div>
+      </div>
+      <div class="ide-card">
+        <div class="ide-name">VS Code</div>
+        <div class="ide-desc">텍스트 에디터이지만 확장 기능으로 IDE처럼 활용 가능</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 교육용 게임 ── -->
+  <section id="game">
+    <div class="section-header">
+      <div class="section-icon icon-green">🎮</div>
+      <div>
+        <h2>교육용 게임이란?</h2>
+        <p class="subtitle">오늘 만들어볼 게임 — 간단한 학습 앱!</p>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="feature-panel panel-blue">
+        <div class="panel-title">📌 교육용 게임의 특징</div>
+        <ul class="feature-list">
+          <li><strong>목적이 명확하다!</strong></li>
+          <li>교육 효과가 있다면 재미가 좀 없어도 괜찮다???</li>
+          <li><strong>재미도 있으면 더 좋겠지요!</strong></li>
+        </ul>
+      </div>
+      <div class="feature-panel panel-green">
+        <div class="panel-title">🎯 진지한 게임 (Serious Game)</div>
+        <p style="font-size: 0.88rem; line-height: 1.7;">
+          교육, 훈련, 의료, 국방 등 <strong>특정 목적을 달성하기 위해 설계된 기능성 게임</strong>을 말합니다.<br>
+          단순한 오락을 넘어 실질적인 학습 효과를 목표로 합니다.
+        </p>
+      </div>
+    </div>
+
+    <strong style="display: block; font-size: 1.05rem; color: var(--primary); margin-bottom: 1rem;">
+      🎲 게임을 만들 때 지켜야 할 규칙
+    </strong>
+
+    <div class="rule-card">
+      <div class="rule-number">1</div>
+      <div>
+        <div class="rule-title">학습에 꼭 필요한 요소에는 "노.가.다"가 있다.</div>
+        <div class="rule-desc">반복 학습은 필수! 지루하지 않게 설계하는 것이 핵심입니다.</div>
+      </div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-number">2</div>
+      <div>
+        <div class="rule-title">재미있게 반복할 수 있다면 — 확실한 피드백과 보상을 설계하기</div>
+        <div class="rule-desc">점수, 이펙트, 격려 메시지 등으로 학습 동기를 유지시키세요.</div>
+      </div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-number">3</div>
+      <div>
+        <div class="rule-title">틀렸다고 바로 "The End"를 주지 말기!</div>
+        <div class="rule-desc">"다시 해봐~" → 다시 도전할 수 있도록 구현하세요.</div>
+      </div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-number">4</div>
+      <div>
+        <div class="rule-title">제목은 직관적으로, 학부모도 타겟이 되어야 한다.</div>
+        <div class="rule-desc">교육용 콘텐츠의 구매 결정자는 학부모! 제목과 설명을 명확하게 쓰세요.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 게임 설계 ── -->
+  <section id="design">
+    <div class="section-header">
+      <div class="section-icon icon-amber">📐</div>
+      <div>
+        <h2>교육용 게임 설계</h2>
+        <p class="subtitle">AI에게 전달할 프롬프트 예제 — 버튼을 눌러 복사하세요!</p>
+      </div>
+    </div>
+
+    <div class="prompt-box">
+      <div class="prompt-header">
+        <span class="prompt-label">📋 프롬프트 예제</span>
+        <button class="btn btn-copy" id="copyBtn" onclick="copyPrompt()">복사하기</button>
+      </div>
+      <div class="prompt-text" id="promptText">나는 교육용 콘텐츠를 개발하는 개발자이고, 너는 나를 가르쳐주는 프로그램 선생님이야. 중학교 학생의 난이도로 영어 단어를 학습하는 앱을 만들고 싶어 문제는 총 100개. 문제를 풀 때마다 1점씩 증가하고, 총점을 기록해주면 좋겠어. 데이터는 배열로 저장해서 내가 편집할 수 있었으면 좋겠어.
+
+첫 번째 페이지는 "중학생을 위한 영어 마스터"라고 나오고 하단에 "Start"라는 버튼을 클릭하면 다음 페이지부터 영어 학습이 가능해. 문제를 맞추면 "참 잘했어요." 라는 피드백과 함께 이펙트가 터지도록 만들어주고, 틀리면 틀렸다고 하지 말고 "다시 한 번 풀어봐."라고 피드백을 해줘. 문제를 풀다가 이전, 다음으로 이동할 수 있고, home으로 이동하는 버튼도 만들어줘. 중학생들이 좋아할 만한 디자인으로 만들어주면 좋겠어. html 단일 페이지로 만들어줘.</div>
+    </div>
+
+    <div class="tip-box">
+      <span class="tip-icon">💡</span>
+      <div>
+        <strong>"html 단일 페이지로 만들어줘"</strong> — 이 요청이 핵심입니다!<br>
+        <span style="font-size: 0.86rem; color: var(--text-muted);">하나의 HTML 파일 안에 모든 기능을 담을 수 있어 배포와 공유가 매우 편리합니다.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 웹 앱 개발 ── -->
+  <section id="webapp">
+    <div class="section-header">
+      <div class="section-icon icon-purple">🌐</div>
+      <div>
+        <h2>웹 앱 개발 기초</h2>
+        <p class="subtitle">기본적으로 3개의 파일이 필요합니다</p>
+      </div>
+    </div>
+
+    <div class="code-grid">
+      <div class="code-item">
+        <span class="file-ext">.html</span>
+        <span class="file-name">index.html</span>
+        <p>사용자에게 보이는 화면(Front)의 <strong>구조</strong>를 정의하는 태그들이 담긴 파일</p>
+      </div>
+      <div class="code-item">
+        <span class="file-ext">.css</span>
+        <span class="file-name">style.css</span>
+        <p>사용자에게 보이는 화면의 <strong>디자인</strong>을 기록한 파일</p>
+      </div>
+      <div class="code-item">
+        <span class="file-ext">.js</span>
+        <span class="file-name">script.js</span>
+        <p>사용자에게 보이는 화면의 <strong>동작</strong>을 구현해놓은 파일</p>
+      </div>
+    </div>
+
+    <div class="file-compare">
+      <div class="file-box multi">
+        <div class="file-count">3개</div>
+        <strong>"교육용 앱 만들어줘"</strong>
+        <p>html · css · js 각각 분리된 3개 파일 생성</p>
+      </div>
+      <div class="file-box single">
+        <div class="file-count">1개</div>
+        <strong>"단일 파일로 만들어줘"</strong>
+        <p>모든 코드가 담긴 html 파일 1개만 생성</p>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="tip-box">
+      <span class="tip-icon">⚠️</span>
+      <div>
+        <strong>생성형 AI와 사랑에 빠지지 마세요 = 배신 당하니까!</strong><br>
+        <span style="font-size: 0.86rem; color: var(--text-muted);">토큰이 부족하기 때문에 오늘은 3번 정도만 실습해 보겠습니다.</span>
+      </div>
+    </div>
+
+    <div class="image-container">
+      <img src="https://luriluan0-a11y.github.io/gameContents/image/146_anti.png" alt="Antigravity IDE 실습 화면">
+    </div>
+  </section>
+
+  <!-- ── 마크다운 ── -->
+  <section id="markdown">
+    <div class="section-header">
+      <div class="section-icon icon-blue">📝</div>
+      <div>
+        <h2>마크다운을 사용해보자!</h2>
+        <p class="subtitle">프롬프트를 재사용 가능하게 — .md 파일로 관리하기</p>
+      </div>
+    </div>
+
+    <div class="info-card card-highlight">
+      <p>
+        프롬프트만 쓰면 재사용하기 어렵습니다.<br>
+        <strong>마크다운(.md) 파일</strong>을 만들어 체계적으로 관리해봅시다!
+      </p>
+    </div>
+
+    <div class="btn-group">
+      <a href="https://luriluan0-a11y.github.io/gameContents/mentoring/05.markdown_gaide.html"
+         target="_blank" class="btn btn-secondary">
+        📖 마크다운 완벽 가이드 보기
+      </a>
+    </div>
+  </section>
+
+  <!-- ── 자료 모음 ── -->
+  <section id="resources">
+    <div class="section-header">
+      <div class="section-icon icon-green">📚</div>
+      <div>
+        <h2>자료 모음</h2>
+        <p class="subtitle">연수 관련 자료를 아래에서 확인하세요</p>
+      </div>
+    </div>
+
+      <div class="resource-card card-green">
+        <strong>📥 강의자료 다운로드</strong>
+        <p>좀 더 복잡한 문서를 만들기 위해, 강의자료를 다운로드하세요.</p>
+        <a href="https://luriluan0-a11y.github.io/gameContents/lectureMaterials.zip"
+           class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+          ⬇️ 강의자료 다운로드
+        </a>
+      </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="footer-title">2026 광명 아이랑(with AI) · 학교로 찾아가는 에듀테크 연수</div>
+  <div>안서중학교 · 바이브 코딩으로 교육용 게임을 만들어 보자!</div>
+</footer>
+
+<script>
+  // ── Clipboard copy ──
+  function copyPrompt() {
+    const text = document.getElementById('promptText').innerText;
+    const btn  = document.getElementById('copyBtn');
+
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '✅ 복사 완료!';
+      btn.classList.add('copied');
+    }).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity  = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      btn.textContent = '✅ 복사 완료!';
+      btn.classList.add('copied');
+    });
+
+    setTimeout(() => {
+      btn.textContent = '복사하기';
+      btn.classList.remove('copied');
+    }, 2200);
+  }
+
+  // ── Smooth scroll ──
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // ── Active nav highlight on scroll ──
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav a.nav-link');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      navLinks.forEach(l => l.classList.remove('active'));
+      const link = document.querySelector(`nav a[href="#${entry.target.id}"]`);
+      if (link) link.classList.add('active');
+    });
+  }, { threshold: 0.35, rootMargin: '-70px 0px -55% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
