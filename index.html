@@ -60,7 +60,7 @@
 
     /* ── MAIN LAYOUT ── */
     .container {
-      max-width: 760px; margin: 0 auto;
+      max-width: 1100px; margin: 0 auto;
       padding: 3rem 1.5rem 5rem;
       display: flex; flex-direction: column; gap: 3rem;
     }
@@ -116,13 +116,16 @@
     .sec-line { flex: 1; height: 1px; background: var(--border); }
 
     /* ── CAREER ── */
-    .career-list { display: flex; flex-direction: column; gap: 0; }
+    .career-list {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 0; border-top: 1px solid var(--border);
+    }
     .career-item {
       display: flex; gap: 1rem;
-      padding: 0.9rem 0;
+      padding: 0.9rem 0.5rem;
       border-bottom: 1px solid var(--border);
     }
-    .career-item:last-child { border-bottom: none; }
+    .career-item:nth-last-child(-n+2) { border-bottom: none; }
     .c-dot {
       width: 8px; height: 8px; border-radius: 50%;
       background: var(--accent); margin-top: 7px; flex-shrink: 0;
@@ -132,29 +135,29 @@
       font-size: 0.9rem; color: var(--text); line-height: 1;
     }
 
-    /* ── NEXON IMAGE ── */
-    .nexon-wrap {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: 10px; overflow: hidden;
+    /* ── NEXON MINI (profile 내부) ── */
+    .nexon-mini {
+      display: flex; flex-direction: column; align-items: center;
+      flex-shrink: 0;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden;
+    }
+    .nexon-mini-img {
+      width: 160px; height: auto;
+      object-fit: contain; display: block;
+      filter: grayscale(20%);
+    }
+    .nexon-mini-cap {
+      padding: 0.4rem 0.6rem;
+      font-family: var(--mono); font-size: 0.7rem; color: var(--muted);
       text-align: center;
     }
-    .nexon-img {
-      width: 500px;
-      object-fit: cover; display: block;
-      filter: grayscale(20%);
-      margin: 0 auto;
-    }
-    .nexon-caption {
-      padding: 0.7rem 1rem;
-      font-family: var(--mono); font-size: 0.75rem; color: var(--muted);
-      border-top: 1px solid var(--border);
-    }
-    .nexon-caption span { color: var(--accent2); }
+    .nexon-mini-cap span { color: var(--accent2); }
 
     /* ── LINK BUTTONS GRID ── */
     .btn-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 0.8rem;
     }
     .btn-link {
@@ -188,8 +191,14 @@
     }
     .cert-item:hover { border-color: var(--accent); }
     .cert-thumb {
-      width: 140px; height: 100px;
+      width: 180px; height: 240px;
       object-fit: cover; display: block;
+      cursor: pointer;
+    }
+    .cert-item b {
+      display: block; padding: 0.5rem 0.7rem;
+      font-size: 0.88rem; font-weight: 600;
+      text-align: center;
     }
 
     /* ── FOOTER ── */
@@ -202,6 +211,9 @@
 
     @media (max-width: 540px) {
       .profile { flex-direction: column; align-items: center; text-align: center; }
+      .career-list { grid-template-columns: 1fr; border-top: none; }
+      .career-item:nth-last-child(-n+2) { border-bottom: 1px solid var(--border); }
+      .career-item:last-child { border-bottom: none; }
       .btn-grid { grid-template-columns: 1fr; }
       nav .nav-links { display: none; }
     }
@@ -238,13 +250,20 @@
         <span>✉</span> luriluan@naver.com
       </a>
     </div>
+    <div class="nexon-mini">
+      <img
+        src="https://raw.githubusercontent.com/luriluan0-a11y/gameContents/main/image/00.png"
+        alt="넥슨코리아 바람의나라 무휼GM"
+        class="nexon-mini-img"
+      />
+      <span class="nexon-mini-cap"><span>img</span> / 넥슨코리아 '바람의나라' 무휼GM</span>
+    </div>
   </section>
 
   <!-- CAREER -->
   <section id="career">
     <div class="sec-header">
       <span class="sec-label">career</span>
-      <div class="sec-line"></div>
     </div>
     <div class="career-list">
       <div class="career-item">
@@ -272,18 +291,8 @@
         <p class="c-text">대원IC 게임전문잡지 V챔프 <strong>리뷰어</strong></p>
       </div>
     </div>
+    <div class="sec-line"></div>
 
-    <!-- Nexon image -->
-    <div class="nexon-wrap" style="margin-top: 1.5rem;">
-      <img
-        class="nexon-img"
-        src="https://raw.githubusercontent.com/luriluan0-a11y/gameContents/main/image/00.png"
-        alt="넥슨코리아 바람의나라 무휼GM"
-      />
-      <div class="nexon-caption">
-        <span>img</span> / 넥슨코리아 '바람의나라' 무휼GM
-      </div>
-    </div>
   </section>
 
   <!-- LINKS -->
@@ -352,7 +361,16 @@
     </div>
     <div class="cert-grid">
       <div class="cert-item">
-        <img src="image/285_22_AItisis.jpg" alt="수료증" class="cert-thumb" />
+        <a href="image/285_22_AItisis.jpg" target="_blank" rel="noopener">
+          <img src="image/285_22_AItisis.jpg" alt="수료증" class="cert-thumb" />
+        </a>
+        <b>지피터스 22기 수료증</b>
+      </div>
+      <div class="cert-item">
+        <a href="image/285_22_AItisis.jpg" target="_blank" rel="noopener">
+          <img src="image/285_22_AItisis.jpg" alt="수료증" class="cert-thumb" />
+        </a>
+        <b>지피터스 22기 수료증</b>
       </div>
     </div>
   </section>
