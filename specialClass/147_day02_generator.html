@@ -426,6 +426,60 @@
       opacity: 1;
       transform: translateY(0);
     }
+
+    /* ── 프롬프트 박스 ── */
+    .prompt-section {
+      max-width: 700px;
+      margin: 40px auto 0;
+      padding: 0 24px;
+    }
+    .prompt-section-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .prompt-box {
+      background: #13131F;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 24px;
+      font-size: 15px;
+      line-height: 1.8;
+      color: #CDD6F4;
+      word-break: keep-all;
+      position: relative;
+    }
+    .prompt-highlight { color: #89DCEB; font-weight: 700; }
+    .btn-copy {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 14px auto 0;
+      background: rgba(108,99,255,0.15);
+      border: 1px solid rgba(108,99,255,0.45);
+      color: #A89CFF;
+      border-radius: 8px;
+      padding: 11px 28px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s;
+      width: fit-content;
+    }
+    .btn-copy:hover {
+      background: rgba(108,99,255,0.3);
+      color: #fff;
+    }
+    .btn-copy.copied {
+      background: rgba(78,205,196,0.15);
+      border-color: rgba(78,205,196,0.45);
+      color: #4ECDC4;
+    }
   </style>
 </head>
 <body>
@@ -607,6 +661,12 @@
     <span class="btn-arrow">→</span>
   </a>
   <div class="cta-hint">새 탭에서 열립니다</div>
+
+  <div class="prompt-section reveal">
+    <div class="prompt-section-label">💬 이 앱을 만든 프롬프트</div>
+    <div class="prompt-box" id="prompt-text"><span class="prompt-highlight">@01_포트폴리오\</span> 폴더에 있는 내용을 토대로 학생들이 방학 중 진행해야할 스터디를 10개 뽑아내는 웹 페이지를 개발하려고 해. 몇 개의 키워드를 제시해주고, 그 키워드들을 토대로 사람들이 필요하다고 생각하는 웹앱을 개발할 수 있는 아이디어를 생성하는 것이 목적이야. 네가 앱 개발 전문가라고 생각하고 요구사항을 제시하고 만들 앱을 정할 수 있도록 가이드해줘.</div>
+    <button class="btn-copy" id="btn-copy" onclick="copyPrompt()">📋 프롬프트 복사하기</button>
+  </div>
 </div>
 
 
@@ -624,6 +684,20 @@
     { threshold: 0.12 }
   );
   reveals.forEach(el => observer.observe(el));
+
+  // 프롬프트 복사
+  function copyPrompt() {
+    const text = document.getElementById('prompt-text').innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('btn-copy');
+      btn.textContent = '✅ 복사 완료!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = '📋 프롬프트 복사하기';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
 </script>
 
 </body>
