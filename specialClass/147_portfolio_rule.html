@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>포트폴리오 사이트 만들기 규칙</title>
+  <style>
+    :root {
+      --blue:        #2563EB;
+      --blue-light:  #DBEAFE;
+      --blue-mid:    #1D4ED8;
+      --green:       #16A34A;
+      --green-light: #DCFCE7;
+      --green-mid:   #15803D;
+      --bg:          #F1F5F9;
+      --surface:     #FFFFFF;
+      --text:        #1E293B;
+      --text-muted:  #64748B;
+      --border:      #CBD5E1;
+      --radius:      12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* ── 헤더 ── */
+    .hero {
+      background: var(--blue-mid);
+      color: #fff;
+      padding: 56px 24px 44px;
+      text-align: center;
+    }
+    .hero-label {
+      display: inline-block;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 999px;
+      padding: 5px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(24px, 5vw, 40px);
+      font-weight: 900;
+      line-height: 1.25;
+      margin-bottom: 12px;
+    }
+    .hero p {
+      font-size: 15px;
+      opacity: 0.85;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* ── 공지 배너 ── */
+    .notice {
+      background: var(--green-light);
+      border-left: 4px solid var(--green);
+      max-width: 780px;
+      margin: 36px auto 0;
+      padding: 14px 20px;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      font-size: 14px;
+      color: var(--green-mid);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ── 메인 ── */
+    .main {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+    }
+
+    /* ── 섹션 제목 ── */
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin: 52px 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── 규칙 카드 그리드 ── */
+    .rules-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .rule-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 20px 22px;
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+    }
+
+    .rule-card.premise {
+      border-color: var(--blue);
+      background: var(--blue-light);
+    }
+
+    .rule-num {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--blue-light);
+      color: var(--blue-mid);
+      font-size: 14px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .rule-card.premise .rule-num {
+      background: var(--blue-mid);
+      color: #fff;
+    }
+
+    .rule-body { flex: 1; }
+
+    .rule-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .rule-card.premise .rule-title { color: var(--blue-mid); }
+
+    .rule-detail {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .rule-sub {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .rule-sub-item {
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+    .rule-sub-item::before {
+      content: '▸';
+      color: var(--green);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── 언어 교정 섹션 ── */
+    .correction-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .correction-row {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .corr-before,
+    .corr-after {
+      padding: 16px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .corr-before {
+      color: var(--text-muted);
+      text-decoration: line-through;
+      text-decoration-color: #EF4444;
+      text-decoration-thickness: 2px;
+    }
+
+    .corr-arrow {
+      padding: 0 12px;
+      font-size: 18px;
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .corr-after {
+      background: var(--green-light);
+      color: var(--green-mid);
+      font-weight: 700;
+      border-left: 3px solid var(--green);
+    }
+
+    @media (max-width: 560px) {
+      .correction-row {
+        grid-template-columns: 1fr;
+      }
+      .corr-arrow {
+        padding: 4px 18px;
+        text-align: center;
+      }
+      .corr-after {
+        border-left: none;
+        border-top: 3px solid var(--green);
+      }
+    }
+
+    /* ── 푸터 ── */
+    footer {
+      text-align: center;
+      padding: 28px 24px;
+      font-size: 13px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════ 헤더 ══════════════ -->
+<div class="hero">
+  <div class="hero-label">🎓 유한대학교 바이브 코딩 방학 특강 2026</div>
+  <h1>포트폴리오 사이트<br>만들기 규칙</h1>
+  <p>포트폴리오를 만들기 전 반드시 확인해야 할 9가지 원칙과 언어 교정 가이드</p>
+</div>
+
+<!-- ══════════════ 메인 ══════════════ -->
+<div class="main">
+
+  <div class="notice">
+    ℹ️ 해당 내용이 없으면 질문을 해서 추가한다
+  </div>
+
+  <!-- ── 규칙 목록 ── -->
+  <div class="section-title">규칙</div>
+  <div class="rules-grid">
+
+    <div class="rule-card premise">
+      <div class="rule-num">0</div>
+      <div class="rule-body">
+        <div class="rule-title">지원 포지션을 명확히 한다</div>
+        <div class="rule-detail">포트폴리오를 만들기 전, 어느 포지션에 지원하는지를 먼저 정해야 합니다.<br>예: 기획 · 프로그래밍 · QA</div>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-num">1</div>
+      <div class="rule-body">
+        <div class="rule-title">형광색을 사용하지 않는다</div>
+        <div class="rule-detail">디자인 시 형광색을 피하고, <strong>녹색·파란색</strong> 계열로 구성합니다. 눈이 편안하고 신뢰감 있는 인상을 줍니다.</div>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-num">2</div>
+      <div class="rule-body">
+        <div class="rule-title">콘텐츠에 그림자를 넣지 않는다</div>
+        <div class="rule-detail">카드·텍스트·이미지 등 콘텐츠 요소에 box-shadow, text-shadow를 사용하지 않습니다. 깔끔하고 읽기 쉬운 레이아웃을 유지합니다.</div>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-num">3</div>
+      <div class="rule-body">
+        <div class="rule-title">가독성이 우선이다</div>
+        <div class="rule-detail">움직이는 배경은 가독성을 떨어뜨립니다. 배경색과 글씨가 명확하게 구분되도록 디자인합니다. 장식보다 내용이 먼저 읽혀야 합니다.</div>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-num">4</div>
+      <div class="rule-body">
+        <div class="rule-title">제목에 마침표를 넣지 않는다</div>
+        <div class="rule-detail">제목(heading)은 문장이 아니라 레이블입니다. 끝에 마침표(.)를 붙이지 않습니다.</div>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-num">5</div>
+      <div class="rule-body">
+        <div class="rule-title">프로젝트를 구체적으로 설명한다</div>
+        <div class="rule-detail">프로젝트를 나열하는 데 그치지 않고 아래 항목을 반드시 포함합니다.</div>
+        <div class="rule-sub">
+          <div class="rule-sub-item">팀 규모 — 몇 명이서 만들었는지</div>
+          <div class="rule-sub-item">기여도 — 본인의 역할이 전체에서 차지하는 비중</div>
+          <div class="rule-sub-item">포지션 — 기획·개발·디자인·QA 중 무엇을 맡았는지</div>
+          <div class="rule-sub-item">동아리 활동: 어떤 문제가 있었고 어떻게 해결했는지, 이 경험을 미래에 어떻게 적용할 것인지</div>
+          <div class="rule-sub-item">클라이언트 개발: 왜 이 프로젝트를 만들어야 했는지 (배경), 요구사항 분석 포함</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-num">6</div>
+      <div class="rule-body">
+        <div class="rule-title">답만 쓰고 질문은 넣지 않는다</div>
+        <div class="rule-detail">설문 항목이나 질문 문구는 페이지에 노출하지 않습니다. 답변 내용만 자연스러운 문장으로 정리해서 넣습니다.</div>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-num">7</div>
+      <div class="rule-body">
+        <div class="rule-title">취업 우선순위 순으로 배치한다</div>
+        <div class="rule-detail">지원하는 포지션과 관련성이 높은 항목을 페이지 상단에 배치합니다. 채용 담당자가 스크롤 없이 핵심을 볼 수 있어야 합니다.</div>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-num">8</div>
+      <div class="rule-body">
+        <div class="rule-title">자신감 없는 표현을 쓰지 않는다</div>
+        <div class="rule-detail">"~라고 생각합니다" "~인 것 같습니다" "~하려고 노력합니다" 같은 표현을 피합니다. 사실과 성과를 직접적으로 서술합니다.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── 언어 교정 ── -->
+  <div class="section-title">언어 교정 가이드</div>
+  <div class="correction-grid">
+
+    <div class="correction-row">
+      <div class="corr-before">내가 다루는 기술, 다룰 줄 아는 것들</div>
+      <div class="corr-arrow">→</div>
+      <div class="corr-after">기술 스펙</div>
+    </div>
+
+    <div class="correction-row">
+      <div class="corr-before">꾸준히 성장하는 개발자</div>
+      <div class="corr-arrow">→</div>
+      <div class="corr-after">(어떤 준비를 한) 준비된 개발자</div>
+    </div>
+
+    <div class="correction-row">
+      <div class="corr-before">도움이 되는 사람이 되고 싶다</div>
+      <div class="corr-arrow">→</div>
+      <div class="corr-after">해결하는 사람이 되고 싶다</div>
+    </div>
+
+    <div class="correction-row">
+      <div class="corr-before">저는 이런 사람입니다</div>
+      <div class="corr-arrow">→</div>
+      <div class="corr-after">저를 소개합니다</div>
+    </div>
+
+  </div>
+
+</div><!-- /main -->
+
+<!-- ══════════════ 다운로드 ══════════════ -->
+<div style="text-align:center; padding: 48px 24px 56px; background: var(--surface); border-top: 1px solid var(--border);">
+  <p style="font-size:14px; color:var(--text-muted); margin-bottom:20px;">규칙 파일을 다운로드해서 팀원과 공유하세요</p>
+  <a href="https://luriluan0-a11y.github.io/gameContents/download/portfolio_rule.zip"
+     download
+     style="display:inline-flex; align-items:center; gap:10px;
+            background:var(--blue-mid); color:#fff; text-decoration:none;
+            border-radius:10px; padding:14px 32px;
+            font-size:15px; font-weight:700; letter-spacing:-0.2px;
+            transition: background 0.18s;">
+    ⬇ 포트폴리오 사이트 만들기 규칙 다운로드
+  </a>
+</div>
+
+<!-- ══════════════ 푸터 ══════════════ -->
+<footer>
+  유한대학교 컴퓨터공학과 바이브 코딩 방학 특강 2026 · 이윤임 교수
+</footer>
+
+</body>
+</html>
