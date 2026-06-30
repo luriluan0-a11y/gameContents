@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>데이터 만들기 vs 다루기 — 유한대 바이브 코딩 특강</title>
+  <style>
+    :root {
+      --make:  #6C63FF;
+      --handle:#FF6B6B;
+      --neutral:#4ECDC4;
+      --bg: #0F0E17;
+      --surface: #1A1928;
+      --surface2: #232235;
+      --text: #FFFFFE;
+      --text-muted: #A7A9BE;
+      --border: #2E2D44;
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* ── 히어로 ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 60px 24px;
+      background: radial-gradient(ellipse at 30% 40%, rgba(108,99,255,0.18) 0%, transparent 60%),
+                  radial-gradient(ellipse at 70% 60%, rgba(255,107,107,0.14) 0%, transparent 60%),
+                  var(--bg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    .badge {
+      display: inline-block;
+      border: 1px solid rgba(108,99,255,0.5);
+      background: rgba(108,99,255,0.12);
+      color: #A89CFF;
+      border-radius: 999px;
+      padding: 6px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 28px;
+    }
+
+    .hero h1 {
+      font-size: clamp(32px, 7vw, 72px);
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 10px;
+      letter-spacing: -1px;
+    }
+
+    .vs-word {
+      display: block;
+      font-size: clamp(14px, 2.5vw, 22px);
+      font-weight: 400;
+      color: var(--text-muted);
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      margin: 6px 0;
+    }
+
+    .make-text  { color: var(--make); }
+    .handle-text { color: var(--handle); }
+
+    .hero-sub {
+      font-size: clamp(15px, 2.5vw, 20px);
+      color: var(--text-muted);
+      max-width: 560px;
+      margin: 24px auto 0;
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--text-muted);
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      animation: float 2s ease-in-out infinite;
+    }
+    .scroll-hint::after {
+      content: '↓';
+      font-size: 20px;
+    }
+    @keyframes float {
+      0%,100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ── 공통 ── */
+    .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+    section { padding: 80px 0; }
+
+    .section-label {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: clamp(22px, 4vw, 36px);
+      font-weight: 800;
+      line-height: 1.3;
+      margin-bottom: 16px;
+    }
+
+    .lead {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin-bottom: 48px;
+    }
+
+    /* ── 비교 카드 ── */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    @media (max-width: 640px) {
+      .compare-grid { grid-template-columns: 1fr; }
+    }
+
+    .compare-card {
+      border-radius: var(--radius);
+      padding: 28px;
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .compare-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+
+    .card-make {
+      background: rgba(108,99,255,0.08);
+      border-color: rgba(108,99,255,0.3);
+    }
+    .card-make::before { background: var(--make); }
+
+    .card-handle {
+      background: rgba(255,107,107,0.08);
+      border-color: rgba(255,107,107,0.3);
+    }
+    .card-handle::before { background: var(--handle); }
+
+    .compare-card .card-icon { font-size: 36px; margin-bottom: 14px; }
+    .compare-card h3 { font-size: 20px; font-weight: 800; margin-bottom: 10px; }
+    .compare-card p { font-size: 15px; color: var(--text-muted); margin-bottom: 16px; }
+
+    .compare-card ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .compare-card ul li {
+      font-size: 14px;
+      color: #D1D0E8;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .compare-card ul li::before { content: '›'; font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .card-make ul li::before   { color: var(--make); }
+    .card-handle ul li::before { color: var(--handle); }
+
+    /* ── 질문 섹션 ── */
+    .question-section {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 40px;
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .big-question {
+      font-size: clamp(20px, 3.5vw, 32px);
+      font-weight: 800;
+      line-height: 1.4;
+      margin-bottom: 16px;
+    }
+
+    .highlight {
+      background: linear-gradient(135deg, var(--make), var(--handle));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .question-sub {
+      color: var(--text-muted);
+      font-size: 16px;
+      max-width: 500px;
+      margin: 0 auto 32px;
+    }
+
+    .opinion-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      text-align: left;
+    }
+
+    .opinion-card {
+      background: var(--surface2);
+      border-radius: 12px;
+      padding: 18px;
+      border: 1px solid var(--border);
+    }
+    .opinion-card .op-icon { font-size: 24px; margin-bottom: 8px; }
+    .opinion-card .op-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .opinion-card p { font-size: 14px; line-height: 1.5; }
+
+    /* ── 활용 섹션 ── */
+    .use-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .use-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 24px;
+      border: 1px solid var(--border);
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .use-card:hover {
+      border-color: var(--make);
+      transform: translateY(-3px);
+    }
+    .use-card .use-icon { font-size: 32px; margin-bottom: 12px; }
+    .use-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .use-card p { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+    /* ── 포트폴리오 업데이트 ── */
+    .update-section {
+      background: linear-gradient(135deg, rgba(108,99,255,0.12), rgba(255,107,107,0.08));
+      border-radius: var(--radius);
+      padding: 48px 40px;
+      border: 1px solid rgba(108,99,255,0.3);
+      text-align: center;
+    }
+
+    .update-section h2 { margin-bottom: 12px; }
+    .update-section .lead { margin: 0 auto 36px; }
+
+    .step-flow {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+
+    .step-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 2px solid var(--make);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .step-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-align: center;
+      max-width: 80px;
+    }
+
+    .step-arrow {
+      font-size: 20px;
+      color: var(--make);
+      padding: 0 8px;
+      opacity: 0.5;
+      margin-bottom: 24px;
+    }
+
+    /* ── CTA 버튼 ── */
+    .cta-area {
+      text-align: center;
+      padding: 80px 24px;
+    }
+
+    .cta-label {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .cta-title {
+      font-size: clamp(22px, 4vw, 36px);
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .cta-sub {
+      color: var(--text-muted);
+      font-size: 16px;
+      margin-bottom: 36px;
+    }
+
+    .btn-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: linear-gradient(135deg, var(--make) 0%, #9B5DE5 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 999px;
+      padding: 18px 40px;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      box-shadow: 0 8px 32px rgba(108,99,255,0.4);
+      transition: all 0.2s ease;
+    }
+    .btn-cta:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 40px rgba(108,99,255,0.55);
+    }
+    .btn-cta:active { transform: translateY(0); }
+
+    .btn-arrow {
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      transition: transform 0.2s;
+    }
+    .btn-cta:hover .btn-arrow { transform: translateX(4px); }
+
+    .cta-hint {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ── 구분선 ── */
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── 푸터 ── */
+    footer {
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 13px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── 페이드인 ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════ 히어로 ══════════════ -->
+<div class="hero">
+  <div class="badge">🎓 유한대학교 바이브 코딩 방학 특강 2026</div>
+  <h1>
+    <span class="make-text">만들기</span>
+    <span class="vs-word">vs</span>
+    <span class="handle-text">다루기</span>
+  </h1>
+  <p class="hero-sub">AI가 조사한 자료는 창작물인가요?<br>데이터는 결국 무엇을 만드는가?</p>
+  <div class="scroll-hint">스크롤</div>
+</div>
+
+
+<!-- ══════════════ 비교 섹션 ══════════════ -->
+<section>
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">DATA 101</div>
+      <h2>데이터를 조사해 봅시다</h2>
+      <p class="lead">데이터에는 두 가지 방향이 있습니다. 없던 것을 새로 만드는 것과, 있는 것을 잘 다루는 것.</p>
+    </div>
+
+    <div class="compare-grid reveal">
+      <div class="compare-card card-make">
+        <div class="card-icon">🏗️</div>
+        <h3 class="make-text">데이터 만들기</h3>
+        <p>새로운 데이터를 직접 생성하는 행위. 세상에 없던 정보를 처음으로 만들어냅니다.</p>
+        <ul>
+          <li>설문·실험·측정으로 1차 데이터 수집</li>
+          <li>사진, 영상, 글 등 직접 창작</li>
+          <li>코드를 짜서 새 기능·서비스 구현</li>
+          <li>아이디어를 구체적인 결과물로 실체화</li>
+        </ul>
+      </div>
+
+      <div class="compare-card card-handle">
+        <div class="card-icon">🔬</div>
+        <h3 class="handle-text">데이터 다루기</h3>
+        <p>기존 데이터를 수집·분석·가공해 새로운 의미를 발견하는 행위입니다.</p>
+        <ul>
+          <li>인터넷 자료·논문·통계 수집 & 정리</li>
+          <li>패턴·트렌드 분석 및 시각화</li>
+          <li>AI로 기존 데이터에서 인사이트 추출</li>
+          <li>여러 자료를 엮어 새로운 해석 제시</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="question-section reveal">
+      <p class="big-question">
+        AI가 조사한 자료들은<br>
+        <span class="highlight">창작물인가요?</span>
+      </p>
+      <p class="question-sub">
+        AI는 방대한 데이터를 학습해 패턴을 찾고 새로운 형태로 결합합니다.<br>
+        이것은 "다루기"일까요, "만들기"일까요?
+      </p>
+
+      <div class="opinion-grid">
+        <div class="opinion-card">
+          <div class="op-icon">🤖</div>
+          <div class="op-label">AI의 역할</div>
+          <p>기존 데이터를 학습해 새로운 조합을 생성 → <strong>"다루기 + 만들기"</strong>의 경계에 있음</p>
+        </div>
+        <div class="opinion-card">
+          <div class="op-icon">⚖️</div>
+          <div class="op-label">저작권 논쟁</div>
+          <p>AI 생성물의 저작권은 아직 전 세계적으로 <strong>논쟁 중</strong>. 법적 기준이 계속 바뀌는 중</p>
+        </div>
+        <div class="opinion-card">
+          <div class="op-icon">💡</div>
+          <div class="op-label">핵심 질문</div>
+          <p>중요한 것은 AI가 만들었냐가 아니라, <strong>내가 어떻게 활용하느냐</strong></p>
+        </div>
+        <div class="opinion-card">
+          <div class="op-icon">🎯</div>
+          <div class="op-label">결론</div>
+          <p>AI 자료를 그냥 복붙 → 다루기. 의도·판단·편집 추가 → <strong>나만의 창작</strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════ 활용 섹션 ══════════════ -->
+<section style="background: var(--surface); padding: 80px 0;">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">USAGE</div>
+      <h2>조사한 데이터, 어디에 쓸 수 있을까요?</h2>
+      <p class="lead">데이터는 쌓아두면 그냥 파일입니다. 연결하고 표현할 때 비로소 가치가 생깁니다.</p>
+    </div>
+
+    <div class="use-grid reveal">
+      <div class="use-card">
+        <div class="use-icon">🌐</div>
+        <h3>포트폴리오 웹사이트</h3>
+        <p>트렌드 자료·조사 결과를 내 포트폴리오 페이지에 넣으면 단순 이력서 이상의 깊이가 생깁니다.</p>
+      </div>
+      <div class="use-card">
+        <div class="use-icon">📊</div>
+        <h3>데이터 시각화</h3>
+        <p>숫자와 트렌드를 차트·그래프로 시각화하면 한눈에 이해되는 인사이트가 됩니다.</p>
+      </div>
+      <div class="use-card">
+        <div class="use-icon">🛠️</div>
+        <h3>웹앱의 콘텐츠</h3>
+        <p>방학 스터디 아이디어 생성기처럼, 조사 데이터가 앱의 핵심 콘텐츠가 될 수 있습니다.</p>
+      </div>
+      <div class="use-card">
+        <div class="use-icon">📝</div>
+        <h3>보고서 & 기획서</h3>
+        <p>근거 있는 데이터가 뒷받침되면 기획서·제안서의 설득력이 완전히 달라집니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════ 포트폴리오 업데이트 ══════════════ -->
+<section>
+  <div class="container">
+    <div class="update-section reveal">
+      <div class="section-label" style="color:#A89CFF; display:block; margin-bottom:16px;">YOUR PORTFOLIO</div>
+      <h2>데이터를 내 포트폴리오에<br>업데이트할 수 있을까요?</h2>
+      <p class="lead" style="margin:0 auto 40px;">네, 할 수 있습니다. 조사한 자료가 곧 포트폴리오의 콘텐츠가 됩니다.</p>
+
+      <div class="step-flow">
+        <div class="step-item">
+          <div class="step-circle">🔍</div>
+          <div class="step-label">데이터 조사</div>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-item">
+          <div class="step-circle">✂️</div>
+          <div class="step-label">정리 & 편집</div>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-item">
+          <div class="step-circle">🎨</div>
+          <div class="step-label">시각화</div>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-item">
+          <div class="step-circle">🌐</div>
+          <div class="step-label">페이지에 반영</div>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-item">
+          <div class="step-circle">🚀</div>
+          <div class="step-label">GitHub 배포</div>
+        </div>
+      </div>
+
+      <p style="color:var(--text-muted); font-size:15px; max-width:500px; margin:0 auto;">
+        이 수업에서 만든 트렌드 자료·AI 조사 결과가<br>
+        이미 여러분의 포트폴리오 재료가 되고 있습니다.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════ CTA — 아이디어 생성기 버튼 ══════════════ -->
+<div class="cta-area reveal">
+  <div class="cta-label">데이터로 만든 결과물</div>
+  <h2 class="cta-title">데이터는 결국 무엇을 만드는가?</h2>
+  <p class="cta-sub">
+    트렌드 코리아, AI 활용 사례, 지피터스 사례 데이터를 모아<br>
+    <strong>방학 스터디 아이디어 생성기</strong>를 만들었습니다.
+  </p>
+  <a class="btn-cta" href="https://luriluan0-a11y.github.io/gameContents/specialClass/147_study-idea-generator.html" target="_blank" rel="noopener">
+    🚀 방학 스터디 아이디어 생성기 열기
+    <span class="btn-arrow">→</span>
+  </a>
+  <div class="cta-hint">새 탭에서 열립니다</div>
+</div>
+
+
+<!-- ══════════════ 푸터 ══════════════ -->
+<footer>
+  유한대학교 컴퓨터공학과 바이브 코딩 방학 특강 2026 · 이윤임 교수
+</footer>
+
+
+<script>
+  // 스크롤 페이드인
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(
+    entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+    { threshold: 0.12 }
+  );
+  reveals.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
