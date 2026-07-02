@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 캐릭터 챗봇을 만들어보자! — 바이브 코딩 특강</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+  :root {
+    --bg: #0b0f1a;
+    --bg-panel: #131a2b;
+    --border: #232c42;
+    --text: #eef1f8;
+    --text-dim: #8b94ac;
+    --accent: #7c6cff;
+    --accent2: #22d3ee;
+    --gradient: linear-gradient(120deg, #7c6cff 0%, #22d3ee 100%);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', 'Inter', sans-serif;
+    overflow: hidden;
+  }
+
+  body {
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(124,108,255,0.16), transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(34,211,238,0.14), transparent 45%),
+      linear-gradient(180deg, #0b0f1a 0%, #0c1220 100%);
+  }
+
+  .deck {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+  }
+
+  /* ── 진행 바 & 카운터 ── */
+  .progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,0.06);
+    z-index: 50;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 16.66%;
+    background: var(--gradient);
+    transition: width 0.4s ease;
+  }
+
+  .slide-counter {
+    position: fixed;
+    top: 22px;
+    right: 32px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    z-index: 50;
+  }
+
+  .slide-counter span#currentSlide { color: var(--text); }
+
+  .brand-tag {
+    position: fixed;
+    top: 22px;
+    left: 32px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    color: var(--text-dim);
+    z-index: 50;
+  }
+
+  .brand-tag b { color: var(--accent2); }
+
+  /* ── 슬라이드 ── */
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10vh 10vw;
+    opacity: 0;
+    transform: translateY(24px);
+    pointer-events: none;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .slide.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--accent2);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+
+  h1.title {
+    font-size: 3.4rem;
+    font-weight: 900;
+    line-height: 1.25;
+    margin-bottom: 20px;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  h2.heading {
+    font-size: 2.3rem;
+    font-weight: 900;
+    line-height: 1.3;
+    margin-bottom: 36px;
+    color: var(--text);
+  }
+
+  h2.heading .accent { color: var(--accent2); }
+
+  .subtitle {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--text-dim);
+    max-width: 640px;
+    line-height: 1.6;
+  }
+
+  .bullets {
+    list-style: none;
+    max-width: 760px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .bullets li {
+    font-size: 1.15rem;
+    font-weight: 500;
+    line-height: 1.6;
+    color: var(--text);
+    padding-left: 30px;
+    position: relative;
+  }
+
+  .bullets li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 9px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gradient);
+  }
+
+  .bullets li .dim { color: var(--text-dim); font-weight: 400; }
+
+  /* ── 표지 슬라이드 ── */
+  .cover {
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .cover-badge {
+    display: inline-block;
+    padding: 8px 18px;
+    border-radius: 50px;
+    border: 1px solid var(--border);
+    background: rgba(124,108,255,0.08);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--accent2);
+    margin-bottom: 28px;
+  }
+
+  .cover h1 {
+    font-size: 4.2rem;
+    font-weight: 900;
+    line-height: 1.2;
+    margin-bottom: 22px;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .cover .subtitle {
+    font-size: 1.4rem;
+    color: var(--text-dim);
+    margin-bottom: 40px;
+  }
+
+  .cover-footer {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+  }
+
+  .cover-footer .line {
+    width: 40px;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── 인용구 카드 ── */
+  .quote-card {
+    margin-top: 40px;
+    max-width: 700px;
+    padding: 26px 30px;
+    border-left: 3px solid var(--accent2);
+    background: var(--bg-panel);
+    border-radius: 8px;
+  }
+
+  .quote-card p {
+    font-size: 1.1rem;
+    font-style: italic;
+    color: var(--text);
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+
+  .quote-card cite {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-dim);
+    font-style: normal;
+  }
+
+  /* ── 카드 그리드 (활용 사례 / 구성요소) ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    max-width: 820px;
+    margin-top: 8px;
+  }
+
+  .info-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 20px;
+  }
+
+  .info-card .icon { font-size: 1.8rem; margin-bottom: 12px; }
+  .info-card .card-title { font-size: 1.02rem; font-weight: 700; margin-bottom: 6px; }
+  .info-card .card-desc { font-size: 0.88rem; color: var(--text-dim); line-height: 1.5; }
+
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .chip {
+    padding: 10px 20px;
+    border-radius: 50px;
+    border: 1px solid var(--border);
+    background: var(--bg-panel);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent2);
+  }
+
+  /* ── 번호 규칙 리스트 ── */
+  .rule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 760px;
+  }
+
+  .rule-item {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 22px;
+  }
+
+  .rule-num {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 900;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    flex-shrink: 0;
+  }
+
+  .rule-text {
+    font-size: 1.02rem;
+    line-height: 1.55;
+    color: var(--text);
+  }
+
+  /* ── 프롬프트 예제 슬라이드 ── */
+  .prompt-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+    max-width: 820px;
+  }
+
+  .prompt-label-left { display: flex; align-items: center; gap: 8px; }
+
+  .prompt-label .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .prompt-label .dot.r { background: #ff5f57; }
+  .prompt-label .dot.y { background: #febc2e; }
+  .prompt-label .dot.g { background: #28c840; }
+
+  .copy-btn {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 16px;
+    border-radius: 50px;
+    border: 1px solid var(--border);
+    background: var(--bg-panel);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  }
+
+  .copy-btn:hover { border-color: var(--accent); background: rgba(124,108,255,0.1); }
+  .copy-btn:active { transform: scale(0.96); }
+
+  .copy-btn.copied {
+    border-color: var(--accent2);
+    background: rgba(34,211,238,0.12);
+    color: var(--accent2);
+  }
+
+  .prompt-card {
+    max-width: 820px;
+    max-height: 52vh;
+    overflow-y: auto;
+    background: #0e1424;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 30px;
+    font-size: 1.0rem;
+    line-height: 1.85;
+    color: #d7dcee;
+  }
+
+  .prompt-card::-webkit-scrollbar { width: 6px; }
+  .prompt-card::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+  .prompt-card table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0 18px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  .prompt-card th, .prompt-card td {
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .prompt-card th {
+    color: var(--accent2);
+    font-weight: 700;
+    background: rgba(124,108,255,0.08);
+    white-space: nowrap;
+  }
+
+  .prompt-card td.blank { color: var(--text-dim); }
+
+  /* ── 내비게이션 ── */
+  .nav-btn {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: rgba(19,26,43,0.85);
+    color: var(--text);
+    font-size: 1.3rem;
+    cursor: pointer;
+    z-index: 50;
+    transition: background 0.15s, transform 0.15s;
+    backdrop-filter: blur(6px);
+  }
+
+  .nav-btn:hover { background: rgba(124,108,255,0.25); }
+  .nav-btn:active { transform: translateY(-50%) scale(0.92); }
+  .nav-btn.prev { left: 26px; }
+  .nav-btn.next { right: 26px; }
+  .nav-btn:disabled { opacity: 0.25; cursor: default; }
+  .nav-btn:disabled:hover { background: rgba(19,26,43,0.85); }
+
+  .dots {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 50;
+  }
+
+  .dot-btn {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.2s, width 0.2s;
+  }
+
+  .dot-btn.active {
+    width: 24px;
+    border-radius: 6px;
+    background: var(--gradient);
+  }
+
+  @media (max-width: 720px) {
+    .slide { padding: 8vh 7vw; }
+    .cover h1 { font-size: 2.6rem; }
+    h1.title { font-size: 2.2rem; }
+    h2.heading { font-size: 1.6rem; }
+    .card-grid { grid-template-columns: 1fr; }
+    .nav-btn { width: 38px; height: 38px; font-size: 1.05rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="deck">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="brand-tag">VIBE CODING <b>WORKSHOP</b></div>
+  <div class="slide-counter"><span id="currentSlide">01</span> / <span id="totalSlides">06</span></div>
+
+  <!-- 1. 표지 -->
+  <section class="slide cover active" data-index="0">
+    <div class="cover-badge">바이브 코딩 특강 · DAY 01</div>
+    <h1>AI 캐릭터 챗봇을<br>만들어보자!</h1>
+    <p class="subtitle">나만의 캐릭터와 대화하는 챗봇, 오늘 직접 만들어봅니다.</p>
+    <div class="cover-footer">
+      <span>AI Character Chatbot Workshop</span>
+      <span class="line"></span>
+      <span>No-Code · Vibe Coding</span>
+    </div>
+  </section>
+
+  <!-- 2. 바이브 코딩이란? -->
+  <section class="slide" data-index="1">
+    <div class="eyebrow">Concept</div>
+    <h2 class="heading">바이브 코딩<span class="accent">(Vibe Coding)</span>이란?</h2>
+    <ul class="bullets">
+      <li>AI에게 자연어로 <span class="dim">"이런 걸 만들어줘"</span>라고 말하면 AI가 코드를 대신 짜주는 방식의 프로그래밍</li>
+      <li>노코드(No-Code) 방식이라고도 한다</li>
+      <li>2025년 초, AI 연구자 <span class="dim">안드레이 카파시(Andrej Karpathy, OpenAI 공동창업자 출신)</span>가 트위터에 이 표현을 쓰면서 유행하기 시작했다</li>
+    </ul>
+    <div class="quote-card">
+      <p>"코드가 있다는 사실 자체를 거의 잊고, 그냥 AI에게 말로 시키면서 결과를 본다"</p>
+      <cite>— Andrej Karpathy</cite>
+    </div>
+  </section>
+
+  <!-- 3. AI 캐릭터 챗봇이란? -->
+  <section class="slide" data-index="2">
+    <div class="eyebrow">Today's Topic</div>
+    <h2 class="heading">AI 캐릭터 챗봇이란?</h2>
+    <ul class="bullets" style="margin-bottom: 34px;">
+      <li>정해진 성격과 말투를 가진 캐릭터가 사용자와 대화를 나누는 콘텐츠</li>
+      <li>진짜 사람과 대화하는 것 같은 몰입감을 줄 수 있다</li>
+    </ul>
+    <div class="card-grid">
+      <div class="info-card">
+        <div class="icon">🎮</div>
+        <div class="card-title">게임 속 NPC</div>
+        <div class="card-desc">플레이어와 상호작용하는 캐릭터 대사 시스템</div>
+      </div>
+      <div class="info-card">
+        <div class="icon">📚</div>
+        <div class="card-title">교육용 튜터 캐릭터</div>
+        <div class="card-desc">학습을 도와주는 친근한 안내자 역할</div>
+      </div>
+      <div class="info-card">
+        <div class="icon">💬</div>
+        <div class="card-title">상담 · 힐링 캐릭터</div>
+        <div class="card-desc">사용자의 이야기를 들어주는 대화 상대</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. 페르소나란? -->
+  <section class="slide" data-index="3">
+    <div class="eyebrow">Design</div>
+    <h2 class="heading">페르소나<span class="accent">(Persona)</span>란?</h2>
+    <ul class="bullets" style="margin-bottom: 30px;">
+      <li>캐릭터에게 생명을 불어넣는 설정값이다</li>
+      <li>페르소나가 뚜렷할수록 챗봇이 매력적으로 느껴진다</li>
+    </ul>
+    <div class="chip-row">
+      <span class="chip">이름</span>
+      <span class="chip">말투</span>
+      <span class="chip">성격</span>
+      <span class="chip">세계관 (배경 이야기)</span>
+    </div>
+  </section>
+
+  <!-- 5. 챗봇을 만들 때 규칙 -->
+  <section class="slide" data-index="4">
+    <div class="eyebrow">Rules</div>
+    <h2 class="heading">챗봇을 만들 때 규칙</h2>
+    <div class="rule-list">
+      <div class="rule-item">
+        <div class="rule-num">01</div>
+        <div class="rule-text">페르소나 일관성을 유지한다. 캐릭터가 갑자기 다른 사람처럼 말하면 몰입이 깨진다.</div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">02</div>
+        <div class="rule-text">오늘은 "규칙 기반" 챗봇을 만든다. 모든 대화를 다 이해할 수는 없으니, 핵심 키워드에 반응하도록 설계한다.</div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">03</div>
+        <div class="rule-text">모르는 질문에는 "모른다"고 딱딱하게 답하지 말고, 캐릭터답게 자연스럽게 회피하는 대사를 준비한다.</div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">04</div>
+        <div class="rule-text">대화 흐름(인사 → 키워드 응답 → 마무리/초기화)을 미리 설계해 둔다.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. 챗봇 설계 - 프롬프트 예제 -->
+  <section class="slide" data-index="5">
+    <div class="eyebrow">Hands-on</div>
+    <h2 class="heading">챗봇 설계 — 프롬프트 예제</h2>
+    <div class="prompt-label">
+      <span class="prompt-label-left">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <span style="margin-left:6px;">캐릭터 챗봇 개발을 위한 프롬프트 예제</span>
+      </span>
+      <button class="copy-btn" id="copyPromptBtn" onclick="copyPrompt()">
+        <span>📋</span><span class="copy-text">마크다운으로 복사</span>
+      </button>
+    </div>
+    <div class="prompt-card">
+      나는 나만의 캐릭터 챗봇을 만들고 싶은 학생이고, 너는 나를 도와주는 코딩 선생님이야. 캐릭터는 OO라는 이름의 OOO이야. 말투는 항상 "OOO"으로 끝나고, 장난기 많고 잘난 척을 좋아하는 성격이야.
+      <br><br>
+      먼저 아래 <b>키워드 응답 설계표</b>를 나 대신 채워줘. 빈칸에는 내 캐릭터에 어울리는 키워드와 대답을 제안해줘.
+      <table>
+        <tr><th>카테고리</th><th>반응할 키워드</th><th>캐릭터의 대답</th></tr>
+        <tr><td>인사</td><td class="blank">&nbsp;</td><td class="blank">&nbsp;</td></tr>
+        <tr><td>이름 소개</td><td class="blank">&nbsp;</td><td class="blank">&nbsp;</td></tr>
+        <tr><td>특기/전문분야</td><td class="blank">&nbsp;</td><td class="blank">&nbsp;</td></tr>
+        <tr><td>고민 상담</td><td class="blank">&nbsp;</td><td class="blank">&nbsp;</td></tr>
+        <tr><td>칭찬받았을 때</td><td class="blank">&nbsp;</td><td class="blank">&nbsp;</td></tr>
+        <tr><td>놀림/무례한 말 들었을 때</td><td class="blank">&nbsp;</td><td class="blank">&nbsp;</td></tr>
+        <tr><td>심심하다고 할 때</td><td class="blank">&nbsp;</td><td class="blank">&nbsp;</td></tr>
+        <tr><td>작별 인사</td><td class="blank">&nbsp;</td><td class="blank">&nbsp;</td></tr>
+      </table>
+      표를 다 채웠으면, 각 줄의 키워드와 대답을 그대로 배열로 저장해서 내가 나중에 편집할 수 있게 해줘. 사용자가 채팅창에 메시지를 입력하면, 표에 정리한 키워드에 따라 캐릭터가 맞는 말투로 대답해줘.
+      <br><br>
+      정해진 키워드가 없는 질문을 하면 "예시) 그건 나도 모른다냥... 다른 걸 물어봐라냥!"이라고 답해줘.
+      <br><br>
+      화면 위쪽에는 캐릭터를 표현하는 큰 이모지와 이름이 보이고, 아래쪽에는 말풍선이 쌓이는 채팅창을 만들어줘. 메시지 입력창과 전송 버튼도 필요해.
+      <br><br>
+      대화 초기화 버튼도 만들어주고, 귀엽고 아기자기한 디자인으로 html 단일 페이지로 만들어줘.
+    </div>
+  </section>
+
+  <button class="nav-btn prev" id="prevBtn" aria-label="이전 슬라이드">‹</button>
+  <button class="nav-btn next" id="nextBtn" aria-label="다음 슬라이드">›</button>
+  <div class="dots" id="dots"></div>
+</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  const dotsEl = document.getElementById('dots');
+  const currentEl = document.getElementById('currentSlide');
+  const totalEl = document.getElementById('totalSlides');
+  const progressFill = document.getElementById('progressFill');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  let current = 0;
+  totalEl.textContent = String(total).padStart(2, '0');
+
+  // ── 프롬프트 마크다운 복사 ──
+  const promptMarkdown = `나는 나만의 캐릭터 챗봇을 만들고 싶은 학생이고, 너는 나를 도와주는 코딩 선생님이야. 캐릭터는 OO라는 이름의 OOO이야. 말투는 항상 "OOO"으로 끝나고, 장난기 많고 잘난 척을 좋아하는 성격이야.
+
+먼저 아래 **키워드 응답 설계표**를 나 대신 채워줘. 빈칸에는 내 캐릭터에 어울리는 키워드와 대답을 제안해줘.
+
+| 카테고리 | 반응할 키워드 | 캐릭터의 대답 |
+|---|---|---|
+| 인사 | | |
+| 이름 소개 | | |
+| 특기/전문분야 | | |
+| 고민 상담 | | |
+| 칭찬받았을 때 | | |
+| 놀림/무례한 말 들었을 때 | | |
+| 심심하다고 할 때 | | |
+| 작별 인사 | | |
+
+표를 다 채웠으면, 각 줄의 키워드와 대답을 그대로 배열로 저장해서 내가 나중에 편집할 수 있게 해줘. 사용자가 채팅창에 메시지를 입력하면, 표에 정리한 키워드에 따라 캐릭터가 맞는 말투로 대답해줘.
+
+정해진 키워드가 없는 질문을 하면 "그건 나도 모른다냥... 다른 걸 물어봐라냥!"이라고 답해줘.
+
+화면 위쪽에는 캐릭터를 표현하는 큰 이모지와 이름이 보이고, 아래쪽에는 말풍선이 쌓이는 채팅창을 만들어줘. 메시지 입력창과 전송 버튼도 필요해.
+
+대화 초기화 버튼도 만들어주고, 귀엽고 아기자기한 디자인으로 html 단일 페이지로 만들어줘.
+`;
+
+  let copyTimeout;
+
+  function copyPrompt() {
+    function markCopied() {
+      const btn = document.getElementById('copyPromptBtn');
+      const textEl = btn.querySelector('.copy-text');
+      btn.classList.add('copied');
+      textEl.textContent = '복사 완료!';
+      clearTimeout(copyTimeout);
+      copyTimeout = setTimeout(() => {
+        btn.classList.remove('copied');
+        textEl.textContent = '마크다운으로 복사';
+      }, 1800);
+    }
+
+    function fallbackCopy() {
+      const ta = document.createElement('textarea');
+      ta.value = promptMarkdown;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+      markCopied();
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(promptMarkdown).then(markCopied).catch(fallbackCopy);
+    } else {
+      fallbackCopy();
+    }
+  }
+
+  slides.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'dot-btn' + (i === 0 ? ' active' : '');
+    dot.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(dot);
+  });
+  const dotEls = Array.from(dotsEl.children);
+
+  function render() {
+    slides.forEach((s, i) => s.classList.toggle('active', i === current));
+    dotEls.forEach((d, i) => d.classList.toggle('active', i === current));
+    currentEl.textContent = String(current + 1).padStart(2, '0');
+    progressFill.style.width = ((current + 1) / total * 100) + '%';
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === total - 1;
+  }
+
+  function goTo(i) {
+    current = Math.max(0, Math.min(total - 1, i));
+    render();
+  }
+
+  prevBtn.addEventListener('click', () => goTo(current - 1));
+  nextBtn.addEventListener('click', () => goTo(current + 1));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') goTo(current + 1);
+    if (e.key === 'ArrowLeft') goTo(current - 1);
+  });
+
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+  document.addEventListener('touchend', (e) => {
+    const diff = e.changedTouches[0].clientX - touchStartX;
+    if (diff > 50) goTo(current - 1);
+    if (diff < -50) goTo(current + 1);
+  });
+
+  render();
+</script>
+</body>
+</html>
