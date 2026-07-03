@@ -114,6 +114,14 @@
       color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
     }
     .sec-line { flex: 1; height: 1px; background: var(--border); }
+    .sec-more {
+      font-family: var(--mono); font-size: 0.72rem; font-weight: 600; color: #0a0f18;
+      text-decoration: none; border: 1px solid var(--accent); border-radius: 4px;
+      padding: 3px 12px; background: #7fb0ec;
+      transition: background 0.2s, transform 0.15s;
+      white-space: nowrap;
+    }
+    .sec-more:hover { background: #9cc4f5; transform: translateY(-1px); }
 
     /* ── CAREER ── */
     .career-list {
@@ -300,6 +308,7 @@
   <section id="links">
     <div class="sec-header">
       <span class="sec-label">lecture links</span>
+      <a class="sec-more" href="https://github.com/luriluan0-a11y/gameContents/lectureLink.html" target="_blank" rel="noopener">더보기</a>
       <div class="sec-line"></div>
     </div>
     <div class="btn-grid">
@@ -372,6 +381,22 @@
         <div>
           <div class="btn-title">AI 리터러시 가이드</div>
           <div class="btn-sub">AI는 눈치가 없다</div>
+        </div>
+        <span class="btn-arrow">→</span>
+      </a>
+      <a class="btn-link" href="https://luriluan0-a11y.github.io/gameContents/specialClass/103_GitHub pages.html">
+        <div class="btn-icon-box">⚒️</div>
+        <div>
+          <div class="btn-title">GitHub 세팅</div>
+          <div class="btn-sub">생성형 AI와 대화하기</div>
+        </div>
+        <span class="btn-arrow">→</span>
+      </a>
+      <a class="btn-link" href="https://luriluan0-a11y.github.io/gameContents/specialClass/147_portfolio_rule.html">
+        <div class="btn-icon-box">⚒️</div>
+        <div>
+          <div class="btn-title">포트폴리오 사이트 만들기 규칙</div>
+          <div class="btn-sub">규칙과 마크다운 다운로드</div>
         </div>
         <span class="btn-arrow">→</span>
       </a>
