@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 마스터 Day3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a2129;
+    --ink-soft: #333c34;
+    --muted: #5c6359;
+    --paper: #f2f3ee;
+    --raised: #ffffff;
+    --line: #dadbd0;
+    --accent: #2f6f62;
+    --accent-strong: #1d4a41;
+    --accent-soft: #dde8e3;
+    --warm: #c96a2e;
+    --warm-soft: #f3e2d3;
+    --code-bg: #e7e9df;
+    --shadow: rgba(26, 33, 30, 0.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #eae7dd;
+      --ink-soft: #cfd0c4;
+      --muted: #9a9d90;
+      --paper: #12161a;
+      --raised: #1a1f21;
+      --line: #2a2f2b;
+      --accent: #6cbba9;
+      --accent-strong: #8fd0c0;
+      --accent-soft: #1c2b28;
+      --warm: #e6a165;
+      --warm-soft: #2c231a;
+      --code-bg: #1e2421;
+      --shadow: rgba(0, 0, 0, 0.45);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #eae7dd;
+    --ink-soft: #cfd0c4;
+    --muted: #9a9d90;
+    --paper: #12161a;
+    --raised: #1a1f21;
+    --line: #2a2f2b;
+    --accent: #6cbba9;
+    --accent-strong: #8fd0c0;
+    --accent-soft: #1c2b28;
+    --warm: #e6a165;
+    --warm-soft: #2c231a;
+    --code-bg: #1e2421;
+    --shadow: rgba(0, 0, 0, 0.45);
+  }
+  :root[data-theme="light"] {
+    --ink: #1a2129;
+    --ink-soft: #333c34;
+    --muted: #5c6359;
+    --paper: #f2f3ee;
+    --raised: #ffffff;
+    --line: #dadbd0;
+    --accent: #2f6f62;
+    --accent-strong: #1d4a41;
+    --accent-soft: #dde8e3;
+    --warm: #c96a2e;
+    --warm-soft: #f3e2d3;
+    --code-bg: #e7e9df;
+    --shadow: rgba(26, 33, 30, 0.10);
+  }
+
+  * { box-sizing: border-box; }
+  html { background: var(--paper); }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    line-height: 1.75;
+    font-size: 16.5px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono {
+    font-family: 'IBM Plex Mono', 'D2Coding', ui-monospace, monospace;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .fade-in {
+      animation: fadeUp 0.7s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  }
+
+  a { color: var(--accent-strong); }
+  a:hover { color: var(--warm); }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    padding: 5.5rem 1.5rem 4rem;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
+    background:
+      radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--accent) 22%, transparent) 1px, transparent 1.6px)
+      0 0 / 26px 26px;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 0%, var(--paper) 92%);
+    pointer-events: none;
+  }
+  .hero-inner {
+    position: relative;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    margin: 0 0 1.3rem;
+  }
+  .hero-eyebrow::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--warm);
+    flex: none;
+  }
+  h1.hero-title {
+    font-size: clamp(2.1rem, 5.4vw, 3.15rem);
+    line-height: 1.18;
+    font-weight: 700;
+    margin: 0 0 1rem;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+  h1.hero-title em {
+    font-style: normal;
+    color: var(--accent-strong);
+  }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em 1.1em;
+    color: var(--muted);
+    font-size: 0.98rem;
+  }
+  .hero-meta span::before {
+    content: "";
+    display: inline-block;
+    width: 1px;
+    height: 0.9em;
+  }
+
+  /* ---------- Page body ---------- */
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 3.6rem 1.5rem 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3.6rem;
+  }
+  section { scroll-margin-top: 2rem; }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .section-num {
+    font-size: 0.85rem;
+    color: var(--warm);
+    letter-spacing: 0.06em;
+    flex: none;
+  }
+  .section-head h2 {
+    font-size: clamp(1.4rem, 3vw, 1.75rem);
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  p { margin: 0.9em 0; color: var(--ink-soft); }
+  strong { color: var(--ink); font-weight: 600; }
+
+  ul.plain, ol.plain {
+    margin: 0.8em 0;
+    padding-left: 1.3em;
+    color: var(--ink-soft);
+  }
+  ul.plain li, ol.plain li { margin: 0.4em 0; }
+
+  /* ---------- Compare cards ---------- */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.1rem;
+    margin: 1.6rem 0;
+  }
+  @media (max-width: 620px) {
+    .compare-grid { grid-template-columns: 1fr; }
+  }
+  .compare-card {
+    background: var(--raised);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1.4rem 1.5rem 1.5rem;
+    box-shadow: 0 1px 2px var(--shadow);
+  }
+  .compare-card .tag {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--warm);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  .compare-card h3 {
+    margin: 0 0 0.7rem;
+    font-size: 1.15rem;
+  }
+  .compare-card ul {
+    margin: 0;
+    padding-left: 1.15em;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+  }
+  .compare-card li { margin: 0.55em 0; }
+  .compare-card.accent { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+  .compare-card.accent .tag { color: var(--accent-strong); }
+
+  /* ---------- Table ---------- */
+  .table-wrap { overflow-x: auto; margin: 1.6rem 0; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 480px;
+    font-size: 0.94rem;
+  }
+  th, td {
+    border-bottom: 1px solid var(--line);
+    padding: 0.75em 0.9em;
+    text-align: left;
+  }
+  th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.76rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+    background: var(--accent-soft);
+  }
+  td:first-child { color: var(--ink); font-weight: 600; }
+  tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+
+  /* ---------- Callout / quote ---------- */
+  .callout {
+    position: relative;
+    background: var(--raised);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 1.2rem 1.4rem;
+    margin: 1.6rem 0;
+  }
+  .callout .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  .callout p { margin: 0; color: var(--ink); font-size: 1.02rem; }
+
+  .callout.warm {
+    border-left-color: var(--warm);
+    background: linear-gradient(180deg, var(--warm-soft), var(--raised) 65%);
+  }
+  .callout.warm .label { color: var(--warm); }
+
+  /* ---------- Command chips ---------- */
+  .cmd-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 0.6rem;
+    margin: 1.4rem 0;
+  }
+  .cmd {
+    display: flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    background: var(--raised);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.88rem;
+  }
+  .cmd.core { border-color: color-mix(in srgb, var(--warm) 45%, var(--line)); }
+  .cmd.core::before {
+    content: "";
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--warm);
+    flex: none;
+    transform: translateY(-1px);
+  }
+  .cmd code {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--accent-strong);
+    font-weight: 600;
+    flex: none;
+    font-size: 0.86rem;
+  }
+  .cmd span { color: var(--muted); }
+
+  /* ---------- Term cards (memory metaphors) ---------- */
+  .term-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1.4rem 0;
+  }
+  @media (max-width: 620px) {
+    .term-grid { grid-template-columns: 1fr; }
+  }
+  .term {
+    padding: 1rem 1.2rem;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: var(--raised);
+  }
+  .term h4 {
+    margin: 0 0 0.15rem;
+    font-size: 1.02rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5em;
+    flex-wrap: wrap;
+  }
+  .term h4 .metaphor {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--warm);
+    font-weight: 500;
+  }
+  .term p {
+    margin: 0.4rem 0 0;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+
+  /* ---------- Area cards (9 use cases) ---------- */
+  .area-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.1rem;
+    margin: 1.6rem 0;
+  }
+  @media (max-width: 620px) {
+    .area-grid { grid-template-columns: 1fr; }
+  }
+  .area {
+    background: var(--raised);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1.3rem 1.4rem 1.4rem;
+    box-shadow: 0 1px 2px var(--shadow);
+  }
+  .area-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+  }
+  .area h3 {
+    margin: 0.3rem 0 0.6rem;
+    font-size: 1.08rem;
+  }
+  .area ul {
+    margin: 0;
+    padding-left: 1.1em;
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+  }
+  .area li { margin: 0.4em 0; }
+  .area.wide { grid-column: 1 / -1; }
+
+  .shots {
+    display: flex;
+    gap: 0.8rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+  .shots figure {
+    margin: 0;
+    flex: 1 1 220px;
+  }
+  .shots img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    box-shadow: 0 2px 8px var(--shadow);
+    cursor: zoom-in;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .shots img:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px var(--shadow);
+  }
+  .shots img:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* ---------- Lightbox ---------- */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4vh 4vw;
+    background: color-mix(in srgb, var(--ink) 82%, black 30%);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease;
+  }
+  .lightbox.open {
+    opacity: 1;
+    visibility: visible;
+  }
+  .lightbox img {
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: 8px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    cursor: zoom-out;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lightbox { transition: none; }
+  }
+  .lightbox-close {
+    position: fixed;
+    top: 1.4rem;
+    right: 1.6rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .lightbox-close:hover { background: rgba(255, 255, 255, 0.18); }
+
+  hr.rule {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 0;
+  }
+
+  footer {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 1.5rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner fade-in">
+    <span class="hero-eyebrow mono">AI Agent Intensive · Day 03</span>
+    <h1 class="hero-title">AI 에이전트<br><em>마스터</em> 클래스</h1>
+    <div class="hero-meta mono">
+      <span>한국폴리텍대학교 성남캠퍼스</span>
+      <span>2026.07.10</span>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <section class="fade-in">
+    <div class="section-head">
+      <span class="section-num mono">01</span>
+      <h2>에이전트 vs AI 에이전트</h2>
+    </div>
+
+    <p>"에이전트"와 "AI 에이전트"는 자주 헷갈리는 개념인데, 핵심 차이는 <strong>"판단을 누가 내리냐"</strong>예요.</p>
+
+    <div class="compare-grid">
+      <div class="compare-card">
+        <span class="tag mono">Rule-based</span>
+        <h3>에이전트 (Agent)</h3>
+        <ul>
+          <li>원래 컴퓨터 과학에서 "에이전트"는 <strong>환경을 인식하고, 정해진 규칙에 따라 행동하는 프로그램/시스템</strong> 전체를 가리키는 넓은 개념</li>
+          <li>AI가 없어도 성립함 — 예: 온도 감지하면 자동으로 히터 켜는 온도조절기, if-else 규칙으로 움직이는 게임 NPC, 정해진 스케줄대로 파일 백업하는 크론 작업</li>
+          <li>핵심: <strong>미리 정해진 규칙(rule-based)</strong>을 따름 → 판단력이 없음, 정해진 조건만 확인</li>
+        </ul>
+      </div>
+      <div class="compare-card accent">
+        <span class="tag mono">Model-driven</span>
+        <h3>AI 에이전트 (AI Agent)</h3>
+        <ul>
+          <li>LLM(거대 언어모델) 같은 AI가 <strong>"두뇌" 역할</strong>을 해서, 상황을 이해하고 스스로 계획을 세워 행동하는 에이전트</li>
+          <li>정해진 규칙이 아니라 <strong>자연어로 된 목표</strong>를 주면, AI가 알아서 단계를 쪼개고, 도구를 선택하고, 실행 결과 보고 다음 행동을 결정함</li>
+          <li>예: Hermes나 OpenClaw처럼 "로그 분석해서 요약해줘"라고 하면, AI가 스스로 "어떤 파일을 볼지 → 어떻게 파싱할지 → 어떤 형식으로 정리할지" 판단해서 실행</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>구분</th><th>에이전트 (일반)</th><th>AI 에이전트</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>판단 방식</td><td>미리 정해진 규칙</td><td>AI가 상황 보고 스스로 판단</td></tr>
+          <tr><td>유연성</td><td>낮음 (정해진 조건만)</td><td>높음 (예상 못한 상황도 대응)</td></tr>
+          <tr><td>예시</td><td>온도조절기, 크론 작업, 게임 NPC</td><td>Hermes, OpenClaw, Claude Code</td></tr>
+          <tr><td>핵심 기술</td><td>if-else, 스케줄러</td><td>LLM + 도구 사용(tool use)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <span class="label">한 문장 요약</span>
+      <p>모든 AI 에이전트는 에이전트지만, 모든 에이전트가 AI 에이전트는 아니다 — "규칙을 따르나(에이전트)" vs "AI가 스스로 생각해서 판단하나(AI 에이전트)"의 차이</p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <div class="section-head">
+      <span class="section-num mono">02</span>
+      <h2>프롬프트</h2>
+    </div>
+    <p>"무엇을 도와드릴까요?"<br>룰을 정하고 무엇을 할지 정해주기</p>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <div class="section-head">
+      <span class="section-num mono">03</span>
+      <h2>도구</h2>
+    </div>
+    <p>무엇을 할 수 있는가?</p>
+    <ul class="plain">
+      <li>웹 검색</li>
+      <li>파일 다루기</li>
+      <li>컴퓨터에서 직접 명령 실행</li>
+      <li>브라우저에서 웹 데이터를 관리</li>
+    </ul>
+    <p>에이전트에 따라서 vision 이미지 분석과 이해가 불가능할 수 있음<br>
+    <code class="mono">session_search</code> 과거 대화 기록 검색 · 주기적으로 선택하는 일 · <code class="mono">cron job</code> 알림</p>
+
+    <h3 style="margin-top:2rem; font-size:1.1rem;">슬래시 커맨드 — 리모콘</h3>
+    <div class="cmd-grid">
+      <div class="cmd"><code>/help</code><span>사용 가능한 명령어 보기</span></div>
+      <div class="cmd core"><code>/new</code><span>새 대화 시작</span></div>
+      <div class="cmd core"><code>/retry</code><span>마지막 요청 다시 시도</span></div>
+      <div class="cmd core"><code>/undo</code><span>마지막 대화 되돌리기</span></div>
+      <div class="cmd"><code>/resume</code><span>이전 세션 이어하기</span></div>
+      <div class="cmd"><code>/goal</code><span>지속 목표 설정</span></div>
+      <div class="cmd"><code>/model</code><span>모델 확인/변경</span></div>
+      <div class="cmd"><code>/reasoning</code><span>추론 수준 조절</span></div>
+      <div class="cmd"><code>/compress</code><span>대화 맥락 압축</span></div>
+      <div class="cmd"><code>/yolo</code><span>승인 없이 실행 토글</span></div>
+      <div class="cmd"><code>/voice</code><span>음성 모드 전환</span></div>
+      <div class="cmd"><code>/background</code><span>백그라운드 작업 실행</span></div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <div class="section-head">
+      <span class="section-num mono">04</span>
+      <h2>메모리(기억)</h2>
+    </div>
+    <p>1800자만 기록함 · 사실관계 중심</p>
+
+    <div class="term-grid">
+      <div class="term">
+        <h4>스킬 <span class="metaphor">— 업무 매뉴얼</span></h4>
+      </div>
+      <div class="term">
+        <h4>MCP <span class="metaphor">— 표준 콘센트</span></h4>
+      </div>
+      <div class="term">
+        <h4>Gateway <span class="metaphor">— 터미널 밖의 에이전트</span></h4>
+        <p>텔레그램, 디스코드, 슬랙, WhatsApp 등</p>
+      </div>
+      <div class="term">
+        <h4>Cron <span class="metaphor">— 정해진 시간에 일하기</span></h4>
+        <p>에이전트에게 "매주 월요일 아침에 이 일을 해줘"라고 예약이 가능</p>
+      </div>
+    </div>
+
+    <div class="cmd-grid" style="grid-template-columns: repeat(auto-fill, minmax(200px,1fr));">
+      <div class="cmd"><code>/rollback</code><span>마지막 체크포인트로 복구</span></div>
+      <div class="cmd"><code>/rollback 3</code><span>3단계 전으로 복구</span></div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <div class="section-head">
+      <span class="section-num mono">05</span>
+      <h2>AI 에이전트가 실제로 많이 쓰이는 영역</h2>
+    </div>
+
+    <div class="area-grid">
+      <div class="area">
+        <span class="area-num">01</span>
+        <h3>코딩 / 개발</h3>
+        <ul>
+          <li>가장 널리 쓰이는 영역. Claude Code, Cursor, GitHub Copilot Agent 등</li>
+          <li>코드 작성, 버그 수정, PR 생성, 테스트 실행까지 자동화</li>
+        </ul>
+      </div>
+
+      <div class="area">
+        <span class="area-num">02</span>
+        <h3>개인 비서 / 메신저 자동화</h3>
+        <ul>
+          <li>Luke님이 쓰시는 Hermes, OpenClaw처럼 텔레그램/디스코드/슬랙에서 대화하며 일정 관리, 리마인더, 정보 조회</li>
+          <li>이메일 정리, 회의 요약</li>
+        </ul>
+        <div class="shots">
+          <figure>
+            <img src="https://luriluan0-a11y.github.io/gameContents/image/obsidian01.png" alt="옵시디언 자동화 예시 1" class="lightbox-trigger" tabindex="0" role="button" aria-label="이미지 크게 보기">
+          </figure>
+          <figure>
+            <img src="https://luriluan0-a11y.github.io/gameContents/image/opsidian02.png" alt="옵시디언 자동화 예시 2" class="lightbox-trigger" tabindex="0" role="button" aria-label="이미지 크게 보기">
+          </figure>
+        </div>
+      </div>
+
+      <div class="area">
+        <span class="area-num">03</span>
+        <h3>고객 서비스 / 상담</h3>
+        <ul>
+          <li>챗봇 넘어서 실제로 티켓 처리, 환불 처리, 계정 조회 같은 액션까지 실행</li>
+          <li>회사 CS팀 1차 응대 자동화</li>
+        </ul>
+      </div>
+
+      <div class="area">
+        <span class="area-num">04</span>
+        <h3>리서치 / 데이터 분석</h3>
+        <ul>
+          <li>여러 사이트 돌아다니며 정보 수집 → 정리 → 보고서 작성</li>
+          <li>경쟁사 분석, 시장 조사, 논문 요약</li>
+        </ul>
+      </div>
+
+      <div class="area">
+        <span class="area-num">05</span>
+        <h3>업무 자동화 (RPA + AI)</h3>
+        <ul>
+          <li>스프레드시트 정리, 반복 문서 작업, 데이터 입력</li>
+          <li>기존 RPA(단순 규칙 기반)에 판단력이 추가된 버전</li>
+        </ul>
+      </div>
+
+      <div class="area">
+        <span class="area-num">06</span>
+        <h3>콘텐츠 제작</h3>
+        <ul>
+          <li>블로그 글, SNS 포스팅 초안 작성 → 검토 → 발행까지 파이프라인화</li>
+          <li>Luke님 블로그 워크플로우처럼, 스킬로 정형화해서 반복 생산</li>
+        </ul>
+      </div>
+
+      <div class="area">
+        <span class="area-num">07</span>
+        <h3>개인 비서형 (일정/이메일/여행 예약)</h3>
+        <ul>
+          <li>캘린더 확인 → 회의 잡기, 항공권/호텔 비교 예약</li>
+        </ul>
+      </div>
+
+      <div class="area">
+        <span class="area-num">08</span>
+        <h3>교육 / 튜터링</h3>
+        <ul>
+          <li>학생 수준에 맞춰 문제 생성, 첨삭, 개인화된 학습 경로 제시</li>
+          <li>Luke님 vibe coding 수업처럼, 학생별 진도 관리</li>
+        </ul>
+      </div>
+
+      <div class="area wide">
+        <span class="area-num">09</span>
+        <h3>시스템 관리 / 운영(DevOps)</h3>
+        <ul>
+          <li>서버 모니터링, 장애 감지하면 자동으로 진단·복구 (아까 보신 Hermes가 OpenClaw 크래시 자동 복구한 사례처럼)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout warm">
+      <span class="label">핵심 포인트</span>
+      <p>가장 활발한 3곳 꼽으면 <strong>코딩 자동화 &gt; 개인 비서(메신저 기반) &gt; 업무 자동화</strong>예요. 수업에서 다루실 거면 학생들이 직접 체감할 수 있는 예시(챗봇, 숙제 도우미, 게임 NPC 등) 위주로 좁혀서 설명하는 게 이해에 더 좋을 수 있어요.</p>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <span>AI Agent Master · Day 03</span>
+  <span>성남캠퍼스</span>
+</footer>
+
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose" aria-label="닫기" type="button">✕</button>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<script>
+  (function () {
+    var lightbox = document.getElementById('lightbox');
+    var lightboxImg = document.getElementById('lightboxImg');
+    var closeBtn = document.getElementById('lightboxClose');
+    var lastFocused = null;
+
+    function openLightbox(img) {
+      lastFocused = document.activeElement;
+      lightboxImg.src = img.src;
+      lightboxImg.alt = img.alt;
+      lightbox.classList.add('open');
+      closeBtn.focus();
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('open');
+      lightboxImg.src = '';
+      document.body.style.overflow = '';
+      if (lastFocused) lastFocused.focus();
+    }
+
+    document.querySelectorAll('.lightbox-trigger').forEach(function (img) {
+      img.addEventListener('click', function () { openLightbox(img); });
+      img.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openLightbox(img);
+        }
+      });
+    });
+
+    lightbox.addEventListener('click', closeLightbox);
+    closeBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      closeLightbox();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox();
+    });
+  })();
+</script>
+
+</body>
+</html>
