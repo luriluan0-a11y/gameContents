@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>가족과 함께하는 AI 바이브코딩 - 퀴즈왕 게임앱 만들기</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: linear-gradient(180deg, #fff4e0 0%, #ffe9f3 35%, #eaf3ff 100%);
+    color: #3a2e5c;
+    line-height: 1.8;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .jua { font-family: 'Jua', sans-serif; }
+
+  /* ── 배경 컨페티 ── */
+  .confetti-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .confetti {
+    position: absolute;
+    font-size: 1.6rem;
+    opacity: 0.55;
+    animation: floaty linear infinite;
+  }
+
+  @keyframes floaty {
+    0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    8%   { opacity: 0.55; }
+    92%  { opacity: 0.55; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* ── 헤더 ── */
+  header {
+    position: relative;
+    background: linear-gradient(120deg, #FF6FA5 0%, #FFA94D 45%, #FFD93D 100%);
+    color: #fff;
+    padding: 56px 24px 44px;
+    text-align: center;
+    border-radius: 0 0 40px 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.35);
+    padding: 8px 22px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 14px;
+  }
+
+  header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    text-shadow: 3px 3px 0 rgba(0,0,0,0.12);
+    line-height: 1.4;
+  }
+
+  header p {
+    margin-top: 10px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    opacity: 0.95;
+  }
+
+  .top-nav {
+    margin-top: 26px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .top-nav a {
+    background: rgba(255,255,255,0.28);
+    color: #fff;
+    text-decoration: none;
+    padding: 9px 18px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: 2px solid rgba(255,255,255,0.5);
+    transition: transform 0.15s, background 0.15s;
+  }
+
+  .top-nav a:hover { background: rgba(255,255,255,0.5); transform: translateY(-2px) scale(1.05); }
+
+  /* ── 컨테이너 ── */
+  .container {
+    max-width: 780px;
+    margin: -18px auto 0;
+    padding: 0 18px 60px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .section {
+    background: #fff;
+    border-radius: 26px;
+    padding: 30px 28px;
+    margin-bottom: 26px;
+    box-shadow: 0 10px 28px rgba(120,90,200,0.12);
+    border: 3px solid transparent;
+  }
+
+  .section.c-pink   { border-color: #FFD0E4; }
+  .section.c-orange { border-color: #FFE0BE; }
+  .section.c-yellow { border-color: #FFF0B0; }
+  .section.c-green  { border-color: #CDEFCF; }
+  .section.c-blue   { border-color: #CBE2FF; }
+  .section.c-purple { border-color: #E4D4FF; }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.5rem;
+    color: #3a2e5c;
+    margin-bottom: 16px;
+  }
+
+  .section-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  .icon-pink   { background: linear-gradient(135deg, #FF9AC1, #FF6FA5); }
+  .icon-orange { background: linear-gradient(135deg, #FFC98B, #FFA94D); }
+  .icon-yellow { background: linear-gradient(135deg, #FFE985, #FFD93D); }
+  .icon-green  { background: linear-gradient(135deg, #A8E6A1, #6BCB77); }
+  .icon-blue   { background: linear-gradient(135deg, #9BC4FF, #4D96FF); }
+  .icon-purple { background: linear-gradient(135deg, #CBA3FF, #9D4EDD); }
+
+  .section p, .section li { font-size: 0.98rem; color: #4a4066; }
+
+  .fun-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 12px 0;
+  }
+
+  .fun-list li {
+    background: #faf7ff;
+    border-radius: 14px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-weight: 500;
+  }
+
+  .fun-list li .dot { font-size: 1.1rem; flex-shrink: 0; }
+  .fun-list li .txt { flex: 1 1 0%; min-width: 0; }
+
+  .callout .txt { flex: 1 1 0%; min-width: 0; }
+
+  /* ── 버튼 ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    font-family: 'Jua', sans-serif;
+    font-size: 1rem;
+    padding: 13px 26px;
+    border-radius: 50px;
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.16);
+    transition: transform 0.15s, box-shadow 0.15s;
+    border: none;
+    cursor: pointer;
+    margin: 6px 6px 6px 0;
+  }
+
+  .btn:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 10px 22px rgba(0,0,0,0.2); }
+  .btn:active { transform: translateY(0) scale(0.98); }
+
+  .btn-pink   { background: linear-gradient(135deg, #FF9AC1, #FF6FA5); }
+  .btn-orange { background: linear-gradient(135deg, #FFC98B, #FFA94D); }
+  .btn-blue   { background: linear-gradient(135deg, #9BC4FF, #4D96FF); }
+  .btn-green  { background: linear-gradient(135deg, #A8E6A1, #6BCB77); }
+  .btn-purple { background: linear-gradient(135deg, #CBA3FF, #9D4EDD); }
+
+  .btn-row { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 14px; }
+
+  /* ── 카드 그리드 ── */
+  .grid3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin: 14px 0;
+  }
+
+  .mini-card {
+    background: #faf7ff;
+    border-radius: 16px;
+    padding: 18px 14px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    transition: transform 0.15s;
+  }
+
+  .mini-card:hover { transform: translateY(-4px) rotate(-1deg); }
+  .mini-card .emoji { font-size: 2rem; margin-bottom: 6px; }
+  .mini-card .label { font-weight: 700; font-family: 'Jua', sans-serif; color: #3a2e5c; }
+  .mini-card .desc { font-size: 0.85rem; color: #7c72a0; margin-top: 4px; }
+
+  /* ── 콜아웃 ── */
+  .callout {
+    background: linear-gradient(135deg, #FFF3CE, #FFE7A3);
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin: 14px 0;
+    font-weight: 700;
+    color: #7a5b00;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .callout.warn {
+    background: linear-gradient(135deg, #FFD9D9, #FFB3B3);
+    color: #8a1f1f;
+  }
+
+  /* ── 폰 목업 (타이틀 화면) ── */
+  .mock-phone {
+    margin: 18px auto 0; max-width: 340px;
+    background: linear-gradient(180deg,#241a45,#3a2570);
+    border-radius: 26px; padding: 30px 22px; color: #fff;
+    box-shadow: 0 14px 30px rgba(36,26,69,0.35);
+  }
+  .mock-trophy { text-align:center; font-size: 2.1rem; margin-bottom: 6px; }
+  .mock-title { font-family:'Jua', sans-serif; font-size: 1.3rem; text-align:center; margin-bottom: 18px; color:#ffe9a8; }
+  .mock-btn {
+    display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.08);
+    border-radius:14px; padding:12px 14px; margin-bottom:10px; font-size:0.92rem; font-weight:700;
+  }
+  .mock-btn .ic { width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
+
+  /* ── 코드 블록 / 프롬프트 (복사 가능) ── */
+  .code-wrap {
+    position: relative;
+    margin: 14px 0;
+  }
+
+  .code-block {
+    background: #241f3a;
+    color: #e6dcff;
+    border-radius: 16px;
+    padding: 20px 60px 20px 20px;
+    font-family: 'Consolas', 'D2Coding', monospace;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    line-height: 1.7;
+    border: 3px solid #4a3d78;
+  }
+
+  .copy-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: linear-gradient(135deg, #CBA3FF, #9D4EDD);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 7px 14px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-family: 'Jua', sans-serif;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.2s;
+  }
+
+  .copy-btn:hover { transform: scale(1.06); }
+  .copy-btn.copied { background: linear-gradient(135deg, #A8E6A1, #6BCB77); }
+
+  /* ── 규칙 카드 ── */
+  .rule-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+  .rule-card {
+    background:#faf7ff; border-radius:16px; padding:16px 16px 14px; position:relative;
+  }
+  .rule-num {
+    position:absolute; top:-10px; left:14px; width:26px; height:26px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-family:'Jua', sans-serif; font-size:0.85rem; color:#fff;
+  }
+  .rule-card p { font-size: 0.88rem; margin-top: 8px; }
+
+  /* ── 퀴즈 예시 카드 ── */
+  .quiz-sample { display:flex; flex-direction:column; gap:10px; margin-top:14px; }
+  .quiz-card {
+    background:#faf7ff; border-radius:14px; padding:14px 16px;
+  }
+  .quiz-card .qnum { font-family:'Jua', sans-serif; color:#9D4EDD; font-size:0.85rem; margin-bottom:4px; }
+  .quiz-card .qtext { font-weight:700; margin-bottom:8px; }
+  .quiz-card .qopts { font-size:0.88rem; color:#4a4066; margin-bottom:6px; }
+  .quiz-card details { font-size: 0.85rem; color:#6BCB77; }
+  .quiz-card summary { cursor:pointer; font-weight:700; }
+  .quiz-card details[open] summary { color:#3a8a4a; }
+  .quiz-card .qanswer { margin-top:6px; color:#4a4066; }
+
+  /* ── 흐름도 ── */
+  .flow { display:flex; flex-direction:column; gap:8px; margin-top:16px; }
+  .flow-step {
+    display:flex; align-items:center; gap:12px; background:#faf7ff; border-radius:14px; padding:12px 16px;
+  }
+  .flow-step .fnum {
+    width:26px; height:26px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:0.8rem; color:#fff;
+  }
+  .flow-step p { font-size: 0.9rem; }
+  .flow-arrow { text-align:center; color:#9a8fbf; font-size:1rem; }
+  .branch { display:flex; gap:10px; }
+  .branch .flow-step { flex:1; }
+
+  /* ── 메달 ── */
+  .medal-row { display:flex; gap:12px; margin-top:14px; flex-wrap:wrap; }
+  .medal-card { flex:1; min-width:140px; background:#faf7ff; border-radius:16px; padding:18px; text-align:center; }
+  .medal-card .em { font-size:2.2rem; margin-bottom:6px; }
+  .medal-card .sc { font-family:'Jua', sans-serif; font-size:1.05rem; margin-bottom:2px; }
+  .medal-card .ds { font-size:0.8rem; color:#7c72a0; }
+
+  /* ── 완성작 CTA ── */
+  .final-cta {
+    text-align: center;
+    background: linear-gradient(135deg, #6C5CE7 0%, #a29bfe 60%, #FF9AC1 100%);
+    border-radius: 26px;
+    padding: 40px 26px;
+    color: #fff;
+    box-shadow: 0 14px 34px rgba(108,92,231,0.35);
+  }
+
+  .final-cta .emoji-big { font-size: 3rem; animation: bounce 1s infinite alternate; }
+  @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-12px); } }
+
+  .final-cta h2 { color: #fff; font-size: 1.6rem; margin: 10px 0 6px; }
+  .final-cta p { color: rgba(255,255,255,0.9); margin-bottom: 18px; font-weight: 500; }
+
+  .final-cta .btn-huge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    color: #6C5CE7;
+    text-decoration: none;
+    font-family: 'Jua', sans-serif;
+    font-size: 1.2rem;
+    padding: 16px 34px;
+    border-radius: 50px;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.25);
+    transition: transform 0.15s;
+  }
+
+  .final-cta .btn-huge:hover { transform: translateY(-4px) scale(1.04); }
+
+  footer {
+    text-align: center;
+    padding: 30px 20px 50px;
+    color: #9a8fbf;
+    font-size: 0.85rem;
+  }
+
+  @media (max-width: 560px) {
+    .section { padding: 24px 18px; }
+    header { padding: 44px 18px 36px; }
+    .rule-grid { grid-template-columns: 1fr; }
+    .branch { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="confetti-bg" id="confetti"></div>
+
+<header>
+  <div class="badge">🏆 경기공유학교 2026</div>
+  <h1>가족과 함께하는<br>AI 바이브코딩! 🧑‍🚀✨</h1>
+  <p>유한대학교 · Day02 · 퀴즈왕 게임앱 만들기 🎮❓</p>
+  <div class="top-nav">
+    <a href="#goal">오늘의 목표</a>
+    <a href="#seriousgame">진지한 게임</a>
+    <a href="#rules">제작 규칙</a>
+    <a href="#design">화면 설계</a>
+    <a href="#prompt">퀴즈 만들기</a>
+    <a href="#sample">예시 퀴즈</a>
+    <a href="#medal">메달 시스템</a>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- 오늘의 목표 -->
+  <section class="section c-pink" id="goal">
+    <div class="section-title"><div class="section-icon icon-pink">🎯</div><h2>오늘 만들어볼 것은?</h2></div>
+    <ul class="fun-list">
+      <li><span class="dot">🤖</span><span class="txt"><strong>AI가 문제를 내고 점수를 획득하는 퀴즈 게임</strong>을 직접 만들어볼 거예요!</span></li>
+      <li><span class="dot">🐾</span><span class="txt">동물 / 🏛️ 사회 / 🎭 문화, 세 가지 분야 중 원하는 주제를 골라 10문제에 도전하는 앱이에요.</span></li>
+      <li><span class="dot">🥇</span><span class="txt">점수에 따라 금메달·은메달·동메달을 받을 수 있어요!</span></li>
+    </ul>
+  </section>
+
+  <!-- 교육용 게임의 특징 -->
+  <section class="section c-orange">
+    <div class="section-title"><div class="section-icon icon-orange">📘</div><h2>교육용 게임의 특징</h2></div>
+    <ul class="fun-list">
+      <li><span class="dot">1️⃣</span><span class="txt">목적이 명확하다!</span></li>
+      <li><span class="dot">2️⃣</span><span class="txt">교육의 효과가 있다면 재미가 좀 없어도 괜찮다???</span></li>
+      <li><span class="dot">3️⃣</span><span class="txt">하지만, 재미도 있으면 좋지 않을까.</span></li>
+    </ul>
+  </section>
+
+  <!-- 진지한 게임 -->
+  <section class="section c-yellow" id="seriousgame">
+    <div class="section-title"><div class="section-icon icon-yellow">🧩</div><h2>교육용 게임 = 진지한 게임 (Serious Game)</h2></div>
+    <p>교육, 훈련, 의료, 국방 등 특정 목적을 달성하기 위해 설계된 <strong>기능성 게임</strong>을 말해요.</p>
+    <div class="grid3">
+      <div class="mini-card"><div class="emoji">📘</div><div class="label">교육</div></div>
+      <div class="mini-card"><div class="emoji">🏋️</div><div class="label">훈련</div></div>
+      <div class="mini-card"><div class="emoji">🩺</div><div class="label">의료</div></div>
+      <div class="mini-card"><div class="emoji">🛡️</div><div class="label">국방</div></div>
+    </div>
+  </section>
+
+  <!-- 제작 규칙 -->
+  <section class="section c-green" id="rules">
+    <div class="section-title"><div class="section-icon icon-green">📋</div><h2>게임을 만들 때 규칙</h2></div>
+    <div class="rule-grid">
+      <div class="rule-card"><div class="rule-num" style="background:#FF6FA5">1</div><p>학습에 꼭 필요한 요소에는 <strong>"노.가.다"</strong>가 있다.</p></div>
+      <div class="rule-card"><div class="rule-num" style="background:#4D96FF">2</div><p>재미있게 반복할 수 있다면? <strong>확실한 피드백과 보상</strong>을 설계하기.</p></div>
+      <div class="rule-card"><div class="rule-num" style="background:#6BCB77">3</div><p>틀렸다고 바로 The End를 주지 말고, <strong>다시 도전</strong>할 수 있도록 구현한다.</p></div>
+      <div class="rule-card"><div class="rule-num" style="background:#9D4EDD">4</div><p>제목은 <strong>직관적</strong>이어야 하고, 비용을 지불하는 <strong>학부모도 타겟</strong>으로 고려한다.</p></div>
+    </div>
+  </section>
+
+  <!-- 화면 설계 -->
+  <section class="section c-blue" id="design">
+    <div class="section-title"><div class="section-icon icon-blue">🖼️</div><h2>퀴즈왕 게임 앱 설계 – 타이틀 화면</h2></div>
+    <p>하단에 주제를 선택할 수 있는 버튼 3개를 배치해요. 버튼을 누르면 해당 분야의 퀴즈 문제가 출제돼요.</p>
+    <div class="mock-phone">
+      <div class="mock-trophy">🏆</div>
+      <div class="mock-title">오늘의 퀴즈왕</div>
+      <div class="mock-btn"><div class="ic" style="background:#4ecdc4">🐾</div>동물 — 다양한 동물 퀴즈 출제</div>
+      <div class="mock-btn"><div class="ic" style="background:#ff6b9d">🏛️</div>사회 — 다양한 사회 퀴즈 출제</div>
+      <div class="mock-btn"><div class="ic" style="background:#ffc93c">🎭</div>문화 — 다양한 문화 퀴즈 출제</div>
+    </div>
+  </section>
+
+  <!-- 퀴즈 문제 만들기 (프롬프트) -->
+  <section class="section c-purple" id="prompt">
+    <div class="section-title"><div class="section-icon icon-purple">✍️</div><h2>퀴즈 문제 만들기</h2></div>
+    <p>아래 프롬프트 오른쪽 위 <strong>복사</strong> 버튼을 눌러 AI에게 붙여넣어 보세요. <code>OO</code> 자리에 '동물', '사회', '문화'를 각각 넣어 실행하면 분야별로 퀴즈 10문제가 마크다운 파일로 정리돼요.</p>
+    <div class="code-wrap">
+      <pre class="code-block" id="quizPrompt">너는 OO 분야의 전문가야. 관련 퀴즈 문제 10개를 만들어서 마크다운 파일에 추가해줘.</pre>
+      <button class="copy-btn" onclick="copyCode('quizPrompt', this)">📋 복사</button>
+    </div>
+    <div class="callout">
+      <span class="dot">💡</span><span class="txt">이렇게 3개 분야의 퀴즈 문제를 마크다운에 저장한 다음, <strong>배열 형태로 HTML 파일</strong>에 담아 웹 페이지를 만들어요.</span>
+    </div>
+  </section>
+
+  <!-- 사회 분야 예시 퀴즈 -->
+  <section class="section c-pink" id="sample">
+    <div class="section-title"><div class="section-icon icon-pink">📚</div><h2>사회 분야 퀴즈 10문제 예시</h2></div>
+    <p>프롬프트로 AI에게 이렇게 생성된 예시예요. 문제를 누르면 정답을 볼 수 있어요.</p>
+    <div class="quiz-sample">
+      <div class="quiz-card">
+        <div class="qnum">1. 정치·헌법</div>
+        <div class="qtext">대한민국 헌법상 국가의 주권은 누구에게 있는가?</div>
+        <div class="qopts"><strong>A.</strong> 대통령 &nbsp; <strong>B.</strong> 국회 &nbsp; <strong>C.</strong> 국민 &nbsp; <strong>D.</strong> 헌법재판소</div>
+        <details><summary>정답 보기</summary><div class="qanswer">정답: C. 국민 (대한민국 헌법 제1조 2항: 대한민국의 주권은 국민에게 있고, 모든 권력은 국민으로부터 나온다.)</div></details>
+      </div>
+      <div class="quiz-card">
+        <div class="qnum">2. 경제</div>
+        <div class="qtext">한 나라의 물가가 지속적으로 상승하는 현상을 무엇이라고 하는가?</div>
+        <div class="qopts"><strong>A.</strong> 디플레이션 &nbsp; <strong>B.</strong> 인플레이션 &nbsp; <strong>C.</strong> 스태그플레이션 &nbsp; <strong>D.</strong> 디폴트</div>
+        <details><summary>정답 보기</summary><div class="qanswer">정답: B. 인플레이션</div></details>
+      </div>
+      <div class="quiz-card">
+        <div class="qnum">3. 국제사회</div>
+        <div class="qtext">국제연합(UN)의 주요 기관 중 국제 평화와 안전 유지에 대한 책임을 지는 기관은?</div>
+        <div class="qopts"><strong>A.</strong> 총회 &nbsp; <strong>B.</strong> 안전보장이사회 &nbsp; <strong>C.</strong> 경제사회이사회 &nbsp; <strong>D.</strong> 국제사법재판소</div>
+        <details><summary>정답 보기</summary><div class="qanswer">정답: B. 안전보장이사회</div></details>
+      </div>
+      <div class="quiz-card">
+        <div class="qnum">4. 사회 문화</div>
+        <div class="qtext">한 사회의 구성원들이 공유하는 생활 양식의 총체를 의미하는 사회학 용어는?</div>
+        <div class="qopts"><strong>A.</strong> 이데올로기 &nbsp; <strong>B.</strong> 문화 &nbsp; <strong>C.</strong> 아노미 &nbsp; <strong>D.</strong> 사회화</div>
+        <details><summary>정답 보기</summary><div class="qanswer">정답: B. 문화</div></details>
+      </div>
+      <div class="quiz-card">
+        <div class="qnum">5. 법과 정치</div>
+        <div class="qtext">법률이 헌법에 위반되는지를 심판하는 대한민국의 기관은?</div>
+        <div class="qopts"><strong>A.</strong> 대법원 &nbsp; <strong>B.</strong> 국회 &nbsp; <strong>C.</strong> 헌법재판소 &nbsp; <strong>D.</strong> 감사원</div>
+        <details><summary>정답 보기</summary><div class="qanswer">정답: C. 헌법재판소</div></details>
+      </div>
+      <div class="quiz-card">
+        <div class="qnum">6. 경제</div>
+        <div class="qtext">수요와 공급이 일치하여 상품의 가격과 거래량이 결정되는 지점을 무엇이라 하는가?</div>
+        <div class="qopts"><strong>A.</strong> 균형가격 &nbsp; <strong>B.</strong> 최저가격 &nbsp; <strong>C.</strong> 독점가격 &nbsp; <strong>D.</strong> 한계가격</div>
+        <details><summary>정답 보기</summary><div class="qanswer">정답: A. 균형가격</div></details>
+      </div>
+      <div class="quiz-card">
+        <div class="qnum">7. 지리·환경</div>
+        <div class="qtext">지구 온난화의 주된 원인으로 지목되는 대표적인 온실가스는?</div>
+        <div class="qopts"><strong>A.</strong> 산소 &nbsp; <strong>B.</strong> 질소 &nbsp; <strong>C.</strong> 이산화탄소 &nbsp; <strong>D.</strong> 아르곤</div>
+        <details><summary>정답 보기</summary><div class="qanswer">정답: C. 이산화탄소</div></details>
+      </div>
+      <div class="quiz-card">
+        <div class="qnum">8. 역사·사회제도</div>
+        <div class="qtext">근대 시민혁명(프랑스 혁명 등)을 통해 확립된, 국가 권력으로부터 개인의 자유를 보장받을 권리를 무엇이라 하는가?</div>
+        <div class="qopts"><strong>A.</strong> 사회권 &nbsp; <strong>B.</strong> 자유권 &nbsp; <strong>C.</strong> 참정권 &nbsp; <strong>D.</strong> 청구권</div>
+        <details><summary>정답 보기</summary><div class="qanswer">정답: B. 자유권</div></details>
+      </div>
+      <div class="quiz-card">
+        <div class="qnum">9. 사회 복지</div>
+        <div class="qtext">소득이 낮은 계층에게 국가가 최저 생활을 보장하기 위해 지급하는 대한민국의 대표적 공공부조 제도는?</div>
+        <div class="qopts"><strong>A.</strong> 국민연금 &nbsp; <strong>B.</strong> 국민기초생활보장제도 &nbsp; <strong>C.</strong> 고용보험 &nbsp; <strong>D.</strong> 산업재해보상보험</div>
+        <details><summary>정답 보기</summary><div class="qanswer">정답: B. 국민기초생활보장제도</div></details>
+      </div>
+      <div class="quiz-card">
+        <div class="qnum">10. 시사·사회 이슈</div>
+        <div class="qtext">저출산·고령화로 인해 생산가능인구(15~64세) 비율이 줄어들고 부양해야 할 인구가 늘어나는 사회 현상을 무엇이라 하는가?</div>
+        <div class="qopts"><strong>A.</strong> 인구 절벽 &nbsp; <strong>B.</strong> 인구 보너스 &nbsp; <strong>C.</strong> 베이비붐 &nbsp; <strong>D.</strong> 인구 증가</div>
+        <details><summary>정답 보기</summary><div class="qanswer">정답: A. 인구 절벽</div></details>
+      </div>
+    </div>
+    <p style="margin-top:14px; font-size:0.85rem; color:#9a8fbf;">총 10문제 · 정치, 경제, 국제사회, 사회문화, 법, 지리, 역사, 복지, 시사 영역 포함</p>
+  </section>
+
+  <!-- 게임 화면 동작 흐름 -->
+  <section class="section c-green">
+    <div class="section-title"><div class="section-icon icon-green">🕹️</div><h2>게임 화면 – 동작 흐름</h2></div>
+    <p>타이틀: <strong>OO 분야 퀴즈</strong></p>
+    <div class="flow">
+      <div class="flow-step"><div class="fnum" style="background:#4D96FF">1</div><p>문제를 출제하고, 하단에 선택 가능한 보기를 제공한다.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="fnum" style="background:#4D96FF">2</div><p>사용자가 답을 하나 선택한다.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="branch">
+        <div class="flow-step" style="background:#ffece9"><div class="fnum" style="background:#FF6FA5">✕</div><p>오답 → "다시 풀어봐~" 안내 후 재선택</p></div>
+        <div class="flow-step" style="background:#eafff2"><div class="fnum" style="background:#6BCB77">✓</div><p>정답 → 점수 +1, 다음 문제로</p></div>
+      </div>
+      <div class="flow-arrow">↓ (같은 문제에서 오답이 두 번째면)</div>
+      <div class="flow-step"><div class="fnum" style="background:#9D4EDD">3</div><p>정답을 알려주고 다음 문제가 출제된다.</p></div>
+    </div>
+  </section>
+
+  <!-- 메달 시스템 -->
+  <section class="section c-yellow" id="medal">
+    <div class="section-title"><div class="section-icon icon-yellow">🏅</div><h2>결과 화면 – 메달 시스템</h2></div>
+    <p>10문제를 모두 풀고 나면 점수에 따라 메달을 보여줘요. <strong>확실한 피드백과 보상</strong>으로 재도전을 유도해요.</p>
+    <div class="medal-row">
+      <div class="medal-card"><div class="em">🥇</div><div class="sc">10점</div><div class="ds">만점 · 금메달</div></div>
+      <div class="medal-card"><div class="em">🥈</div><div class="sc">7~9점</div><div class="ds">우수 · 은메달</div></div>
+      <div class="medal-card"><div class="em">🥉</div><div class="sc">4~6점</div><div class="ds">양호 · 동메달</div></div>
+    </div>
+    <div class="callout" style="margin-top:14px;">
+      <span class="dot">💡</span><span class="txt">3점 이하라도 The End가 아니라 "다음 기회에!" 같은 격려 메시지로 마무리해요. (규칙 3번!)</span>
+    </div>
+    <ul class="fun-list" style="margin-top:16px;">
+      <li><span class="dot">🔁</span><span class="txt"><strong>다시 풀기</strong>: 같은 분야 퀴즈를 처음부터 다시 도전한다.</span></li>
+      <li><span class="dot">🏠</span><span class="txt"><strong>돌아가기</strong>: '타이틀 화면'으로 돌아간다.</span></li>
+    </ul>
+  </section>
+
+  <!-- 완성작 보러가기 -->
+  <div class="final-cta">
+    <div class="emoji-big">🏆❓</div>
+    <h2 class="jua">완성된 퀴즈왕 게임 앱</h2>
+    <p>먼저 완성된 예시로 어떤 앱을 만들 수 있는지 구경해볼까요?</p>
+    <a class="btn-huge" href="./퀴즈왕_게임_앱.html" target="_blank" rel="noopener">
+      🚀 퀴즈왕 게임 만나러 가기
+    </a>
+  </div>
+
+</div>
+
+<footer>
+  🏆 경기공유학교 2026 · 가족과 함께하는 AI 바이브코딩 (유한대학교) 🏆
+</footer>
+
+<script>
+  function copyCode(id, btn) {
+    const text = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const original = btn.textContent;
+      btn.textContent = '✅ 완료!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove('copied');
+      }, 1800);
+    });
+  }
+
+  // 배경 컨페티
+  const shapes = ['🏆','⭐','✨','🎈','🎉','💫','🥇','🍭','🎵','☁️'];
+  const bg = document.getElementById('confetti');
+  for (let i = 0; i < 24; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.fontSize = (1 + Math.random() * 1.6) + 'rem';
+    el.style.animationDuration = (10 + Math.random() * 14) + 's';
+    el.style.animationDelay = (Math.random() * 14) + 's';
+    bg.appendChild(el);
+  }
+</script>
+
+</body>
+</html>
