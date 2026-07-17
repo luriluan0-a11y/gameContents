@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>가족과 함께하는 AI 바이브코딩 - 텍스트 어드벤처 게임 만들기</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: linear-gradient(180deg, #fff4e0 0%, #ffe9f3 35%, #eaf3ff 100%);
+    color: #3a2e5c;
+    line-height: 1.8;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .jua { font-family: 'Jua', sans-serif; }
+
+  /* ── 배경 컨페티 ── */
+  .confetti-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .confetti { position: absolute; font-size: 1.6rem; opacity: 0.55; animation: floaty linear infinite; }
+  @keyframes floaty {
+    0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    8%   { opacity: 0.55; }
+    92%  { opacity: 0.55; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* ── 헤더 ── */
+  header {
+    position: relative;
+    background: linear-gradient(120deg, #6C5CE7 0%, #9D4EDD 45%, #FF6FA5 100%);
+    color: #fff;
+    padding: 56px 24px 44px;
+    text-align: center;
+    border-radius: 0 0 40px 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.3);
+    padding: 8px 22px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 14px;
+  }
+
+  header h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); text-shadow: 3px 3px 0 rgba(0,0,0,0.12); line-height: 1.4; }
+  header p { margin-top: 10px; font-size: 1.05rem; font-weight: 700; opacity: 0.95; }
+
+  .top-nav { margin-top: 26px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+  .top-nav a {
+    background: rgba(255,255,255,0.28); color: #fff; text-decoration: none; padding: 9px 18px;
+    border-radius: 50px; font-weight: 700; font-size: 0.9rem; border: 2px solid rgba(255,255,255,0.5);
+    transition: transform 0.15s, background 0.15s;
+  }
+  .top-nav a:hover { background: rgba(255,255,255,0.5); transform: translateY(-2px) scale(1.05); }
+
+  /* ── 컨테이너 ── */
+  .container { max-width: 780px; margin: -18px auto 0; padding: 0 18px 60px; position: relative; z-index: 1; }
+
+  .section {
+    background: #fff; border-radius: 26px; padding: 30px 28px; margin-bottom: 26px;
+    box-shadow: 0 10px 28px rgba(120,90,200,0.12); border: 3px solid transparent;
+  }
+  .section.c-pink   { border-color: #FFD0E4; }
+  .section.c-orange { border-color: #FFE0BE; }
+  .section.c-yellow { border-color: #FFF0B0; }
+  .section.c-green  { border-color: #CDEFCF; }
+  .section.c-blue   { border-color: #CBE2FF; }
+  .section.c-purple { border-color: #E4D4FF; }
+
+  .section-title { display: flex; align-items: center; gap: 12px; font-size: 1.5rem; color: #3a2e5c; margin-bottom: 16px; }
+  .section-icon {
+    width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  .icon-pink   { background: linear-gradient(135deg, #FF9AC1, #FF6FA5); }
+  .icon-orange { background: linear-gradient(135deg, #FFC98B, #FFA94D); }
+  .icon-yellow { background: linear-gradient(135deg, #FFE985, #FFD93D); }
+  .icon-green  { background: linear-gradient(135deg, #A8E6A1, #6BCB77); }
+  .icon-blue   { background: linear-gradient(135deg, #9BC4FF, #4D96FF); }
+  .icon-purple { background: linear-gradient(135deg, #CBA3FF, #9D4EDD); }
+
+  .section p, .section li { font-size: 0.98rem; color: #4a4066; }
+
+  .fun-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
+  .fun-list li { background: #faf7ff; border-radius: 14px; padding: 12px 16px; display: flex; align-items: flex-start; gap: 10px; font-weight: 500; }
+  .fun-list li .dot { font-size: 1.1rem; flex-shrink: 0; }
+  .fun-list li .txt { flex: 1 1 0%; min-width: 0; }
+  .callout .txt { flex: 1 1 0%; min-width: 0; }
+
+  /* ── 카드 그리드 ── */
+  .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin: 14px 0; }
+  .mini-card { background: #faf7ff; border-radius: 16px; padding: 18px 14px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.06); transition: transform 0.15s; }
+  .mini-card:hover { transform: translateY(-4px) rotate(-1deg); }
+  .mini-card .emoji { font-size: 2rem; margin-bottom: 6px; }
+  .mini-card .label { font-weight: 700; font-family: 'Jua', sans-serif; color: #3a2e5c; }
+  .mini-card .desc { font-size: 0.85rem; color: #7c72a0; margin-top: 4px; }
+
+  /* ── 콜아웃 ── */
+  .callout { background: linear-gradient(135deg, #FFF3CE, #FFE7A3); border-radius: 16px; padding: 16px 20px; margin: 14px 0; font-weight: 700; color: #7a5b00; display: flex; align-items: center; gap: 10px; }
+  .callout.info { background: linear-gradient(135deg, #DCEBFF, #B9D6FF); color: #1f4f8a; }
+  .callout.warn { background: linear-gradient(135deg, #FFD9D9, #FFB3B3); color: #8a1f1f; }
+
+  /* ── 코드 블록 / 프롬프트 ── */
+  .code-wrap { position: relative; margin: 14px 0; }
+  .code-block {
+    background: #241f3a; color: #e6dcff; border-radius: 16px; padding: 20px 60px 20px 20px;
+    font-family: 'Consolas', 'D2Coding', monospace; font-size: 0.9rem; white-space: pre-wrap;
+    overflow-x: auto; line-height: 1.7; border: 3px solid #4a3d78;
+  }
+  .copy-btn {
+    position: absolute; top: 14px; right: 14px; background: linear-gradient(135deg, #CBA3FF, #9D4EDD);
+    color: #fff; border: none; border-radius: 10px; padding: 7px 14px; font-size: 0.8rem; font-weight: 700;
+    font-family: 'Jua', sans-serif; cursor: pointer; transition: transform 0.1s, background 0.2s;
+  }
+  .copy-btn:hover { transform: scale(1.06); }
+  .copy-btn.copied { background: linear-gradient(135deg, #A8E6A1, #6BCB77); }
+
+  /* ── 규칙 카드 ── */
+  .rule-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+  .rule-card { background:#faf7ff; border-radius:16px; padding:16px 16px 14px; position:relative; }
+  .rule-num { position:absolute; top:-10px; left:14px; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Jua', sans-serif; font-size:0.85rem; color:#fff; }
+  .rule-card p { font-size: 0.88rem; margin-top: 8px; }
+
+  /* ── 캐릭터 프로필 카드 ── */
+  .profile-card { background: linear-gradient(135deg,#241a45,#3a2570); border-radius: 20px; padding: 22px; color:#fff; margin: 14px 0; }
+  .profile-row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom: 14px; }
+  .profile-tag { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 8px 14px; font-size: 0.88rem; }
+  .profile-tag b { color: #ffe9a8; }
+  .story-box { background: rgba(255,255,255,0.06); border-radius: 14px; padding: 16px; font-size: 0.92rem; line-height: 1.75; white-space: pre-line; }
+
+  /* ── 흐름도 / 분기 ── */
+  .flow { display:flex; flex-direction:column; gap:8px; margin-top:16px; }
+  .flow-step { display:flex; align-items:center; gap:12px; background:#faf7ff; border-radius:14px; padding:12px 16px; }
+  .flow-step .fnum { width:26px; height:26px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; color:#fff; }
+  .flow-step p { font-size: 0.9rem; }
+  .flow-arrow { text-align:center; color:#9a8fbf; font-size:1rem; }
+  .branch { display:flex; gap:10px; }
+  .branch .flow-step { flex:1; }
+
+  /* ── 엔딩 카드 ── */
+  .ending-row { display:flex; gap:12px; margin-top:14px; flex-wrap:wrap; }
+  .ending-card { flex:1; min-width:160px; background:#faf7ff; border-radius:16px; padding:18px; text-align:center; }
+  .ending-card .em { font-size:2.2rem; margin-bottom:6px; }
+  .ending-card .sc { font-family:'Jua', sans-serif; font-size:1.05rem; margin-bottom:2px; }
+  .ending-card .ds { font-size:0.8rem; color:#7c72a0; }
+  .ending-detail { background:#faf7ff; border-radius:14px; padding:14px 16px; margin-top:10px; font-size:0.9rem; }
+  .ending-detail .et { font-family:'Jua', sans-serif; margin-bottom:6px; }
+  .ending-detail.good .et { color:#3a8a4a; }
+  .ending-detail.soso .et { color:#c88a00; }
+  .ending-detail.bad  .et { color:#c8393f; }
+
+  /* ── 완성작 CTA ── */
+  .final-cta { text-align: center; background: linear-gradient(135deg, #6C5CE7 0%, #a29bfe 60%, #FF9AC1 100%); border-radius: 26px; padding: 40px 26px; color: #fff; box-shadow: 0 14px 34px rgba(108,92,231,0.35); }
+  .final-cta .emoji-big { font-size: 3rem; animation: bounce 1s infinite alternate; }
+  @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-12px); } }
+  .final-cta h2 { color: #fff; font-size: 1.6rem; margin: 10px 0 6px; }
+  .final-cta p { color: rgba(255,255,255,0.9); margin-bottom: 18px; font-weight: 500; }
+  .final-cta .btn-huge {
+    display: inline-flex; align-items: center; gap: 10px; background: #fff; color: #6C5CE7; text-decoration: none;
+    font-family: 'Jua', sans-serif; font-size: 1.2rem; padding: 16px 34px; border-radius: 50px;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.25); transition: transform 0.15s;
+  }
+  .final-cta .btn-huge:hover { transform: translateY(-4px) scale(1.04); }
+
+  footer { text-align: center; padding: 30px 20px 50px; color: #9a8fbf; font-size: 0.85rem; }
+
+  @media (max-width: 560px) {
+    .section { padding: 24px 18px; }
+    header { padding: 44px 18px 36px; }
+    .rule-grid { grid-template-columns: 1fr; }
+    .branch { flex-direction: column; }
+    .profile-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="confetti-bg" id="confetti"></div>
+
+<header>
+  <div class="badge">📖 경기공유학교 2026</div>
+  <h1>가족과 함께하는<br>AI 바이브코딩! 🧑‍🚀✨</h1>
+  <p>유한대학교 · Day03 · 텍스트 어드벤처 게임 만들기 📖🦋</p>
+  <div class="top-nav">
+    <a href="#goal">오늘의 목표</a>
+    <a href="#rules">설계 규칙</a>
+    <a href="#story">스토리 예시</a>
+    <a href="#branch">분기 구조</a>
+    <a href="#prompt">문제 만들기</a>
+    <a href="#ending">엔딩 시스템</a>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- 오늘의 목표 -->
+  <section class="section c-pink" id="goal">
+    <div class="section-title"><div class="section-icon icon-pink">🎯</div><h2>오늘 만들어볼 것은?</h2></div>
+    <ul class="fun-list">
+      <li><span class="dot">📖</span><span class="txt"><strong>선택지에 따라 이야기가 달라지는 텍스트 어드벤처 게임</strong>을 만들어볼 거예요!</span></li>
+      <li><span class="dot">🧭</span><span class="txt">주인공이 되어 이야기를 따라가다가, 중요한 순간마다 <strong>선택</strong>을 하게 돼요.</span></li>
+      <li><span class="dot">🌈</span><span class="txt">내가 고른 선택에 따라 <strong>서로 다른 결말(엔딩)</strong>에 도착하는 게임이에요.</span></li>
+    </ul>
+    <div class="callout info">
+      <span class="dot">🆚</span><span class="txt">퀴즈왕 게임과 다른 점 하나! 퀴즈는 문제 10개를 순서대로 풀지만, 텍스트 어드벤처는 <strong>"분기 구조"</strong>가 핵심이에요. 선택에 따라 이야기 자체가 갈라져요.</span>
+    </div>
+  </section>
+
+  <!-- 설계 규칙 -->
+  <section class="section c-orange" id="rules">
+    <div class="section-title"><div class="section-icon icon-orange">📋</div><h2>텍스트 어드벤처 특화 설계 규칙</h2></div>
+    <div class="rule-grid">
+      <div class="rule-card"><div class="rule-num" style="background:#FF6FA5">1</div><p><strong>분기 구조</strong>가 핵심! 선택에 따라 이야기가 서로 다른 길로 갈라진다.</p></div>
+      <div class="rule-card"><div class="rule-num" style="background:#4D96FF">2</div><p>선택지는 <strong>2~3개</strong>만 준다. 너무 많으면 헷갈릴 수 있다.</p></div>
+      <div class="rule-card"><div class="rule-num" style="background:#6BCB77">3</div><p><strong>엔딩의 개수와 성격</strong>을 정한다. (Good / Soso / Bad / Hidden 등 최소 2~3개)</p></div>
+      <div class="rule-card"><div class="rule-num" style="background:#9D4EDD">4</div><p><strong>되돌리기 불가</strong>로 할지, <strong>챕터 단위 재도전</strong>을 허용할지 정한다. 재도전 허용은 보상이 될 수 있다.</p></div>
+      <div class="rule-card" style="grid-column: span 2;"><div class="rule-num" style="background:#FFA94D">5</div><p>각 선택이 <strong>"왜 그 결과로 이어지는지"</strong> 교육적 근거를 넣을지 여부를 정한다.</p></div>
+    </div>
+  </section>
+
+  <!-- 스토리 설계 예시 -->
+  <section class="section c-blue" id="story">
+    <div class="section-title"><div class="section-icon icon-blue">🦋</div><h2>스토리 설계 예시</h2></div>
+    <div class="callout warn">
+      <span class="dot">⚠️</span><span class="txt">아래 예시는 <strong>구현용이 아니라 설계 아이디어를 보여주는 참고용</strong>이에요. 실습에서는 자기만의 이야기로 바꿔서 만들어볼 거예요.</span>
+    </div>
+    <div class="profile-card">
+      <div class="profile-row">
+        <div class="profile-tag">게임명 <b>한국사 답사 어드벤처</b></div>
+        <div class="profile-tag">배경 <b>현대 · 초등학교 학생</b></div>
+        <div class="profile-tag">주인공 <b>연우 (남)</b></div>
+      </div>
+      <div class="story-box">삼촌을 만나러 가던 길, 연우는 우연히 낡은 상자를 발견한다. "이거 뭐지?"
+상자를 열자 나비 한 마리가 날아올라 "고맙다"고 인사한다. 자신은 나비 왕국의 왕자인데 사악한 주술에 갇혀 있었다는 것.
+나비가 사라진 후 연우가 다시 길을 걷는데, 눈앞에 갑자기 사악한 악령이 나타난다!</div>
+    </div>
+  </section>
+
+  <!-- 대화와 분기 구조 -->
+  <section class="section c-green" id="branch">
+    <div class="section-title"><div class="section-icon icon-green">🔀</div><h2>대사와 선택 분기</h2></div>
+    <p>악령이 연우에게 묻는다: <strong>"네 녀석이 나비 왕국의 왕자를 풀어줬겠다."</strong> 연우는 두 가지 중 하나를 선택할 수 있다.</p>
+    <div class="flow">
+      <div class="flow-step"><div class="fnum" style="background:#9D4EDD">1</div><p>사악한 악령 등장, 선택을 요구한다.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="branch">
+        <div class="flow-step" style="background:#ffece9"><div class="fnum" style="background:#FF6FA5">A</div><p>"저는 모르는 일입니다." <em>(거짓말)</em> → 나비 가루가 증거로 발각 → <strong>Bad 엔딩</strong></p></div>
+        <div class="flow-step" style="background:#eafff2"><div class="fnum" style="background:#6BCB77">B</div><p>"왕자를 가둔 건 잘못한 일 아닌가요?" <em>(정직)</em> → 도덕 문제 도전 시작</p></div>
+      </div>
+      <div class="flow-arrow">↓ (B를 선택한 경우)</div>
+      <div class="flow-step"><div class="fnum" style="background:#4D96FF">2</div><p>"그렇다면 네가 얼마나 도덕적인 인간인지 시험해 보겠다." → 사지선다 문제 10개 출제</p></div>
+    </div>
+  </section>
+
+  <!-- 문제 만들기 (프롬프트) -->
+  <section class="section c-purple" id="prompt">
+    <div class="section-title"><div class="section-icon icon-purple">✍️</div><h2>문제 만들기</h2></div>
+    <p>아래 프롬프트 오른쪽 위 <strong>복사</strong> 버튼을 눌러 AI에게 붙여넣어 보세요. <code>OO</code> 자리에는 이야기 주제에 맞는 유형(도덕, 역사, 안전 등)을 넣으면 돼요.</p>
+    <div class="code-wrap">
+      <pre class="code-block" id="advPrompt">너는 (주제) 분야의 전문가야. 사지선다 (문제 유형) 문제 10개를 만들어줘.</pre>
+      <button class="copy-btn" onclick="copyCode('advPrompt', this)">📋 복사</button>
+    </div>
+    <div class="callout">
+      <span class="dot">💡</span><span class="txt">이렇게 만든 문제 10개를 정답 개수에 따라 <strong>서로 다른 엔딩</strong>으로 연결해요.</span>
+    </div>
+  </section>
+
+  <!-- 엔딩 시스템 -->
+  <section class="section c-yellow" id="ending">
+    <div class="section-title"><div class="section-icon icon-yellow">🏁</div><h2>결과 화면 – 엔딩 시스템</h2></div>
+    <p>문제 10개를 다 풀고 나면, 맞춘 개수에 따라 서로 다른 엔딩으로 이동해요. 틀렸다고 바로 The End가 아니라, 결과에 맞는 이야기로 마무리해줘요.</p>
+    <div class="ending-row">
+      <div class="ending-card"><div class="em">🦋</div><div class="sc">8~10개</div><div class="ds">Good 엔딩</div></div>
+      <div class="ending-card"><div class="em">😵</div><div class="sc">4~7개</div><div class="ds">Soso 엔딩</div></div>
+      <div class="ending-card"><div class="em">💦</div><div class="sc">0~3개</div><div class="ds">Bad 엔딩</div></div>
+    </div>
+    <div class="ending-detail good"><div class="et">🦋 Good 엔딩</div>연우는 사악한 악령을 물리치고 나비 왕국에 초대되어 금은보화를 선물로 받았습니다.</div>
+    <div class="ending-detail soso"><div class="et">😵 Soso 엔딩</div>연우는 사악한 악령의 공격을 받고 기절했다가 반나절 만에 집에 겨우 돌아왔습니다.</div>
+    <div class="ending-detail bad"><div class="et">💦 Bad 엔딩</div>연우는 사악한 악령의 공격을 받고 부산으로 버려져 며칠간 떠돌다 겨우 집에 돌아왔습니다.</div>
+    <div class="callout" style="margin-top:14px;">
+      <span class="dot">🔁</span><span class="txt">엔딩 화면에는 <strong>"다시 하기"</strong> 버튼을 두어, 처음부터 다른 선택으로 다시 도전할 수 있게 해줘요.</span>
+    </div>
+  </section>
+
+  <!-- 완성작 보러가기 -->
+  <div class="final-cta">
+    <div class="emoji-big">📖🦋</div>
+    <h2 class="jua">텍스트 어드벤처 게임 앱 만들기</h2>
+    <p>텍스트 어드벤쳐 게임 앱 마크다운 받기</p>
+    <a class="btn-huge" href="https://luriluan0-a11y.github.io/gameContents/download/textAdventure_text.zip" target="_blank" rel="noopener" download>
+      🚀 텍스트 어드벤처 게임 다운로드
+    </a>
+    <p style="margin-top: 10px;">샘플 게임 살펴보기</p>
+    <a class="btn-huge" href="https://luriluan0-a11y.github.io/Source/textAdventureApp/1408_textAdventure_App.html" target="_blank" rel="noopener">
+      🚀 샘플 텍스트 어드벤처 게임 플레이
+    </a>    
+  </div>
+
+</div>
+
+<footer>
+  📖 경기공유학교 2026 · 가족과 함께하는 AI 바이브코딩 (유한대학교) 📖
+</footer>
+
+<script>
+  function copyCode(id, btn) {
+    const text = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const original = btn.textContent;
+      btn.textContent = '✅ 완료!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove('copied');
+      }, 1800);
+    });
+  }
+
+  // 배경 컨페티
+  const shapes = ['🦋','📖','✨','🌙','🔮','⭐','💫','🍃','🎭','☁️'];
+  const bg = document.getElementById('confetti');
+  for (let i = 0; i < 24; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.fontSize = (1 + Math.random() * 1.6) + 'rem';
+    el.style.animationDuration = (10 + Math.random() * 14) + 's';
+    el.style.animationDelay = (Math.random() * 14) + 's';
+    bg.appendChild(el);
+  }
+</script>
+
+</body>
+</html>
