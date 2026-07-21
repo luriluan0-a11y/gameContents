@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>텍스트 어드벤처 게임 앱 만들기 — 수업 자료</title>
+<style>
+  :root {
+    --bg: #12141c;
+    --bg-panel: #1b1f2e;
+    --bg-input: #262b3d;
+    --border: #3a4058;
+    --text: #eef0f7;
+    --text-dim: #9aa1b8;
+    --accent: #ffb84d;
+    --accent-2: #6ee7c0;
+    --accent-3: #ff6b81;
+    --font: "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    font-family: var(--font);
+    background: radial-gradient(circle at 20% -10%, #232840 0%, var(--bg) 55%);
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  .deck {
+    position: relative;
+    width: 100vw;
+    height: 100dvh;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 70px 8vw 90px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(24px);
+    pointer-events: none;
+    transition: opacity 0.45s ease, transform 0.45s ease;
+    overflow-y: auto;
+  }
+  .slide.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .eyebrow {
+    color: var(--accent-2);
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+  }
+
+  h1.big {
+    font-size: clamp(1.8rem, 4.2vw, 3.2rem);
+    margin: 0 0 18px;
+    line-height: 1.3;
+  }
+
+  h2.slide-title {
+    font-size: clamp(1.5rem, 3.2vw, 2.4rem);
+    margin: 0 0 30px;
+    line-height: 1.35;
+  }
+
+  p.lead {
+    font-size: clamp(1rem, 1.6vw, 1.3rem);
+    color: var(--text-dim);
+    max-width: 780px;
+    margin: 0 auto;
+  }
+
+  .highlight { color: var(--accent); font-weight: 700; }
+  .highlight2 { color: var(--accent-2); font-weight: 700; }
+  .highlight3 { color: var(--accent-3); font-weight: 700; }
+
+  ul.bullets {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    max-width: 780px;
+    text-align: left;
+  }
+  ul.bullets li {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+    line-height: 1.55;
+  }
+  ul.bullets li::before {
+    content: "▸ ";
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(240px, 1fr));
+    gap: 16px;
+    max-width: 880px;
+    margin: 0 auto;
+  }
+  .rule-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 20px;
+    text-align: left;
+  }
+  .rule-card .n {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #1a1408;
+    font-weight: 800;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+  }
+  .rule-card p { margin: 0; font-size: 0.98rem; color: var(--text); line-height: 1.5; }
+
+  .definition-box {
+    max-width: 720px;
+    background: var(--bg-panel);
+    border: 1px solid var(--accent-2);
+    border-radius: 16px;
+    padding: 30px 34px;
+    font-size: clamp(1rem, 1.7vw, 1.25rem);
+    line-height: 1.7;
+  }
+
+  .story-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 24px;
+    max-width: 760px;
+    text-align: left;
+    margin: 0 auto 14px;
+    font-size: 0.98rem;
+    line-height: 1.65;
+  }
+  .story-card .tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    padding: 2px 10px;
+    margin-bottom: 8px;
+  }
+
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
+    gap: 10px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .flow .node {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 0.88rem;
+    width: 190px;
+    text-align: left;
+    line-height: 1.5;
+  }
+  .flow .node.branch-a { border-color: var(--accent-3); }
+  .flow .node.branch-b { border-color: var(--accent-2); }
+  .flow .arrow {
+    align-self: center;
+    color: var(--text-dim);
+    font-size: 1.3rem;
+  }
+
+  .ending-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .ending-card {
+    border-radius: 14px;
+    padding: 20px;
+    text-align: left;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+  }
+  .ending-card.good { border-left: 5px solid var(--accent-2); }
+  .ending-card.soso { border-left: 5px solid var(--accent); }
+  .ending-card.bad  { border-left: 5px solid var(--accent-3); }
+  .ending-card h3 { margin: 0 0 8px; font-size: 1.05rem; }
+  .ending-card p { margin: 0; color: var(--text-dim); font-size: 0.9rem; line-height: 1.5; }
+  .ending-card .score { font-size: 0.78rem; color: var(--text-dim); }
+
+  .download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--accent);
+    color: #1a1408;
+    font-weight: 800;
+    font-size: 1.15rem;
+    padding: 18px 34px;
+    border-radius: 999px;
+    text-decoration: none;
+    margin-top: 14px;
+    transition: transform 0.15s ease, filter 0.15s ease;
+  }
+  .download-btn:hover { transform: scale(1.04); filter: brightness(1.06); }
+  .download-btn:active { transform: scale(0.98); }
+
+  .play-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--accent-2);
+    color: #06231b;
+    font-weight: 800;
+    font-size: 1.15rem;
+    padding: 18px 34px;
+    border-radius: 999px;
+    text-decoration: none;
+    margin-top: 28px;
+    transition: transform 0.15s ease, filter 0.15s ease;
+  }
+  .play-btn:hover { transform: scale(1.04); filter: brightness(1.06); }
+  .play-btn:active { transform: scale(0.98); }
+
+  /* nav */
+  .nav-arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(38,43,61,0.7);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    font-size: 1.3rem;
+    cursor: pointer;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav-arrow:hover { background: rgba(38,43,61,0.95); }
+  .nav-arrow.prev { left: 18px; }
+  .nav-arrow.next { right: 18px; }
+  .nav-arrow:disabled { opacity: 0.25; cursor: default; }
+
+  .dots {
+    position: fixed;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 30;
+  }
+  .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--border);
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+  .dot.active { background: var(--accent); transform: scale(1.3); }
+
+  .counter {
+    position: fixed;
+    top: 18px;
+    right: 22px;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    z-index: 30;
+    background: rgba(38,43,61,0.6);
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+  }
+
+  .kicker-top {
+    position: fixed;
+    top: 18px;
+    left: 22px;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    z-index: 30;
+  }
+
+  @media (max-width: 640px) {
+    .card-grid { grid-template-columns: 1fr; }
+    .flow .arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+<div class="kicker-top">덕일전자공업고 · 대학 학과 체험</div>
+<div class="counter" id="counter">1 / 11</div>
+
+<div class="deck" id="deck">
+
+  <!-- 0 표지 -->
+  <section class="slide">
+    <div class="eyebrow">2026 고교생 맞춤형 고용서비스 직무멘토링 · 유한교원 서포터즈</div>
+    <h1 class="big">덕일전자공업고등학교<br>대학 학과 체험 프로그램</h1>
+    <p class="lead">2026. 07. 22 · 유한대학교 컴퓨터공학과 게임콘텐츠전공</p>
+  </section>
+
+  <!-- 1 학과 소개 -->
+  <section class="slide">
+    <div class="eyebrow">학과 소개</div>
+    <h2 class="slide-title">유한대학교 컴퓨터공학과<br>게임콘텐츠전공</h2>
+    <ul class="bullets">
+      <li>간단한 게임을 개발하는 프로젝트 수업이 많아요.</li>
+      <li>개발 외에도 <span class="highlight">QA, GM</span> 같은 분야로도 취업을 많이 하고 있어요.</li>
+      <li>게임 업체에 취업하고 싶은 학생이 많은데, <span class="highlight2">개발하는 것</span>과 <span class="highlight2">즐기는 것</span>은 많이 달라요.</li>
+      <li>LOL, 배틀그라운드, 피파... 이런 게임만 하는 분들은 앞으로 다양한 게임을 플레이해보세요.</li>
+      <li>MMORPG 중에는 <span class="highlight3">메이플스토리 개발자들이 싫어하는 게임</span>이 있다는 것도 참고!</li>
+    </ul>
+  </section>
+
+  <!-- 2 오늘 만들 것 -->
+  <section class="slide">
+    <div class="eyebrow">오늘 만들어볼 것</div>
+    <h2 class="slide-title">교육용 텍스트 어드벤처<br>게임 앱 만들기</h2>
+    <p class="lead">교육용 텍스트 어드벤처를 기반으로<br><span class="highlight">학습을 시켜주는 교육용 앱</span>을 직접 만들어봅니다.</p>
+  </section>
+
+  <!-- 3 교육용 게임의 특징 -->
+  <section class="slide">
+    <div class="eyebrow">교육용 게임의 특징</div>
+    <h2 class="slide-title">교육용 게임의 특징</h2>
+    <ul class="bullets">
+      <li>목적이 <span class="highlight">명확</span>하다!</li>
+      <li>교육의 효과가 있다면 재미가 좀 없어도 괜찮다???</li>
+      <li>하지만, <span class="highlight2">재미도 있으면</span> 더 좋지 않을까?</li>
+    </ul>
+  </section>
+
+  <!-- 4 진지한 게임 -->
+  <section class="slide">
+    <div class="eyebrow">Serious Game</div>
+    <h2 class="slide-title">교육용 게임 = 진지한 게임<br>(Serious Game)</h2>
+    <div class="definition-box">
+      교육, 훈련, 의료, 국방 등 <span class="highlight">특정 목적을 달성하기 위해</span> 설계된 기능성 게임을 말한다.
+    </div>
+  </section>
+
+  <!-- 5 규칙 -->
+  <section class="slide">
+    <div class="eyebrow">게임을 만들 때 규칙</div>
+    <h2 class="slide-title">게임을 만들 때 규칙</h2>
+    <div class="card-grid">
+      <div class="rule-card">
+        <span class="n">1</span>
+        <p>학습에 꼭 필요한 요소에는 <b>"노.가.다"</b>가 있다.</p>
+      </div>
+      <div class="rule-card">
+        <span class="n">2</span>
+        <p>재미있게 반복할 수 있다면? <b>확실한 피드백과 보상</b>을 설계하자.</p>
+      </div>
+      <div class="rule-card">
+        <span class="n">3</span>
+        <p>틀렸다고 바로 The End를 주지 말고, <b>다시 도전</b>할 수 있게 만든다.</p>
+      </div>
+      <div class="rule-card">
+        <span class="n">4</span>
+        <p>제목은 <b>직관적</b>이어야 하고, 비용을 지불하는 <b>학부모</b>도 타겟이 되어야 한다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 설계 예시 - 기본 설정 -->
+  <section class="slide">
+    <div class="eyebrow">교육용 챗봇 앱 설계 예시 · ①</div>
+    <h2 class="slide-title">이렇게 질문하고,<br>이렇게 답해봐요</h2>
+    <div class="story-card">
+      <span class="tag">Q. 어떤 게임을 만들고 싶나요?</span><br>
+      예시: 한국사를 공부하는 앱을 만들고 싶어.
+    </div>
+    <div class="story-card">
+      <span class="tag">배경</span> 현대 &nbsp;·&nbsp;
+      <span class="tag">주인공 설정</span> 초등학교 학생 &nbsp;·&nbsp;
+      <span class="tag">성별</span> 남 &nbsp;·&nbsp;
+      <span class="tag">이름</span> 철수
+    </div>
+  </section>
+
+  <!-- 7 시놉시스 -->
+  <section class="slide">
+    <div class="eyebrow">교육용 챗봇 앱 설계 예시 · ②</div>
+    <h2 class="slide-title">시놉시스 (간단한 줄거리)</h2>
+    <div class="story-card">
+      주인공 연우는 삼촌을 만나러 가던 길에 우연히 상자를 하나 발견하게 된다. 이거 뭐지? 상자를 열었더니 나비 한 마리가 날아오르며 "고맙다"고 인사를 한다. 자신은 나비 왕국의 왕자인데 사악한 주술에 갇혀있었다는 것이다. 나비가 고맙다고 하고 사라진 후 연우가 다시 길을 가고 있는데 연우의 앞에 갑자기 나타난 <span class="highlight3">사악한 악령</span>.
+    </div>
+    <p class="lead">주인공을 괴롭히는 <span class="highlight3">빌런</span> = 사악한 악령</p>
+  </section>
+
+  <!-- 8 대사와 선택지 흐름 -->
+  <section class="slide">
+    <div class="eyebrow">교육용 챗봇 앱 설계 예시 · ③</div>
+    <h2 class="slide-title">대사 &amp; 선택지로 이야기가 갈라져요</h2>
+    <div class="flow">
+      <div class="node">
+        <b>빌런 대사 1</b><br>
+        "네 녀석이 나비 왕국의 왕자를 풀어줬겠다."
+      </div>
+      <div class="arrow">→</div>
+      <div class="node branch-a">
+        <b>선택 A</b><br>
+        "저는 모르는 일입니다."<br>→ 배드 엔딩
+      </div>
+      <div class="node branch-b">
+        <b>선택 B</b><br>
+        "왕자를 가둔 것이 잘못한 일 아닌가요?"<br>→ 문제 출제
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 문제 출제 & 채점 -->
+  <section class="slide">
+    <div class="eyebrow">교육용 챗봇 앱 설계 예시 · ④</div>
+    <h2 class="slide-title">AI에게 사지선다 문제 10개 요청하기</h2>
+    <p class="lead">빌런: "그렇다면 네가 얼마나 도덕적인 인간인지 시험해 보겠다. 내가 내는 문제를 맞춰보아라."</p>
+    <div class="ending-grid" style="margin-top:24px;">
+      <div class="ending-card good"><h3>10~8개 정답</h3><p class="score">Ending (Good)</p></div>
+      <div class="ending-card soso"><h3>7~4개 정답</h3><p class="score">Ending (Soso)</p></div>
+      <div class="ending-card bad"><h3>3~0개 정답</h3><p class="score">Ending (Bad)</p></div>
+    </div>
+  </section>
+
+  <!-- 10 엔딩 -->
+  <section class="slide">
+    <div class="eyebrow">교육용 챗봇 앱 설계 예시 · ⑤</div>
+    <h2 class="slide-title">세 가지 결말</h2>
+    <div class="ending-grid">
+      <div class="ending-card good">
+        <h3>🏆 Good</h3>
+        <p>철수는 사악한 악령을 물리치고 나비 왕국에 초대되어 금은보화를 선물로 받았습니다.</p>
+      </div>
+      <div class="ending-card soso">
+        <h3>😐 Soso</h3>
+        <p>철수는 사악한 악령의 공격을 받고 기절했다가 반나절 만에 집에 겨우 돌아왔습니다.</p>
+      </div>
+      <div class="ending-card bad">
+        <h3>💀 Bad</h3>
+        <p>철수는 사악한 악령의 공격을 받고 부산으로 버려져 며칠간 떠돌다 겨우 집에 돌아왔습니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 다운로드 -->
+  <section class="slide">
+    <div class="eyebrow">이제 내 차례!</div>
+    <h2 class="slide-title">텍스트 어드벤처 설계도구<br>다운로드</h2>
+    <p class="lead">설계도구를 내려받아 압축을 풀고, 오늘 배운 순서대로<br>나만의 교육용 텍스트 어드벤처를 직접 설계해보세요.</p>
+    <a class="play-btn" href="https://luriluan0-a11y.github.io/Source/textAdventureApp/1408_textAdventure_App.html" target="_blank" rel="noopener">
+      ▶ 게임 플레이해보기
+    </a>
+    <a class="download-btn" href="https://luriluan0-a11y.github.io/gameContents/download/%ED%85%8D%EC%8A%A4%ED%8A%B8%EC%96%B4%EB%93%9C%EB%B2%A4%EC%B2%98_%EC%84%A4%EA%B3%84%EB%8F%84%EA%B5%AC.zip" download>
+      ⬇ 텍스트 어드벤처 설계도구 다운로드
+    </a>
+  </section>
+
+</div>
+
+<button class="nav-arrow prev" id="prevBtn" aria-label="이전 슬라이드">‹</button>
+<button class="nav-arrow next" id="nextBtn" aria-label="다음 슬라이드">›</button>
+<div class="dots" id="dots"></div>
+
+<script>
+(function () {
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const dotsWrap = document.getElementById("dots");
+  const counter = document.getElementById("counter");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  let current = 0;
+
+  slides.forEach((_, i) => {
+    const d = document.createElement("div");
+    d.className = "dot";
+    d.addEventListener("click", () => goTo(i));
+    dotsWrap.appendChild(d);
+  });
+  const dots = Array.from(dotsWrap.children);
+
+  function render() {
+    slides.forEach((s, i) => s.classList.toggle("active", i === current));
+    dots.forEach((d, i) => d.classList.toggle("active", i === current));
+    counter.textContent = (current + 1) + " / " + slides.length;
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === slides.length - 1;
+  }
+
+  function goTo(i) {
+    if (i < 0 || i >= slides.length) return;
+    current = i;
+    render();
+  }
+
+  prevBtn.addEventListener("click", () => goTo(current - 1));
+  nextBtn.addEventListener("click", () => goTo(current + 1));
+
+  document.addEventListener("keydown", (e) => {
+    if (["ArrowRight", "ArrowDown", "PageDown", " "].includes(e.key)) { e.preventDefault(); goTo(current + 1); }
+    if (["ArrowLeft", "ArrowUp", "PageUp"].includes(e.key)) { e.preventDefault(); goTo(current - 1); }
+    if (e.key === "Home") goTo(0);
+    if (e.key === "End") goTo(slides.length - 1);
+  });
+
+  let touchStartX = null;
+  document.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener("touchend", (e) => {
+    if (touchStartX === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 60) goTo(current + (dx < 0 ? 1 : -1));
+    touchStartX = null;
+  }, { passive: true });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
