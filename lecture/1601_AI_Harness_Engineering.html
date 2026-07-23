@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>하네스 엔지니어링 — AI를 다루는 업무 매뉴얼</title>
+<style>
+  :root {
+    --paper: #F3F4EF;
+    --surface: #FFFFFF;
+    --ink: #1E2A33;
+    --ink-soft: #5C6B72;
+    --ink-faint: #8B979C;
+    --line: #DADFD6;
+    --line-strong: #C3CAC0;
+    --accent: #A9762A;
+    --accent-ink: #6E4E1C;
+    --accent-2: #33645F;
+    --accent-2-ink: #234441;
+    --radius: 3px;
+    --serif-fallback: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #14181B;
+      --surface: #1B2126;
+      --ink: #E9EAE4;
+      --ink-soft: #9BA6A8;
+      --ink-faint: #6E7A7D;
+      --line: #2C343A;
+      --line-strong: #3A434A;
+      --accent: #D6A44B;
+      --accent-ink: #F0CE8E;
+      --accent-2: #5B968F;
+      --accent-2-ink: #8FC4BD;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #14181B;
+    --surface: #1B2126;
+    --ink: #E9EAE4;
+    --ink-soft: #9BA6A8;
+    --ink-faint: #6E7A7D;
+    --line: #2C343A;
+    --line-strong: #3A434A;
+    --accent: #D6A44B;
+    --accent-ink: #F0CE8E;
+    --accent-2: #5B968F;
+    --accent-2-ink: #8FC4BD;
+  }
+  :root[data-theme="light"] {
+    --paper: #F3F4EF;
+    --surface: #FFFFFF;
+    --ink: #1E2A33;
+    --ink-soft: #5C6B72;
+    --ink-faint: #8B979C;
+    --line: #DADFD6;
+    --line-strong: #C3CAC0;
+    --accent: #A9762A;
+    --accent-ink: #6E4E1C;
+    --accent-2: #33645F;
+    --accent-2-ink: #234441;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  body {
+    font-family: var(--serif-fallback);
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+  .page {
+    max-width: min(1120px, 94vw);
+    margin: 0 auto;
+    padding: 4.5rem 2rem 6rem;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 22px;
+    height: 1px;
+    background: var(--accent);
+    display: inline-block;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4.5vw, 2.6rem);
+    line-height: 1.28;
+    margin: 0.9rem 0 0.5rem;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .subtitle {
+    font-size: 1.05rem;
+    color: var(--ink-soft);
+    max-width: 34em;
+    margin: 0 0 2.2rem;
+    text-wrap: balance;
+  }
+
+  header.hero {
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 2.4rem;
+    margin-bottom: 3rem;
+  }
+
+  .pins { display: flex; gap: 6px; margin-top: 1.6rem; }
+  .pins span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--line-strong);
+  }
+  .pins span:first-child { background: var(--accent); }
+
+  h2 {
+    font-size: 1.5rem;
+    letter-spacing: -0.005em;
+    margin: 0 0 1.1rem;
+    text-wrap: balance;
+  }
+
+  .section { margin: 3.6rem 0; }
+  .section > p { margin: 0 0 1.1rem; max-width: 62ch; }
+
+  p { color: var(--ink); }
+  .muted { color: var(--ink-soft); }
+
+  /* --- employee checklist card --- */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.6rem 1.8rem;
+  }
+
+  .fail-list {
+    list-style: none;
+    margin: 1.4rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.9rem;
+  }
+  .fail-list li {
+    display: flex;
+    gap: 0.85rem;
+    align-items: baseline;
+    font-size: 0.98rem;
+  }
+  .fail-list li::before {
+    content: "☐";
+    color: var(--ink-faint);
+    font-family: var(--mono);
+    flex: none;
+    transform: translateY(1px);
+  }
+
+  .definition {
+    margin-top: 2rem;
+    border-left: 3px solid var(--accent);
+    padding: 0.2rem 0 0.2rem 1.2rem;
+  }
+  .definition .label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+  .definition p { margin: 0; font-size: 1.03rem; }
+  .definition strong { color: var(--ink); }
+
+  /* --- three-way comparison --- */
+  .modes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin: 1.6rem 0 2rem;
+  }
+  @media (max-width: 640px) {
+    .modes { grid-template-columns: 1fr; }
+  }
+  .mode {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.3rem 1.3rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+  .mode .kind {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .mode .name { font-size: 1.05rem; font-weight: 600; }
+  .mode .desc { font-size: 0.9rem; color: var(--ink-soft); flex: 1; }
+
+  .meter { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.2rem; }
+  .meter .ticks { display: flex; gap: 3px; }
+  .meter .ticks i {
+    width: 14px; height: 4px; border-radius: 2px;
+    background: var(--line-strong);
+    display: block;
+  }
+  .meter .ticks i.on { background: var(--accent); }
+  .meter .tag {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--ink-soft);
+  }
+  .mode.router .meter { color: var(--accent-2-ink); }
+  .fork-icon { width: 15px; height: 15px; flex: none; color: var(--accent-2); }
+  .fork-icon svg { width: 100%; height: 100%; }
+
+  .rule-box {
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    padding: 1.6rem 1.8rem;
+    position: relative;
+  }
+  .rule-box .label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    margin-bottom: 0.6rem;
+    display: block;
+  }
+  .rule-box p {
+    margin: 0;
+    font-size: 1.12rem;
+    line-height: 1.65;
+  }
+  .rule-box .accent-word { color: var(--accent-ink); font-weight: 600; }
+  .rule-box .accent2-word { color: var(--accent-2-ink); font-weight: 600; }
+
+  /* --- harness spine steps --- */
+  .spine {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.6rem;
+  }
+  .step {
+    border-top: 1px solid var(--line);
+    padding-top: 1.8rem;
+  }
+  .step:first-child {
+    border-top: none;
+    padding-top: 0;
+  }
+  .step .node {
+    flex: none;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    color: var(--accent-ink);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .step h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin: 0 0 0.7rem;
+    font-size: 1.15rem;
+  }
+  .step .body { max-width: 62ch; }
+  .step p { margin: 0 0 0.9rem; }
+
+  .table-wrap { margin-top: 0.6rem; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid var(--line);
+  }
+  th {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
+  td.strong-cell { color: var(--accent-ink); font-weight: 600; }
+
+  .checklist {
+    list-style: none;
+    margin: 0.4rem 0 1.2rem;
+    padding: 0;
+    display: grid;
+    gap: 0.6rem;
+  }
+  .checklist li {
+    display: flex;
+    gap: 0.7rem;
+    font-size: 0.95rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 0.65rem 0.9rem;
+  }
+  .checklist li .when {
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    flex: none;
+    width: 3.4rem;
+    padding-top: 0.15rem;
+  }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0.6rem 0 1.2rem; }
+  .chip {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    border: 1px solid var(--accent-2);
+    color: var(--accent-2-ink);
+    border-radius: 999px;
+    padding: 0.32rem 0.85rem;
+  }
+
+  .log {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 0.9rem 1.1rem;
+    display: grid;
+    gap: 0.45rem;
+    margin: 0.6rem 0 1rem;
+  }
+  .log .entry { display: flex; gap: 0.7rem; color: var(--ink-soft); }
+  .log .entry .tag { color: var(--accent-ink); }
+  .log .entry .arrow { color: var(--ink-faint); }
+
+  footer.recap {
+    margin-top: 4rem;
+    border-top: 1px solid var(--line);
+    padding-top: 2.4rem;
+  }
+  .recap .label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 0.9rem;
+    display: block;
+  }
+  .recap-steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    font-size: 0.98rem;
+  }
+  .recap-steps .r {
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    padding: 0.55rem 0.9rem;
+  }
+  .recap-steps .sep { color: var(--ink-faint); font-family: var(--mono); }
+  .recap p.closing {
+    margin: 1.6rem 0 0;
+    color: var(--ink-soft);
+    max-width: 62ch;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="hero">
+    <div class="eyebrow">AI Harness Engineering · 학생 특강 자료</div>
+    <h1>하네스 엔지니어링</h1>
+    <p class="subtitle">AI를 똑똑한 신입 직원이라고 생각해보면, 하네스는 그 직원 옆에 붙여주는 업무 매뉴얼이자 검수 담당자입니다.</p>
+    <div class="pins"><span></span><span></span><span></span></div>
+  </header>
+
+  <section class="section">
+    <h2>AI를 "직원"이라고 생각해보면</h2>
+    <p>똑똑한 신입 직원 한 명이 있다고 해봅시다. 이 직원(=AI 모델)은 지식도 많고 글도 잘 쓰지만, 혼자 두면 이런 문제가 생깁니다.</p>
+
+    <div class="card">
+      <ul class="fail-list">
+        <li>상사가 뭘 원하는지 제대로 안 물어보고 바로 일을 시작함</li>
+        <li>확인 안 된 숫자나 출처를 그냥 자신 있게 씀</li>
+        <li>보고서 형식을 매번 다르게 냄 (어떤 날은 표로, 어떤 날은 줄글로)</li>
+        <li>결과물에 "제가 열심히 도와드리겠습니다!" 같은 필요 없는 말을 자꾸 붙임</li>
+        <li>피드백을 줘도 왜 틀렸는지 스스로 설명 안 하고 그냥 다시 씀</li>
+      </ul>
+
+      <div class="definition">
+        <span class="label">Definition</span>
+        <p><strong>하네스</strong>는 이 직원 옆에 붙여주는 "업무 매뉴얼 + 검수 담당자"입니다. 직원의 실력 자체를 바꾸는 게 아니라, 일하는 과정에 체크포인트를 끼워 넣는 것입니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>체크포인트를 언제 넣을지가 핵심</h2>
+    <p>"에이전트 활용에 따라 어떻게 다르게 써야 하는가"는 일하는 방식 세 가지로 나눠보면 쉬워집니다.</p>
+
+    <div class="modes">
+      <div class="mode">
+        <span class="kind">Unattended</span>
+        <span class="name">완전 자동 실행형</span>
+        <span class="desc">사람이 중간에 못 봐주는 일. 백그라운드 리서치, 배치 작업.</span>
+        <div class="meter">
+          <span class="ticks"><i class="on"></i><i class="on"></i><i class="on"></i></span>
+          <span class="tag">체크포인트 강하게</span>
+        </div>
+      </div>
+      <div class="mode">
+        <span class="kind">Interactive</span>
+        <span class="name">대화형</span>
+        <span class="desc">지금 이 대화처럼, 결과물이 마음에 안 들면 바로 "이거 아니야" 할 수 있는 일.</span>
+        <div class="meter">
+          <span class="ticks"><i class="on"></i><i></i><i></i></span>
+          <span class="tag">체크포인트 약하게</span>
+        </div>
+      </div>
+      <div class="mode router">
+        <span class="kind">Router</span>
+        <span class="name">만능 라우터형</span>
+        <span class="desc">여러 종류의 일을 시키는 만능 직원. 블로그도 쓰고 논문도 쓰는 경우.</span>
+        <div class="meter">
+          <span class="fork-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v7M12 10l-6 8M12 10l6 8"/></svg></span>
+          <span class="tag">분류 정확도가 핵심</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rule-box">
+      <span class="label">핵심 원칙 · 한 문장</span>
+      <p>일을 완전히 맡기고 안 볼수록 검사를 <span class="accent-word">빡빡하게</span>, 계속 옆에서 보면서 할수록 검사는 느슨하게 대신 <span class="accent2-word">되돌리기를 빠르게</span> — 이 한 문장이 전부입니다.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>손에 잡히게 적용하는 5단계</h2>
+    <p class="muted">실제로 지금 쓰는 에이전트에 적용하는 순서입니다.</p>
+
+    <div class="spine">
+
+      <div class="step">
+        <div class="body">
+          <h3><span class="node">1</span>지금 쓰는 에이전트/스킬을 분류하기</h3>
+          <p>먼저 지금 운영 중인 것을 세 가지 축으로 나눠봅니다. 표만 그려봐도 "지금 이 에이전트에 어떤 하네스가 필요한지" 감이 잡힙니다.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>구분</th><th>예시</th><th>체크포인트 강도</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>완전 자동 실행형</td><td>백그라운드로 도는 리서치, 배치 작업</td><td class="strong-cell">강하게</td></tr>
+              <tr><td>대화형</td><td>Claude와 지금처럼 turn-by-turn</td><td>약하게</td></tr>
+              <tr><td>만능 라우터형</td><td>harness-meta-system, Hermes의 스킬 관리</td><td>분류 정확도가 핵심</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="body">
+          <h3><span class="node">2</span>체크포인트를 실제 문장으로 써보기</h3>
+          <p>추상적으로 "검증 게이트"라고 하지 말고, 진짜 질문 문장으로 적어봅니다. 학생 포트폴리오 첨삭 스킬을 예로 들면:</p>
+          <ul class="checklist">
+            <li><span class="when">시작 전</span><span>학생 이름, 전공, 포트폴리오 목적을 확인했는가?</span></li>
+            <li><span class="when">중간</span><span>게임 스크린샷/코드 링크가 실제로 첨부됐는가, 아니면 지어낸 예시인가?</span></li>
+            <li><span class="when">끝</span><span>결론에서 앞 내용을 그대로 반복하지 않았는가?</span></li>
+          </ul>
+          <p>이렇게 질문 형태로 3~5개만 뽑아도 그게 바로 하네스의 뼈대입니다. harness-meta-system의 Hook 1~4가 딱 이 방식으로 만들어진 것입니다.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="body">
+          <h3><span class="node">3</span>예외 조건을 반드시 같이 정하기</h3>
+          <p>체크포인트만 만들면 매번 확인 질문 때문에 느려집니다. "이럴 땐 건너뛴다"를 같이 정해야 실용적입니다.</p>
+          <div class="chips">
+            <span class="chip">SKIP · 이전 대화에서 맥락이 이미 확립됐으면</span>
+            <span class="chip">SKIP · 사용자가 "한 번에 해줘"라고 하면</span>
+          </div>
+          <p>지금 갖고 있는 스킬 파일에도 이 예외 조건들이 이미 들어가 있는데, 이게 실무에서 가장 중요한 부분입니다. 예외 없는 하네스는 결국 안 쓰게 됩니다.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="body">
+          <h3><span class="node">4</span>라우팅 표를 계속 업데이트하기</h3>
+          <p>에이전트를 여러 용도로 쓸수록 "어떤 요청이 오면 어떤 스킬/모듈로 보낼지"를 표로 관리하는 게 중요합니다. 새 용도가 생기면(예: 새로운 강의 콘텐츠 유형) 표에 한 줄 추가하고, 트리거 문구가 기존 것과 안 겹치는지만 확인하면 됩니다.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="body">
+          <h3><span class="node">5</span>실패 사례를 기록해서 하네스를 키우기</h3>
+          <p>응답이 마음에 안 들 때마다 "왜 틀렸는지"를 한 문장으로 남겨두면 그게 그대로 다음 버전 하네스의 체크포인트가 됩니다.</p>
+          <div class="log">
+            <div class="entry"><span class="tag">[fail]</span><span>분량 부족</span><span class="arrow">→</span><span>다음 체크포인트로 추가</span></div>
+            <div class="entry"><span class="tag">[fail]</span><span>톤 불일치</span><span class="arrow">→</span><span>다음 체크포인트로 추가</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="recap">
+    <span class="label">정리</span>
+    <div class="recap-steps">
+      <span class="r">① 자동/대화/라우팅으로 분류</span>
+      <span class="sep">→</span>
+      <span class="r">② 체크포인트를 질문 문장으로 뽑기</span>
+      <span class="sep">→</span>
+      <span class="r">③ 예외 조건 정하기</span>
+      <span class="sep">→</span>
+      <span class="r">④ 실패할 때마다 규칙 추가</span>
+    </div>
+    <p class="closing">하네스 엔지니어링을 "활용"한다는 것은 거창한 시스템을 처음부터 설계하는 게 아니라, 이 네 단계를 반복하는 것입니다. 새 스킬을 추가할 때도 이 순서대로 하면 자연스럽게 하네스가 만들어집니다.</p>
+  </footer>
+
+</div>
+</body>
+</html>
