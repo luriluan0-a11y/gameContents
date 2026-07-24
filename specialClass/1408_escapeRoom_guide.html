@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>가족과 함께하는 AI 바이브코딩 - AI 방탈출 수수께끼 앱 만들기</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: linear-gradient(180deg, #fff4e0 0%, #ffe9f3 35%, #eaf3ff 100%);
+    color: #3a2e5c;
+    line-height: 1.8;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .jua { font-family: 'Jua', sans-serif; }
+
+  /* ── 배경 컨페티 ── */
+  .confetti-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .confetti { position: absolute; font-size: 1.6rem; opacity: 0.55; animation: floaty linear infinite; }
+  @keyframes floaty {
+    0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    8%   { opacity: 0.55; }
+    92%  { opacity: 0.55; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* ── 헤더 ── */
+  header {
+    position: relative;
+    background: linear-gradient(120deg, #6C5CE7 0%, #9D4EDD 45%, #FF6FA5 100%);
+    color: #fff;
+    padding: 56px 24px 44px;
+    text-align: center;
+    border-radius: 0 0 40px 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.3);
+    padding: 8px 22px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 14px;
+  }
+
+  header h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); text-shadow: 3px 3px 0 rgba(0,0,0,0.12); line-height: 1.4; }
+  header p { margin-top: 10px; font-size: 1.05rem; font-weight: 700; opacity: 0.95; }
+
+  .top-nav { margin-top: 26px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+  .top-nav a {
+    background: rgba(255,255,255,0.28); color: #fff; text-decoration: none; padding: 9px 18px;
+    border-radius: 50px; font-weight: 700; font-size: 0.9rem; border: 2px solid rgba(255,255,255,0.5);
+    transition: transform 0.15s, background 0.15s;
+  }
+  .top-nav a:hover { background: rgba(255,255,255,0.5); transform: translateY(-2px) scale(1.05); }
+
+  /* ── 컨테이너 ── */
+  .container { max-width: 780px; margin: -18px auto 0; padding: 0 18px 60px; position: relative; z-index: 1; }
+
+  .section {
+    background: #fff; border-radius: 26px; padding: 30px 28px; margin-bottom: 26px;
+    box-shadow: 0 10px 28px rgba(120,90,200,0.12); border: 3px solid transparent;
+  }
+  .section.c-pink   { border-color: #FFD0E4; }
+  .section.c-orange { border-color: #FFE0BE; }
+  .section.c-yellow { border-color: #FFF0B0; }
+  .section.c-green  { border-color: #CDEFCF; }
+  .section.c-blue   { border-color: #CBE2FF; }
+  .section.c-purple { border-color: #E4D4FF; }
+
+  .section-title { display: flex; align-items: center; gap: 12px; font-size: 1.5rem; color: #3a2e5c; margin-bottom: 16px; }
+  .section-icon {
+    width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  .icon-pink   { background: linear-gradient(135deg, #FF9AC1, #FF6FA5); }
+  .icon-orange { background: linear-gradient(135deg, #FFC98B, #FFA94D); }
+  .icon-yellow { background: linear-gradient(135deg, #FFE985, #FFD93D); }
+  .icon-green  { background: linear-gradient(135deg, #A8E6A1, #6BCB77); }
+  .icon-blue   { background: linear-gradient(135deg, #9BC4FF, #4D96FF); }
+  .icon-purple { background: linear-gradient(135deg, #CBA3FF, #9D4EDD); }
+
+  .section p, .section li { font-size: 0.98rem; color: #4a4066; }
+
+  .fun-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
+  .fun-list li { background: #faf7ff; border-radius: 14px; padding: 12px 16px; display: flex; align-items: flex-start; gap: 10px; font-weight: 500; }
+  .fun-list li .dot { font-size: 1.1rem; flex-shrink: 0; }
+  .fun-list li .txt { flex: 1 1 0%; min-width: 0; }
+  .callout .txt { flex: 1 1 0%; min-width: 0; }
+
+  /* ── 콜아웃 ── */
+  .callout { background: linear-gradient(135deg, #FFF3CE, #FFE7A3); border-radius: 16px; padding: 16px 20px; margin: 14px 0; font-weight: 700; color: #7a5b00; display: flex; align-items: center; gap: 10px; }
+  .callout.info { background: linear-gradient(135deg, #DCEBFF, #B9D6FF); color: #1f4f8a; }
+  .callout.warn { background: linear-gradient(135deg, #FFD9D9, #FFB3B3); color: #8a1f1f; }
+
+  /* ── 영상 카드 ── */
+  .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin: 14px 0; }
+  .video-card {
+    background: #faf7ff; border-radius: 18px; padding: 20px 16px; text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  }
+  .video-card .emoji { font-size: 2.2rem; margin-bottom: 10px; }
+  .video-card .vtitle { font-size: 0.92rem; font-weight: 700; color: #3a2e5c; margin-bottom: 14px; min-height: 3.2em; }
+  .video-btn {
+    display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #FF9AC1, #FF6FA5);
+    color: #fff; text-decoration: none; font-family: 'Jua', sans-serif; font-size: 0.9rem;
+    padding: 10px 20px; border-radius: 50px; box-shadow: 0 6px 14px rgba(255,111,165,0.35);
+    transition: transform 0.15s;
+  }
+  .video-btn:hover { transform: translateY(-3px) scale(1.05); }
+
+  /* ── 규칙 카드 ── */
+  .rule-grid { display:grid; grid-template-columns: 1fr; gap: 12px; margin: 14px 0; }
+  .rule-card { background:#faf7ff; border-radius:16px; padding:16px 16px 14px 20px; position:relative; display:flex; align-items:flex-start; gap:14px; }
+  .rule-num { flex-shrink:0; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Jua', sans-serif; font-size:0.95rem; color:#fff; }
+  .rule-card p { font-size: 0.95rem; margin-top: 2px; }
+
+  /* ── 기획서 작성기 CTA (중간) ── */
+  .mid-cta {
+    text-align: center; background: linear-gradient(135deg, #4D96FF 0%, #6C5CE7 100%);
+    border-radius: 20px; padding: 26px 22px; color: #fff; margin-top: 16px;
+    box-shadow: 0 10px 24px rgba(77,150,255,0.3);
+  }
+  .mid-cta .emoji-mid { font-size: 2.2rem; }
+  .mid-cta p { color: #fff; font-weight: 700; margin: 8px 0 14px; }
+  .btn-huge {
+    display: inline-flex; align-items: center; gap: 10px; background: #fff; color: #6C5CE7; text-decoration: none;
+    font-family: 'Jua', sans-serif; font-size: 1.1rem; padding: 14px 30px; border-radius: 50px;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.2); transition: transform 0.15s;
+  }
+  .btn-huge:hover { transform: translateY(-4px) scale(1.04); }
+
+  /* ── 흐름도 ── */
+  .flow { display:flex; flex-direction:column; gap:8px; margin-top:16px; }
+  .flow-step { display:flex; align-items:center; gap:14px; background:#faf7ff; border-radius:14px; padding:14px 18px; }
+  .flow-step .fnum { width:30px; height:30px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; color:#fff; font-family:'Jua', sans-serif; }
+  .flow-step p { font-size: 0.95rem; }
+  .flow-arrow { text-align:center; color:#9a8fbf; font-size:1.2rem; }
+
+  /* ── 완성작 CTA ── */
+  .final-cta { text-align: center; background: linear-gradient(135deg, #6C5CE7 0%, #a29bfe 60%, #FF9AC1 100%); border-radius: 26px; padding: 40px 26px; color: #fff; box-shadow: 0 14px 34px rgba(108,92,231,0.35); }
+  .final-cta .emoji-big { font-size: 3rem; animation: bounce 1s infinite alternate; }
+  @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-12px); } }
+  .final-cta h2 { color: #fff; font-size: 1.6rem; margin: 10px 0 6px; }
+  .final-cta p { color: rgba(255,255,255,0.9); margin-bottom: 18px; font-weight: 500; }
+
+  footer { text-align: center; padding: 30px 20px 50px; color: #9a8fbf; font-size: 0.85rem; }
+
+  @media (max-width: 560px) {
+    .section { padding: 24px 18px; }
+    header { padding: 44px 18px 36px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="confetti-bg" id="confetti"></div>
+
+<header>
+  <div class="badge">🚪 경기공유학교 2026</div>
+  <h1>가족과 함께하는<br>AI 바이브코딩! 🧑‍🚀✨</h1>
+  <p>유한대학교 · Day04 · AI 방탈출 수수께끼 앱 만들기 🔑🕵️</p>
+  <div class="top-nav">
+    <a href="#goal">오늘의 목표</a>
+    <a href="#videos">참고 영상</a>
+    <a href="#rules">설계 규칙</a>
+    <a href="#paper">기획서 작성기</a>
+    <a href="#steps">만드는 순서</a>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- 오늘의 목표 -->
+  <section class="section c-pink" id="goal">
+    <div class="section-title"><div class="section-icon icon-pink">🎯</div><h2>오늘 만들어볼 것은?</h2></div>
+    <ul class="fun-list">
+      <li><span class="dot">🚪</span><span class="txt"><strong>수수께끼를 풀어 방을 탈출하는 방탈출 게임</strong>을 만들어볼 거예요!</span></li>
+      <li><span class="dot">🔑</span><span class="txt">방 안에 숨겨진 힌트를 찾고, 문제를 풀어야만 다음 문으로 나갈 수 있어요.</span></li>
+      <li><span class="dot">🤖</span><span class="txt">AI의 도움을 받아 나만의 방탈출 이야기와 수수께끼를 직접 설계해볼 거예요.</span></li>
+    </ul>
+  </section>
+
+  <!-- 참고 영상 -->
+  <section class="section c-blue" id="videos">
+    <div class="section-title"><div class="section-icon icon-blue">🎬</div><h2>방탈출·어드벤처 게임, 먼저 구경해볼까요?</h2></div>
+    <p>버튼을 누르면 영상 링크로 이동해요. 어떤 분위기의 게임들이 있는지 살펴보세요!</p>
+    <div class="video-grid">
+      <div class="video-card">
+        <div class="emoji">🕵️</div>
+        <div class="vtitle">'더 드리프터'에 놀란 게이머들. 함께 즐기는 전설의 어드벤처 명작 6선</div>
+        <a class="video-btn" href="https://youtu.be/8kbDxDhs6Hs?si=qv20XqnocOEpy-by" target="_blank" rel="noopener">▶ 영상 보기</a>
+      </div>
+      <div class="video-card">
+        <div class="emoji">🕹️</div>
+        <div class="vtitle">90년대 인기 어드벤처 게임</div>
+        <a class="video-btn" href="https://youtu.be/sQW5c0a05PE?si=ehdw7G0MUpZiTlgZ" target="_blank" rel="noopener">▶ 영상 보기</a>
+      </div>
+      <div class="video-card">
+        <div class="emoji">🌟</div>
+        <div class="vtitle">2026년 상반기 최고의 기대작 TOP 10</div>
+        <a class="video-btn" href="https://youtu.be/sRJvJBRxvJE?si=dCqvIXSpyLcw9JWa" target="_blank" rel="noopener">▶ 영상 보기</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 설계 규칙 -->
+  <section class="section c-orange" id="rules">
+    <div class="section-title"><div class="section-icon icon-orange">📋</div><h2>방탈출 특화 설계 규칙</h2></div>
+    <div class="rule-grid">
+      <div class="rule-card"><div class="rule-num" style="background:#FF6FA5">1</div><p>한 곳에 오래 머물러 있어야 하기 때문에 <strong>방의 분위기</strong>가 살짝 왜곡되어 있는 경향이 있어요.</p></div>
+      <div class="rule-card"><div class="rule-num" style="background:#4D96FF">2</div><p>방 안에 <strong>움직이는 오브젝트</strong>들을 넣어서 힌트를 얻을 수 있도록 해줘요.</p></div>
+      <div class="rule-card"><div class="rule-num" style="background:#6BCB77">3</div><p><strong>수수께끼나 퍼즐</strong> 같은 문제풀이 요소를 만들어서 푸는 재미를 느낄 수 있게 해줘요.</p></div>
+    </div>
+  </section>
+
+  <!-- 기획서 작성기 -->
+  <section class="section c-purple" id="paper">
+    <div class="section-title"><div class="section-icon icon-purple">📝</div><h2>방탈출 게임 기획서 작성기</h2></div>
+    <p>버튼을 클릭하면 방탈출 설계서를 만들 수 있는 페이지가 나와요. 이 안에서 나만의 방탈출 게임을 기획해봐요!</p>
+    <div class="mid-cta">
+      <div class="emoji-mid">🗝️</div>
+      <p>방탈출 게임 기획서 작성기 열기</p>
+      <a class="btn-huge" href="https://luriluan0-a11y.github.io/Source/escapeRoom/escapeRoom_paper.html" target="_blank" rel="noopener">
+        🚀 기획서 작성기 바로가기
+      </a>
+    </div>
+  </section>
+
+  <!-- 만드는 순서 -->
+  <section class="section c-yellow" id="steps">
+    <div class="section-title"><div class="section-icon icon-yellow">🛠️</div><h2>이렇게 만들어요!</h2></div>
+    <div class="flow">
+      <div class="flow-step"><div class="fnum" style="background:#FF6FA5">1</div><p>먼저 <strong>배경 사진</strong>을 골라요.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="fnum" style="background:#FFA94D">2</div><p>기획서 작성기에 <strong>예시대로 기획서</strong>를 작성해요.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="fnum" style="background:#FFD93D">3</div><p>완성되면 <strong>마크다운 파일을 다운로드</strong>해요.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="fnum" style="background:#6BCB77">4</div><p>Antigravity IDE를 열고 <strong>"마크다운 파일을 읽고 html 단일 페이지로 개발해줘."</strong>라고 요청해요.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="fnum" style="background:#4D96FF">5</div><p>완성되면 <strong>html 파일을 열어서</strong> 직접 확인해봐요.</p></div>
+    </div>
+  </section>
+
+  <!-- 완성작 CTA -->
+  <div class="final-cta">
+    <div class="emoji-big">🚪🔑</div>
+    <h2 class="jua">나만의 방탈출 게임 완성하기</h2>
+    <p>기획서를 완성했다면, 이제 나만의 방탈출 게임을 직접 만들어봐요!</p>
+    <a class="btn-huge" href="https://luriluan0-a11y.github.io/Source/escapeRoom/escapeRoom_paper.html" target="_blank" rel="noopener">
+      🚀 기획서 작성기로 이동하기
+    </a>
+  </div>
+
+</div>
+
+<footer>
+  🚪 경기공유학교 2026 · 가족과 함께하는 AI 바이브코딩 (유한대학교) 🔑
+</footer>
+
+<script>
+  // 배경 컨페티
+  const shapes = ['🔑','🚪','✨','🔍','🕵️','⭐','💫','🧩','🎭','☁️'];
+  const bg = document.getElementById('confetti');
+  for (let i = 0; i < 24; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.fontSize = (1 + Math.random() * 1.6) + 'rem';
+    el.style.animationDuration = (10 + Math.random() * 14) + 's';
+    el.style.animationDelay = (Math.random() * 14) + 's';
+    bg.appendChild(el);
+  }
+</script>
+
+</body>
+</html>
