@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 마스터 Day 05</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a2129;
+    --ink-soft: #333c34;
+    --muted: #5c6359;
+    --paper: #f2f3ee;
+    --raised: #ffffff;
+    --line: #dadbd0;
+    --accent: #2f6f62;
+    --accent-strong: #1d4a41;
+    --accent-soft: #dde8e3;
+    --warm: #c96a2e;
+    --warm-soft: #f3e2d3;
+    --code-bg: #e7e9df;
+    --shadow: rgba(26, 33, 30, 0.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #eae7dd;
+      --ink-soft: #cfd0c4;
+      --muted: #9a9d90;
+      --paper: #12161a;
+      --raised: #1a1f21;
+      --line: #2a2f2b;
+      --accent: #6cbba9;
+      --accent-strong: #8fd0c0;
+      --accent-soft: #1c2b28;
+      --warm: #e6a165;
+      --warm-soft: #2c231a;
+      --code-bg: #1e2421;
+      --shadow: rgba(0, 0, 0, 0.45);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #eae7dd;
+    --ink-soft: #cfd0c4;
+    --muted: #9a9d90;
+    --paper: #12161a;
+    --raised: #1a1f21;
+    --line: #2a2f2b;
+    --accent: #6cbba9;
+    --accent-strong: #8fd0c0;
+    --accent-soft: #1c2b28;
+    --warm: #e6a165;
+    --warm-soft: #2c231a;
+    --code-bg: #1e2421;
+    --shadow: rgba(0, 0, 0, 0.45);
+  }
+  :root[data-theme="light"] {
+    --ink: #1a2129;
+    --ink-soft: #333c34;
+    --muted: #5c6359;
+    --paper: #f2f3ee;
+    --raised: #ffffff;
+    --line: #dadbd0;
+    --accent: #2f6f62;
+    --accent-strong: #1d4a41;
+    --accent-soft: #dde8e3;
+    --warm: #c96a2e;
+    --warm-soft: #f3e2d3;
+    --code-bg: #e7e9df;
+    --shadow: rgba(26, 33, 30, 0.10);
+  }
+
+  * { box-sizing: border-box; }
+  html { background: var(--paper); }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    line-height: 1.75;
+    font-size: 16.5px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono {
+    font-family: 'IBM Plex Mono', 'D2Coding', ui-monospace, monospace;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .fade-in {
+      animation: fadeUp 0.7s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  }
+
+  a { color: var(--accent-strong); }
+  a:hover { color: var(--warm); }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    padding: 5.5rem 1.5rem 4rem;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
+    background:
+      radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--accent) 22%, transparent) 1px, transparent 1.6px)
+      0 0 / 26px 26px;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 0%, var(--paper) 92%);
+    pointer-events: none;
+  }
+  .hero-inner {
+    position: relative;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    margin: 0 0 1.3rem;
+  }
+  .hero-eyebrow::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--warm);
+    flex: none;
+  }
+  h1.hero-title {
+    font-size: clamp(2.1rem, 5.4vw, 3.15rem);
+    line-height: 1.18;
+    font-weight: 700;
+    margin: 0 0 1rem;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+  h1.hero-title em {
+    font-style: normal;
+    color: var(--accent-strong);
+  }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em 1.1em;
+    color: var(--muted);
+    font-size: 0.98rem;
+  }
+
+  /* ---------- Page body ---------- */
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 3.6rem 1.5rem 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3.6rem;
+  }
+  section { scroll-margin-top: 2rem; }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .section-num {
+    font-size: 0.85rem;
+    color: var(--warm);
+    letter-spacing: 0.06em;
+    flex: none;
+  }
+  .section-head h2 {
+    font-size: clamp(1.4rem, 3vw, 1.75rem);
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  h3.sub {
+    font-size: 1.1rem;
+    margin: 1.8rem 0 0.9rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  p { margin: 0.9em 0; color: var(--ink-soft); }
+  strong { color: var(--ink); font-weight: 600; }
+
+  ul.plain, ol.plain {
+    margin: 0.8em 0;
+    padding-left: 1.3em;
+    color: var(--ink-soft);
+  }
+  ul.plain li, ol.plain li { margin: 0.5em 0; }
+  code.inline {
+    font-family: 'IBM Plex Mono', monospace;
+    background: var(--code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    font-size: 0.9em;
+    color: var(--accent-strong);
+  }
+
+  /* ---------- Compare cards ---------- */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.1rem;
+    margin: 1.6rem 0;
+  }
+  @media (max-width: 620px) {
+    .compare-grid { grid-template-columns: 1fr; }
+  }
+  .compare-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.1rem;
+    margin: 1.6rem 0;
+  }
+  @media (max-width: 900px) {
+    .compare-grid-3 { grid-template-columns: 1fr; }
+  }
+  .compare-card {
+    background: var(--raised);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1.4rem 1.5rem 1.5rem;
+    box-shadow: 0 1px 2px var(--shadow);
+  }
+  .compare-card .tag {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--warm);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  .compare-card h3 {
+    margin: 0 0 0.7rem;
+    font-size: 1.15rem;
+  }
+  .compare-card ul {
+    margin: 0;
+    padding-left: 1.15em;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+  }
+  .compare-card li { margin: 0.55em 0; }
+  .compare-card.accent { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+  .compare-card.accent .tag { color: var(--accent-strong); }
+  .compare-card p.lede {
+    margin: 0 0 0.9rem;
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+
+  /* ---------- Table ---------- */
+  .table-wrap { overflow-x: auto; margin: 1.6rem 0; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 480px;
+    font-size: 0.9rem;
+  }
+  th, td {
+    border-bottom: 1px solid var(--line);
+    padding: 0.75em 0.9em;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.76rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+    background: var(--accent-soft);
+  }
+  tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+
+  /* ---------- Callout / quote ---------- */
+  .callout {
+    position: relative;
+    background: var(--raised);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 1.2rem 1.4rem;
+    margin: 1.6rem 0;
+  }
+  .callout .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  .callout p { margin: 0.5em 0 0; color: var(--ink); font-size: 1.02rem; }
+  .callout p:first-of-type { margin-top: 0; }
+
+  .callout.warm {
+    border-left-color: var(--warm);
+    background: linear-gradient(180deg, var(--warm-soft), var(--raised) 65%);
+  }
+  .callout.warm .label { color: var(--warm); }
+
+  .callout.quote p { font-style: italic; }
+  .callout.transcript p {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.86rem;
+    font-style: normal;
+    color: var(--ink-soft);
+    line-height: 1.7;
+  }
+  .callout.transcript { border-left-color: var(--muted); }
+  .callout.transcript .label { color: var(--muted); }
+
+  /* ---------- Button link ---------- */
+  .btn-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    background: var(--accent);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.92rem;
+    padding: 0.7em 1.3em;
+    border-radius: 8px;
+    margin: 1rem 0;
+    box-shadow: 0 2px 6px var(--shadow);
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .btn-link:hover {
+    background: var(--accent-strong);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+
+  /* ---------- Copy block ---------- */
+  .copy-block {
+    background: var(--raised);
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    margin: 1.2rem 0;
+    overflow: hidden;
+  }
+  .copy-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.9rem;
+    background: var(--accent-soft);
+    border-bottom: 1px solid var(--line);
+  }
+  .copy-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+  }
+  .copy-btn {
+    font-size: 0.76rem;
+    padding: 0.3em 0.8em;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--raised);
+    color: var(--ink);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent-strong); }
+  .copy-btn.copied { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .copy-pre {
+    margin: 0;
+    padding: 1rem 1.1rem;
+    font-size: 0.92rem;
+    color: var(--ink);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  hr.rule {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 0;
+  }
+
+  footer {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 1.5rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner fade-in">
+    <span class="hero-eyebrow mono">AI Agent Intensive · Day 05</span>
+    <h1 class="hero-title">AI 에이전트<br><em>마스터</em> 클래스</h1>
+    <div class="hero-meta mono">
+      <span>한국폴리텍대학교 성남캠퍼스</span>
+      <span>2026.07.30</span>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <section class="fade-in">
+    <div class="section-head">
+      <span class="section-num mono">01</span>
+      <h2>AI 에이전트 활용하기</h2>
+    </div>
+
+    <ul class="plain">
+      <li>hermes는 세션이 시작될 때 <code class="inline">soul.md</code>를 읽고 시작함</li>
+      <li>hermes가 자주 죽는데 이 과정이 지나면 안정화가 되고, 덜 죽는다고 함</li>
+      <li>hermes는 칸반 기능이 있음</li>
+    </ul>
+
+    <div class="copy-block">
+      <div class="copy-head">
+        <span class="copy-label mono">예시 프롬프트</span>
+        <button class="copy-btn mono" type="button" data-copy-target="kanban1">복사</button>
+      </div>
+      <pre class="copy-pre mono" id="kanban1">칸반 기능 사용해서 계획 및 구현해줘</pre>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <div class="section-head">
+      <span class="section-num mono">02</span>
+      <h2>AI 에이전트 기능 차이</h2>
+    </div>
+
+    <ul class="plain">
+      <li>철학 자체가 다르기 때문에 성장시켜보고 마음에 드는 것을 선택하거나 더 많이 사용하면 됨</li>
+    </ul>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>구분</th><th>OpenClaw</th><th>Hermes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>만든 곳</td>
+            <td>오픈소스 커뮤니티 기반 개인 비서 프레임워크</td>
+            <td>AI 모델(Hermes, Nomos, Psyche)도 만드는 Nous Research가 개발</td>
+          </tr>
+          <tr>
+            <td>철학</td>
+            <td>"잘 세팅된 비서" — 사람이 정체성·규칙 파일을 써주고, 정해진 스킬을 필요할 때 꺼내 씀</td>
+            <td>"스스로 성장하는 직원" — 일하면서 자기 노하우(스킬)를 알아서 만들고 다듬음</td>
+          </tr>
+          <tr>
+            <td>봇 끼리 대화</td>
+            <td>봇 끼리 대화하는 기능 제공</td>
+            <td>기능 없음</td>
+          </tr>
+          <tr>
+            <td>토큰 소모</td>
+            <td>매 에이전트 실행마다 자체적으로 시스템 프롬프트를 구성하는데, 별도의 런타임 기본 프롬프트는 없고 기본 지침·스킬 목록·워크스페이스 파일 등 여러 레이어를 조합해서 만듦. 설치된 스킬 전체를 시스템 프롬프트에 다 집어넣지 않고, 스킬의 이름·설명·경로만 담은 압축된 목록만 넣어두었다가 모델이 필요하다고 판단하면 그때 SKILL.md를 읽어오는 방식이라, 토큰을 아끼는 구조임</td>
+            <td>구조상 비슷하게, SKILL.md 기반 워크플로우나 설정이 에이전트의 "행동 규칙"을 정의하는 시스템 프롬프트 성격이고, 텔레그램/디스코드로 들어오는 실제 대화가 사용자 입력임. 헤르메스는 엄청 길고 무거워 토큰 사용량이 큰 편임. 이미 수백 개의 스킬이 설치되어 있어서 그 스킬을 로딩하는 것도 포함되어 더욱 무겁다고 알려져 있음</td>
+          </tr>
+          <tr>
+            <td>스킬 획득 방식</td>
+            <td>스킬을 통째로 미리 다 읽지 않고 이름·설명·경로만 목록으로 갖고 있다가 필요할 때 해당 SKILL.md를 골라 읽는 방식. 대부분 <strong>사람이 미리 작성</strong>해둔 스킬</td>
+            <td>경험에서 새 스킬을 스스로 생성하고, 실행하면서 다듬는 방식 — <code class="inline">skill_manage</code> 툴로 학습하며 스킬을 만들고 고침</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <div class="section-head">
+      <span class="section-num mono">03</span>
+      <h2>반복 작업이 뭐가 있는지 물어보기</h2>
+    </div>
+
+    <div class="copy-block">
+      <div class="copy-head">
+        <span class="copy-label mono">예시 프롬프트</span>
+        <button class="copy-btn mono" type="button" data-copy-target="repeat1">복사</button>
+      </div>
+      <pre class="copy-pre mono" id="repeat1">지금까지 저랑 작업하면서, 자주 반복한 작업이 뭐가 있었나요? 그중에 자동화하면 편해질 만한 걸 몇 개 추천해주세요. 왜 그게 반복인지, 자동화하면 뭐가 좋아지는지도 같이 알려주시면 좋겠습니다.</pre>
+    </div>
+
+    <div class="callout transcript">
+      <span class="label">Hermes 응답</span>
+      <p><code class="inline">MEMORY.md</code>, <code class="inline">memory/</code>, 등록된 알림 작업을 직접 봤습니다.</p>
+      <p>자주 반복된 작업은 꽤 분명합니다.</p>
+      <p><strong>1. 일정 기록과 알림 설정</strong><br>
+      왜 반복인가: 기억 파일에서 일정/알림/예약/회의/면담 계열 기록이 압도적으로 많습니다. 특강, 병원, 면담, 회의, 가족 일정, 노조 일정이 계속 들어오고, 알림 시간도 "1시간 전", "전날 저녁", "당일 아침"으로 반복됩니다.<br>
+      자동화하면 좋은 점: 루리가 "OOO 면담 7/28 13시"처럼 짧게 보내면 날짜·요일 확인, 충돌 체크, cron 알림, 메모 기록까지 한 번에 처리할 수 있습니다. 날짜 요일 착오도 줄어듭니다.</p>
+      <p><strong>2. 학생 상담/면담 기록 업데이트</strong><br>
+      왜 반복인가: 학생별 상담 파일을 찾거나 만들고, "면담 진행", "이력서 검토", "피드백 전달"을 추가하는 일이 반복됩니다.<br>
+      자동화하면 좋은 점: "이경민 매드엔진 이력서 검토 추가"라고만 말해도 학생 폴더 탐색, 없으면 생성, 학생명.md 업데이트, 오늘 날짜 줄 병합까지 자동 처리할 수 있습니다.</p>
+      <p><strong>3. 하루 기록 요약과 Obsidian 할일트래커 반영</strong><br>
+      왜 반복인가: 이미 매일 오전 6시에 하루 요약 Markdown 생성과 할일트래커 업데이트가 돌아가고 있습니다.<br>
+      자동화하면 좋은 점: 루리가 "스픽 듀오링고 운동 완료"라고 보내는 순간 오늘 할일트래커까지 바로 체크되게 할 수 있습니다. 아침 6시까지 기다리지 않아도 되고, 기록 누락도 줄어듭니다.</p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <div class="section-head">
+      <span class="section-num mono">04</span>
+      <h2>세션 다이어트</h2>
+    </div>
+
+    <ul class="plain">
+      <li><code class="inline">/new</code> 를 이용해서 한 번씩 대화를 정리해주기</li>
+      <li><code class="inline">/stop</code> 프로세스를 중단시키는 명령</li>
+    </ul>
+
+    <div class="copy-block">
+      <div class="copy-head">
+        <span class="copy-label mono">예시 프롬프트</span>
+        <button class="copy-btn mono" type="button" data-copy-target="handoff1">복사</button>
+      </div>
+      <pre class="copy-pre mono" id="handoff1">세션을 새로 시작하려고 하는데 핸드오프 문서 남겨줘.</pre>
+    </div>
+
+    <ul class="plain">
+      <li>인수인계 서류라고 생각하면 됨</li>
+    </ul>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <div class="section-head">
+      <span class="section-num mono">05</span>
+      <h2>LLM-wiki</h2>
+    </div>
+
+    <ul class="plain">
+      <li>"LLM-wiki"라는 용어 자체가 아직 업계에서 딱 하나로 정해진 게 아님</li>
+      <li>실제로는 세 가지 정도의 서로 다른 개념이 이 이름으로 불림</li>
+    </ul>
+
+    <div class="compare-grid-3">
+      <div class="compare-card">
+        <span class="tag mono">Type 1</span>
+        <h3>학습용 위키</h3>
+        <p class="lede">사람이(또는 LLM 도움을 받아) LLM/AI 관련 개념을 위키 형태로 정리해놓은 것. 나무위키·위키백과처럼.</p>
+        <ul>
+          <li>예: "Transformer란?", "RAG란?", "토큰이란?" 문서가 서로 링크된 사이트</li>
+          <li>누가 씀: 사람(또는 사람 + LLM 초안)</li>
+          <li>용도: 학생 교육 자료, 강의 참고 자료</li>
+          <li>만드는 법: Notion, GitBook, Obsidian, 정적 사이트 생성기(Docusaurus 등)로 구조를 짜고 GPT/Claude로 초안 작성 → 검수</li>
+        </ul>
+      </div>
+      <div class="compare-card accent">
+        <span class="tag mono">Type 2</span>
+        <h3>자동 갱신 위키</h3>
+        <p class="lede">위키 자체를 AI 에이전트가 관리 — 질문받으면 문서를 자동 생성하고, 관련 문서끼리 알아서 링크를 걸고, 시간이 지나면 스스로 업데이트하는 지식베이스.</p>
+        <ul>
+          <li>예: Hermes의 메모리 시스템, OpenClaw의 MEMORY.md가 이 방향의 초기 형태</li>
+          <li>누가 씀: LLM/에이전트가 대부분 자동으로</li>
+          <li>용도: 팀/개인의 살아있는 지식창고, 리서치 아카이브</li>
+          <li>만드는 법: 벡터 DB(임베딩 검색) + 에이전트 프레임워크로 "질문 → 문서 없으면 생성 → 있으면 갱신" 루프 구성</li>
+        </ul>
+      </div>
+      <div class="compare-card">
+        <span class="tag mono">Type 3</span>
+        <h3>코드 문서화 위키</h3>
+        <p class="lede">깃허브 저장소 같은 걸 넣으면 LLM이 알아서 구조를 파악해서 설명 문서(위키)를 만들어줌.</p>
+        <ul>
+          <li>예: DeepWiki (NousResearch/hermes-agent 저장소를 자동 문서화한 것처럼)</li>
+          <li>누가 씀: LLM이 코드를 읽고 자동 생성, 사람은 거의 손 안 댐</li>
+          <li>용도: 오픈소스 프로젝트 온보딩 문서, 레거시 코드 이해</li>
+          <li>만드는 법: DeepWiki 같은 기존 툴을 쓰거나, "저장소 스캔 → LLM 요약 → 위키 문서 생성 → 문서 간 링크" 파이프라인 구성</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 class="sub">어떻게 사용하는가?</h3>
+    <ul class="plain">
+      <li>지난 주 방탈출 게임으로 살펴봄</li>
+    </ul>
+
+    <a class="btn-link mono" href="https://game-contents.vercel.app/lecture/1408_escapeRoom_LLM-wiki.html" target="_blank" rel="noopener noreferrer">AI 방탈출 수수께끼 앱 만들기 · LLM wiki 바로가기 →</a>
+  </section>
+
+</div>
+
+<footer>
+  <span>AI Agent Master · Day 05</span>
+  <span>성남캠퍼스</span>
+</footer>
+
+<script>
+  (function () {
+    document.querySelectorAll('.copy-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var targetId = btn.getAttribute('data-copy-target');
+        var target = document.getElementById(targetId);
+        if (!target) return;
+        var text = target.textContent;
+
+        function showCopied() {
+          var original = btn.textContent;
+          btn.textContent = '복사됨';
+          btn.classList.add('copied');
+          setTimeout(function () {
+            btn.textContent = original;
+            btn.classList.remove('copied');
+          }, 1500);
+        }
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(showCopied);
+        } else {
+          var textarea = document.createElement('textarea');
+          textarea.value = text;
+          textarea.style.position = 'fixed';
+          textarea.style.opacity = '0';
+          document.body.appendChild(textarea);
+          textarea.select();
+          try { document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(textarea);
+          showCopied();
+        }
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
