@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>피타의 구구단 마법 교실</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+  :root {
+    --bg: #0f1b30;
+    --panel: #16233c;
+    --panel-2: #1d2d48;
+    --border: #2f4566;
+    --accent: #7cc4ff;
+    --accent-2: #5c9dff;
+    --text: #e9f2ff;
+    --text-dim: #9eb3d1;
+    --ok: #6bffb0;
+    --danger: #ff6b81;
+    --gold: #ffd76b;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    min-height: 100%;
+    font-family: 'Noto Sans KR', sans-serif;
+    background: radial-gradient(circle at top, #1c3155 0%, var(--bg) 65%);
+    color: var(--text);
+  }
+  .jua { font-family: 'Jua', sans-serif; }
+
+  #app {
+    max-width: 640px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 16px 100px;
+  }
+
+  /* ---------- 상단바 ---------- */
+  #topBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  #topBar h1 {
+    font-size: 1.15rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #resetBtn {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 0.78rem;
+    padding: 7px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  #resetBtn:hover { color: var(--text); border-color: var(--accent-2); }
+
+  /* ---------- 진행바 ---------- */
+  #progressWrap {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    height: 10px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+  #progressBar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent-2), var(--ok));
+    transition: width 0.4s ease;
+  }
+  #progressLabel {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    text-align: right;
+    margin-bottom: 20px;
+  }
+
+  /* ---------- 캐릭터 말풍선 ---------- */
+  .buddy-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .buddy-avatar {
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3a5a8a, #1d2d48);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.7rem;
+    border: 2px solid var(--border);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+  .buddy-bubble {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px 16px 16px 16px;
+    padding: 14px 16px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    flex: 1;
+  }
+
+  /* ---------- 패널(카드) ---------- */
+  .panel-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 20px 22px;
+    margin-bottom: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  }
+  .panel-card h2 {
+    margin: 0 0 10px;
+    font-size: 1.05rem;
+    color: var(--accent);
+  }
+  .example-box {
+    background: var(--panel-2);
+    border-left: 4px solid var(--accent-2);
+    border-radius: 0 10px 10px 0;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+
+  .primary-btn {
+    display: block;
+    width: 100%;
+    background: linear-gradient(90deg, #5c9dff, #6bffb0);
+    border: none;
+    color: #0f1a2e;
+    font-weight: 800;
+    font-size: 0.98rem;
+    padding: 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .primary-btn:hover { filter: brightness(1.08); }
+
+  /* ---------- 퀴즈 ---------- */
+  .quiz-question { font-size: 1rem; font-weight: 700; margin-bottom: 14px; }
+  .choice-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--panel-2);
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  .choice-btn:hover:not(:disabled) { border-color: var(--accent-2); }
+  .choice-btn:disabled { cursor: default; opacity: 0.7; }
+  .choice-btn.correct { border-color: var(--ok); background: rgba(107,255,176,0.14); color: var(--ok); }
+  .choice-btn.wrong { border-color: var(--danger); background: rgba(255,107,129,0.12); color: var(--danger); }
+
+  .feedback-msg {
+    margin-top: 4px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    display: none;
+  }
+  .feedback-msg.show { display: block; }
+  .feedback-msg.ok { background: rgba(107,255,176,0.12); border: 1px solid var(--ok); color: var(--ok); }
+  .feedback-msg.hint { background: rgba(255,215,107,0.12); border: 1px solid var(--gold); color: var(--gold); }
+
+  /* ---------- 완주 화면 ---------- */
+  #finishPanel { text-align: center; display: none; }
+  #finishPanel .badge-emoji { font-size: 3.2rem; margin-bottom: 8px; }
+  #finishPanel h2 { font-size: 1.3rem; margin: 6px 0; }
+  #finishPanel .badge-name {
+    display: inline-block;
+    background: linear-gradient(90deg, #ffd76b, #ff8bcb);
+    color: #2c2340;
+    font-weight: 800;
+    padding: 6px 18px;
+    border-radius: 999px;
+    margin: 8px 0 14px;
+    font-size: 0.9rem;
+  }
+
+  /* ---------- 자유 질문 입력창 ---------- */
+  #askBar {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    background: rgba(15, 27, 48, 0.92);
+    backdrop-filter: blur(6px);
+    border-top: 1px solid var(--border);
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  }
+  #askInner {
+    max-width: 640px;
+    margin: 0 auto;
+    display: flex;
+    gap: 8px;
+  }
+  #askInput {
+    flex: 1;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text);
+    padding: 11px 16px;
+    font-size: 0.9rem;
+  }
+  #askInput:focus { outline: none; border-color: var(--accent-2); }
+  #askBtn {
+    background: var(--accent-2);
+    border: none;
+    color: #0f1a2e;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0 18px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  #askReply {
+    max-width: 640px;
+    margin: 0 auto 8px;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    display: none;
+  }
+  #askReply.show { display: block; }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <div id="topBar">
+    <h1 class="jua">🦉 피타의 구구단 마법 교실</h1>
+    <button type="button" id="resetBtn">🔄 처음부터</button>
+  </div>
+
+  <div id="progressWrap"><div id="progressBar"></div></div>
+  <div id="progressLabel">0 / 3</div>
+
+  <div class="buddy-row">
+    <div class="buddy-avatar">🦉</div>
+    <div class="buddy-bubble" id="buddyBubble">후우~ 안녕 꼬마 마법사야! 나는 숫자 마법사 피타야. 오늘은 구구단의 비밀을 함께 파헤쳐볼까?</div>
+  </div>
+
+  <!-- 시작 화면 -->
+  <div class="panel-card" id="startPanel">
+    <p style="margin:0 0 14px; color:var(--text-dim); font-size:0.9rem;">
+      총 3가지 마법(개념)을 배우고 미니 퀴즈를 풀며 구구단 마스터가 되어보자!
+    </p>
+    <button type="button" class="primary-btn" id="startBtn">✨ 마법 수업 시작하기</button>
+  </div>
+
+  <!-- 개념 설명 + 퀴즈 화면 -->
+  <div class="panel-card" id="conceptPanel" style="display:none;">
+    <h2 id="conceptTitle"></h2>
+    <p id="conceptExplain" style="font-size:0.95rem; margin-bottom:10px;"></p>
+    <div class="example-box" id="conceptExample"></div>
+
+    <div id="quizArea" style="display:none;">
+      <div class="quiz-question" id="quizQuestion"></div>
+      <div id="choiceList"></div>
+      <div class="feedback-msg" id="feedbackMsg"></div>
+      <button type="button" class="primary-btn" id="nextBtn" style="display:none;">다음으로 →</button>
+    </div>
+
+    <button type="button" class="primary-btn" id="toQuizBtn">🧩 미니 퀴즈 풀어보기</button>
+  </div>
+
+  <!-- 완주 화면 -->
+  <div class="panel-card" id="finishPanel">
+    <div class="badge-emoji">🏆</div>
+    <h2 class="jua">수업 완료!</h2>
+    <div class="badge-name" id="finishBadge"></div>
+    <p id="finishMsg" style="font-size:0.95rem;"></p>
+    <button type="button" class="primary-btn" id="restartBtn">🔁 다시 배우기</button>
+  </div>
+
+</div>
+
+<div id="askBar">
+  <div id="askReply"></div>
+  <div id="askInner">
+    <input type="text" id="askInput" placeholder="피타에게 아무 말이나 걸어보세요...">
+    <button type="button" id="askBtn">물어보기</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  const GREETING = '후우~ 안녕 꼬마 마법사야! 나는 숫자 마법사 피타야. 오늘은 구구단의 비밀을 함께 파헤쳐볼까?';
+  const RESET_TEXT = '기억을 후루룩 지웠다후! 처음부터 다시 마법 수업을 시작하자!';
+  const BADGE_NAME = '구구단 마스터 배지';
+  const CELEBRATE_TEXT = '우와 후! 세 가지 마법을 모두 익혔구나! 너는 이제 진정한 구구단 마스터다후!';
+  const FALLBACKS = [
+    '후우? 그건 다음에 알려줄게! 지금은 마법 수업에 집중하자후~',
+    '궁금한 게 많구나! 일단 오늘 마법부터 완성하고 물어봐줄래후?'
+  ];
+
+  const CONCEPTS = [
+    {
+      name: '곱셈은 반복되는 덧셈이다',
+      explain: '2×3은 2를 3번 더하는 것과 같아후! 2+2+2 = 6, 그래서 2×3=6이지.',
+      example: '예시) 3×4는 3을 4번 더하는 거야: 3+3+3+3 = 12',
+      question: '그럼 4×3은 얼마일까후?',
+      choices: ['10', '12', '14', '16'],
+      answer: 1,
+      correctMsg: '완벽하다후!! 곱셈의 비밀을 파악했구나!',
+      hintMsg: '다시 생각해볼까후? 4를 3번 더해보자: 4+4+4는 얼마일까?'
+    },
+    {
+      name: '구구단 2단의 규칙',
+      explain: '2단은 항상 2씩 늘어나후! 2, 4, 6, 8, 10... 이렇게 2씩 커지는 거야.',
+      example: '예시) 2×5 = 10, 2×6 = 12, 2씩 커지는 게 보이지?',
+      question: '2×7은 얼마일까후?',
+      choices: ['12', '14', '16', '18'],
+      answer: 1,
+      correctMsg: '정확해! 2단의 마법을 완전히 익혔구나후!',
+      hintMsg: '2×6이 12였지? 거기에 2를 한 번 더 더해보자후!'
+    },
+    {
+      name: '곱셈으로 문제 해결하기',
+      explain: '사탕이 한 봉지에 5개씩 들어있어. 봉지가 3개면 사탕은 모두 몇 개일까후? 이럴 때 곱셈을 쓰는 거야!',
+      example: '예시) 5개씩 3봉지 = 5×3 = 15개',
+      question: '사탕이 한 봉지에 6개씩 들어있고 봉지가 4개 있다면, 사탕은 모두 몇 개일까후?',
+      choices: ['20', '22', '24', '26'],
+      answer: 2,
+      correctMsg: '우와! 진짜 마법사처럼 술술 풀었구나후!',
+      hintMsg: '6개씩 4번 더해볼까후? 6+6+6+6은 얼마일까?'
+    }
+  ];
+
+  const state = { conceptIndex: 0, wrongCount: 0 };
+
+  const buddyBubble = document.getElementById('buddyBubble');
+  const progressBar = document.getElementById('progressBar');
+  const progressLabelText = document.getElementById('progressLabel');
+  const startPanel = document.getElementById('startPanel');
+  const conceptPanel = document.getElementById('conceptPanel');
+  const finishPanel = document.getElementById('finishPanel');
+
+  const conceptTitle = document.getElementById('conceptTitle');
+  const conceptExplain = document.getElementById('conceptExplain');
+  const conceptExample = document.getElementById('conceptExample');
+  const toQuizBtn = document.getElementById('toQuizBtn');
+  const quizArea = document.getElementById('quizArea');
+  const quizQuestion = document.getElementById('quizQuestion');
+  const choiceList = document.getElementById('choiceList');
+  const feedbackMsg = document.getElementById('feedbackMsg');
+  const nextBtn = document.getElementById('nextBtn');
+
+  function say(text) { buddyBubble.textContent = text; }
+
+  function updateProgress() {
+    const pct = Math.round((state.conceptIndex / CONCEPTS.length) * 100);
+    progressBar.style.width = pct + '%';
+    progressLabelText.textContent = state.conceptIndex + ' / ' + CONCEPTS.length;
+  }
+
+  function showConcept() {
+    startPanel.style.display = 'none';
+    finishPanel.style.display = 'none';
+    conceptPanel.style.display = 'block';
+
+    const c = CONCEPTS[state.conceptIndex];
+    state.wrongCount = 0;
+
+    conceptTitle.textContent = '개념 ' + (state.conceptIndex + 1) + '. ' + c.name;
+    conceptExplain.textContent = c.explain;
+    conceptExample.textContent = c.example;
+    say(c.explain);
+
+    quizArea.style.display = 'none';
+    toQuizBtn.style.display = 'block';
+    feedbackMsg.className = 'feedback-msg';
+    nextBtn.style.display = 'none';
+
+    updateProgress();
+  }
+
+  function showQuiz() {
+    const c = CONCEPTS[state.conceptIndex];
+    toQuizBtn.style.display = 'none';
+    quizArea.style.display = 'block';
+    quizQuestion.textContent = c.question;
+    say(c.question);
+
+    choiceList.innerHTML = '';
+    c.choices.forEach((choiceText, idx) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'choice-btn';
+      btn.textContent = choiceText;
+      btn.addEventListener('click', () => onChoiceClick(idx, btn));
+      choiceList.appendChild(btn);
+    });
+
+    feedbackMsg.className = 'feedback-msg';
+    nextBtn.style.display = 'none';
+  }
+
+  function onChoiceClick(idx, btn) {
+    const c = CONCEPTS[state.conceptIndex];
+    const buttons = Array.from(choiceList.children);
+
+    if (idx === c.answer) {
+      buttons.forEach((b) => (b.disabled = true));
+      btn.classList.add('correct');
+      feedbackMsg.textContent = c.correctMsg;
+      feedbackMsg.className = 'feedback-msg ok show';
+      say(c.correctMsg);
+      nextBtn.textContent = (state.conceptIndex === CONCEPTS.length - 1) ? '수업 완료하기 →' : '다음 개념으로 →';
+      nextBtn.style.display = 'block';
+    } else {
+      state.wrongCount += 1;
+      btn.classList.add('wrong');
+
+      if (state.wrongCount >= 2) {
+        buttons.forEach((b) => (b.disabled = true));
+        buttons[c.answer].classList.add('correct');
+        feedbackMsg.textContent = '괜찮아후! 정답은 "' + c.choices[c.answer] + '" 였어. ' + c.correctMsg;
+        feedbackMsg.className = 'feedback-msg ok show';
+        say('정답은 "' + c.choices[c.answer] + '" 였어후. 다음 마법으로 넘어가보자!');
+        nextBtn.textContent = (state.conceptIndex === CONCEPTS.length - 1) ? '수업 완료하기 →' : '다음 개념으로 →';
+        nextBtn.style.display = 'block';
+      } else {
+        btn.disabled = true;
+        feedbackMsg.textContent = c.hintMsg;
+        feedbackMsg.className = 'feedback-msg hint show';
+        say(c.hintMsg);
+      }
+    }
+  }
+
+  function nextConcept() {
+    state.conceptIndex += 1;
+    if (state.conceptIndex >= CONCEPTS.length) {
+      showFinish();
+    } else {
+      showConcept();
+    }
+  }
+
+  function showFinish() {
+    conceptPanel.style.display = 'none';
+    finishPanel.style.display = 'block';
+    document.getElementById('finishBadge').textContent = '🏅 ' + BADGE_NAME;
+    document.getElementById('finishMsg').textContent = CELEBRATE_TEXT;
+    say(CELEBRATE_TEXT);
+    progressBar.style.width = '100%';
+    progressLabelText.textContent = CONCEPTS.length + ' / ' + CONCEPTS.length;
+  }
+
+  function restart() {
+    state.conceptIndex = 0;
+    state.wrongCount = 0;
+    startPanel.style.display = 'block';
+    conceptPanel.style.display = 'none';
+    finishPanel.style.display = 'none';
+    say(RESET_TEXT);
+    updateProgress();
+  }
+
+  document.getElementById('startBtn').addEventListener('click', showConcept);
+  toQuizBtn.addEventListener('click', showQuiz);
+  nextBtn.addEventListener('click', nextConcept);
+  document.getElementById('resetBtn').addEventListener('click', restart);
+  document.getElementById('restartBtn').addEventListener('click', restart);
+
+  // ---------- 자유 질문(Fallback) ----------
+  const askInput = document.getElementById('askInput');
+  const askBtn = document.getElementById('askBtn');
+  const askReply = document.getElementById('askReply');
+
+  function handleAsk() {
+    const val = askInput.value.trim();
+    if (!val) return;
+    const reply = FALLBACKS[Math.floor(Math.random() * FALLBACKS.length)];
+    askReply.textContent = '🦉 ' + reply;
+    askReply.classList.add('show');
+    say(reply);
+    askInput.value = '';
+  }
+
+  askBtn.addEventListener('click', handleAsk);
+  askInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleAsk(); });
+
+  updateProgress();
+})();
+</script>
+</body>
+</html>

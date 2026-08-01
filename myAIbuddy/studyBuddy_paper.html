@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>나만의 AI 학습 도우미 설계서 작성기</title>
+<style>
+  :root {
+    --bg: #101b2e;
+    --panel: #16233a;
+    --panel-2: #1d2d48;
+    --border: #2f4566;
+    --accent: #7cc4ff;
+    --accent-2: #5c9dff;
+    --text: #e6f0ff;
+    --text-dim: #9eb3d1;
+    --danger: #ff6b81;
+    --ok: #6bffb0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Pretendard", "Malgun Gothic", "Segoe UI", sans-serif;
+    background: radial-gradient(circle at top, #1c3155 0%, var(--bg) 60%);
+    color: var(--text);
+    padding: 32px 16px 80px;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; }
+  h1 {
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 4px;
+    background: linear-gradient(90deg, #6bffb0, #7cc4ff, #ffd76b);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .subtitle {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 28px;
+  }
+  section.card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+  }
+  section.card > h2 {
+    margin: 0 0 4px;
+    font-size: 1.1rem;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hint {
+    color: var(--text-dim);
+    font-size: 0.82rem;
+    margin: 0 0 14px;
+    line-height: 1.5;
+  }
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 12px 0 6px;
+    color: var(--text);
+  }
+  label:first-of-type { margin-top: 0; }
+  input[type="text"], textarea, select {
+    width: 100%;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    padding: 10px 12px;
+    font-size: 0.92rem;
+    font-family: inherit;
+    resize: vertical;
+  }
+  input[type="text"]:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--accent-2);
+    box-shadow: 0 0 0 3px rgba(92,157,255,0.25);
+  }
+  textarea { min-height: 60px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .choice-row { display: grid; grid-template-columns: 24px 1fr; gap: 8px; align-items: center; margin-top: 8px; }
+  .choice-row .idx { color: var(--text-dim); font-size: 0.85rem; text-align: center; }
+  .concept-block {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .concept-block .concept-title {
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+  }
+  .remove-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: transparent;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.78rem;
+    cursor: pointer;
+  }
+  .remove-btn:hover { background: rgba(255,107,129,0.15); }
+  .add-btn {
+    display: block;
+    width: 100%;
+    background: transparent;
+    border: 1.5px dashed var(--accent-2);
+    color: var(--accent);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .add-btn:hover { background: rgba(92,157,255,0.12); }
+  .empty-note {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    font-style: italic;
+    margin-bottom: 12px;
+  }
+  .download-btn {
+    display: block;
+    width: 100%;
+    background: linear-gradient(90deg, #5c9dff, #6bffb0);
+    border: none;
+    color: #0f1a2e;
+    font-weight: 800;
+    font-size: 1rem;
+    padding: 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 12px;
+    box-shadow: 0 6px 20px rgba(92,157,255,0.35);
+  }
+  .download-btn:hover { filter: brightness(1.08); }
+  .status-msg {
+    text-align: center;
+    color: var(--ok);
+    font-size: 0.85rem;
+    height: 1.2em;
+    margin-top: 8px;
+  }
+  .action-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .fill-example-btn {
+    flex: 2;
+    background: rgba(107, 255, 176, 0.12);
+    border: 1.5px solid var(--ok);
+    color: var(--ok);
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 13px;
+    border-radius: 12px;
+    cursor: pointer;
+  }
+  .fill-example-btn:hover { background: rgba(107, 255, 176, 0.22); }
+  .reset-btn {
+    flex: 1;
+    background: rgba(255, 107, 129, 0.1);
+    border: 1.5px solid var(--danger);
+    color: var(--danger);
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 13px;
+    border-radius: 12px;
+    cursor: pointer;
+  }
+  .reset-btn:hover { background: rgba(255, 107, 129, 0.2); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>나만의 AI 학습 도우미 설계서 작성기</h1>
+  <p class="subtitle">항목을 입력하고 하단에서 마크다운 파일로 다운로드하세요.</p>
+
+  <div class="action-row">
+    <button type="button" class="fill-example-btn" id="fillExampleBtn">✨ 예시대로 채우기 (뭘 써야 할지 모르겠으면 눌러보세요!)</button>
+    <button type="button" class="reset-btn" id="resetBtn">🔄 초기화</button>
+  </div>
+
+  <section class="card">
+    <h2>학습 도우미 기본 정보</h2>
+    <label for="buddyName">도우미 이름</label>
+    <input type="text" id="buddyName" placeholder="예) 피타">
+
+    <label for="buddyIdentity">정체 (사람/동물/로봇/마법사 등)</label>
+    <input type="text" id="buddyIdentity" placeholder="예) 숫자 마법부엉이">
+
+    <label for="buddyPersonality">성격을 표현하는 단어 3개</label>
+    <input type="text" id="buddyPersonality" placeholder="예) 상냥함, 유쾌함, 참을성 많음">
+
+    <label for="buddyCatchphrase">말버릇 (문장 끝에 항상 붙는 말)</label>
+    <input type="text" id="buddyCatchphrase" placeholder="예) 문장 끝에 ~후! 를 붙인다">
+
+    <label for="buddyEmoji">도우미를 표현하는 이모지 1~2개</label>
+    <input type="text" id="buddyEmoji" placeholder="예) 🦉✨">
+
+    <label for="subject">가르칠 과목</label>
+    <select id="subject">
+      <option value="수학">수학</option>
+      <option value="영어">영어</option>
+      <option value="국어">국어</option>
+      <option value="과학">과학</option>
+      <option value="역사">역사</option>
+      <option value="코딩">코딩</option>
+      <option value="기타">기타 (직접 입력)</option>
+    </select>
+    <input type="text" id="subjectOther" placeholder="과목을 직접 입력하세요" style="margin-top:8px; display:none;">
+
+    <label for="greeting">첫 인사말 (처음 열었을 때 하는 말)</label>
+    <textarea id="greeting" placeholder="예) 후우~ 안녕 꼬마 마법사야! 나는 숫자 마법사 피타야. 오늘은 구구단의 비밀을 함께 파헤쳐볼까?"></textarea>
+  </section>
+
+  <section class="card">
+    <h2>개념(학습 목표) 목록</h2>
+    <p class="hint">
+      가르칠 개념을 하나씩 추가하세요. 각 개념은 <b>쉬운 설명 → 예시 → 객관식 퀴즈(4지선다)</b>
+      한 세트로 구성됩니다. 정답이면 다음 개념으로, 오답이면 힌트를 주고 다시 풀게 됩니다.
+    </p>
+    <div id="conceptList"></div>
+    <p class="empty-note" id="emptyNote">아직 추가된 개념이 없습니다. 아래 버튼을 눌러 추가하세요.</p>
+    <button type="button" class="add-btn" id="addConceptBtn">+ 개념 추가</button>
+  </section>
+
+  <section class="card">
+    <h2>완주 보상</h2>
+    <label for="badgeName">모든 개념을 마쳤을 때 주는 배지 이름</label>
+    <input type="text" id="badgeName" placeholder="예) 구구단 마스터 배지">
+
+    <label for="celebrateText">완주 축하 멘트</label>
+    <textarea id="celebrateText" placeholder="예) 우와 후! 세 가지 마법을 모두 익혔구나! 너는 이제 진정한 구구단 마스터다후!"></textarea>
+  </section>
+
+  <section class="card">
+    <h2>자유 질문 회피 대사 (Fallback)</h2>
+    <p class="hint">학습 흐름과 상관없는 말을 입력했을 때 캐릭터답게 둘러대는 대사 2개 이상.</p>
+    <label for="fallback1">회피 대사 1</label>
+    <textarea id="fallback1" placeholder="예) 후우? 그건 다음에 알려줄게! 지금은 마법 수업에 집중하자후~"></textarea>
+    <label for="fallback2">회피 대사 2</label>
+    <textarea id="fallback2" placeholder="예) 궁금한 게 많구나! 일단 오늘 마법부터 완성하고 물어봐줄래후?"></textarea>
+
+    <label for="resetText">초기화 버튼을 눌렀을 때 하는 말</label>
+    <textarea id="resetText" placeholder="예) 기억을 후루룩 지웠다후! 처음부터 다시 마법 수업을 시작하자!"></textarea>
+  </section>
+
+  <button type="button" class="download-btn" id="downloadBtn">📄 마크다운 파일 다운로드</button>
+  <p class="status-msg" id="statusMsg"></p>
+</div>
+
+<script>
+(function () {
+  const conceptList = document.getElementById('conceptList');
+  const emptyNote = document.getElementById('emptyNote');
+  const addConceptBtn = document.getElementById('addConceptBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const statusMsg = document.getElementById('statusMsg');
+  const fillExampleBtn = document.getElementById('fillExampleBtn');
+  const subjectSelect = document.getElementById('subject');
+  const subjectOther = document.getElementById('subjectOther');
+  let conceptSeq = 0;
+
+  subjectSelect.addEventListener('change', () => {
+    subjectOther.style.display = subjectSelect.value === '기타' ? 'block' : 'none';
+  });
+
+  function updateEmptyNote() {
+    emptyNote.style.display = conceptList.children.length === 0 ? 'block' : 'none';
+  }
+
+  function renumber() {
+    Array.from(conceptList.children).forEach((block, i) => {
+      block.querySelector('.concept-title').textContent = '개념 ' + (i + 1);
+    });
+  }
+
+  function addConcept(prefill) {
+    conceptSeq += 1;
+    const id = conceptSeq;
+    const block = document.createElement('div');
+    block.className = 'concept-block';
+    block.dataset.id = id;
+    block.innerHTML = `
+      <button type="button" class="remove-btn">삭제</button>
+      <div class="concept-title">개념</div>
+
+      <label>개념 이름</label>
+      <input type="text" class="c-name" placeholder="예) 곱셈은 반복되는 덧셈이다">
+
+      <label>쉬운 설명 (캐릭터 말투로)</label>
+      <textarea class="c-explain" placeholder="예) 2×3은 2를 3번 더하는 것과 같아후! 2+2+2 = 6, 그래서 2×3=6이지."></textarea>
+
+      <label>예시</label>
+      <textarea class="c-example" placeholder="예) 3×4는 3을 4번 더하는 거야: 3+3+3+3 = 12"></textarea>
+
+      <label>퀴즈 질문</label>
+      <input type="text" class="c-question" placeholder="예) 그럼 4×3은 얼마일까후?">
+
+      <label>보기 4개</label>
+      <div class="choice-row"><div class="idx">1</div><input type="text" class="c-choice" placeholder="보기 1"></div>
+      <div class="choice-row"><div class="idx">2</div><input type="text" class="c-choice" placeholder="보기 2"></div>
+      <div class="choice-row"><div class="idx">3</div><input type="text" class="c-choice" placeholder="보기 3"></div>
+      <div class="choice-row"><div class="idx">4</div><input type="text" class="c-choice" placeholder="보기 4"></div>
+
+      <label>정답 번호</label>
+      <select class="c-answer">
+        <option value="1">보기 1</option>
+        <option value="2">보기 2</option>
+        <option value="3">보기 3</option>
+        <option value="4">보기 4</option>
+      </select>
+
+      <label>정답 시 칭찬 멘트</label>
+      <textarea class="c-correct" placeholder="예) 완벽하다후!! 곱셈의 비밀을 파악했구나!"></textarea>
+
+      <label>오답 시 힌트 멘트</label>
+      <textarea class="c-hint" placeholder="예) 다시 생각해볼까후? 4를 3번 더해보자: 4+4+4는 얼마일까?"></textarea>
+    `;
+    conceptList.appendChild(block);
+
+    block.querySelector('.remove-btn').addEventListener('click', () => {
+      block.remove();
+      renumber();
+      updateEmptyNote();
+    });
+
+    if (prefill) {
+      block.querySelector('.c-name').value = prefill.name || '';
+      block.querySelector('.c-explain').value = prefill.explain || '';
+      block.querySelector('.c-example').value = prefill.example || '';
+      block.querySelector('.c-question').value = prefill.question || '';
+      const choiceInputs = block.querySelectorAll('.c-choice');
+      (prefill.choices || []).forEach((c, i) => { if (choiceInputs[i]) choiceInputs[i].value = c; });
+      block.querySelector('.c-answer').value = String(prefill.answer || 1);
+      block.querySelector('.c-correct').value = prefill.correctMsg || '';
+      block.querySelector('.c-hint').value = prefill.hintMsg || '';
+    }
+
+    renumber();
+    updateEmptyNote();
+  }
+
+  addConceptBtn.addEventListener('click', () => addConcept());
+
+  // 기본으로 하나는 추가해 시작
+  addConcept();
+
+  // ---------- 예시로 전체 채우기 ----------
+  function fillExample() {
+    document.getElementById('buddyName').value = '피타';
+    document.getElementById('buddyIdentity').value = '숫자 마법부엉이';
+    document.getElementById('buddyPersonality').value = '상냥함, 유쾌함, 참을성 많음';
+    document.getElementById('buddyCatchphrase').value = '문장 끝에 ~후! 를 붙인다';
+    document.getElementById('buddyEmoji').value = '🦉✨';
+    subjectSelect.value = '수학';
+    subjectOther.style.display = 'none';
+    document.getElementById('greeting').value =
+      '후우~ 안녕 꼬마 마법사야! 나는 숫자 마법사 피타야. 오늘은 구구단의 비밀을 함께 파헤쳐볼까?';
+    document.getElementById('badgeName').value = '구구단 마스터 배지';
+    document.getElementById('celebrateText').value =
+      '우와 후! 세 가지 마법을 모두 익혔구나! 너는 이제 진정한 구구단 마스터다후!';
+    document.getElementById('fallback1').value =
+      '후우? 그건 다음에 알려줄게! 지금은 마법 수업에 집중하자후~';
+    document.getElementById('fallback2').value =
+      '궁금한 게 많구나! 일단 오늘 마법부터 완성하고 물어봐줄래후?';
+    document.getElementById('resetText').value =
+      '기억을 후루룩 지웠다후! 처음부터 다시 마법 수업을 시작하자!';
+
+    conceptList.innerHTML = '';
+    conceptSeq = 0;
+    addConcept({
+      name: '곱셈은 반복되는 덧셈이다',
+      explain: '2×3은 2를 3번 더하는 것과 같아후! 2+2+2 = 6, 그래서 2×3=6이지.',
+      example: '3×4는 3을 4번 더하는 거야: 3+3+3+3 = 12',
+      question: '그럼 4×3은 얼마일까후?',
+      choices: ['10', '12', '14', '16'],
+      answer: 2,
+      correctMsg: '완벽하다후!! 곱셈의 비밀을 파악했구나!',
+      hintMsg: '다시 생각해볼까후? 4를 3번 더해보자: 4+4+4는 얼마일까?'
+    });
+    addConcept({
+      name: '구구단 2단의 규칙',
+      explain: '2단은 항상 2씩 늘어나후! 2, 4, 6, 8, 10... 이렇게 2씩 커지는 거야.',
+      example: '2×5 = 10, 2×6 = 12, 2씩 커지는 게 보이지?',
+      question: '2×7은 얼마일까후?',
+      choices: ['12', '14', '16', '18'],
+      answer: 2,
+      correctMsg: '정확해! 2단의 마법을 완전히 익혔구나후!',
+      hintMsg: '2×6이 12였지? 거기에 2를 한 번 더 더해보자후!'
+    });
+    addConcept({
+      name: '곱셈으로 문제 해결하기',
+      explain: '사탕이 한 봉지에 5개씩 들어있어. 봉지가 3개면 사탕은 모두 몇 개일까후? 이럴 때 곱셈을 쓰는 거야!',
+      example: '5개씩 3봉지 = 5×3 = 15개',
+      question: '사탕이 한 봉지에 6개씩 들어있고 봉지가 4개 있다면, 사탕은 모두 몇 개일까후?',
+      choices: ['20', '22', '24', '26'],
+      answer: 3,
+      correctMsg: '우와! 진짜 마법사처럼 술술 풀었구나후!',
+      hintMsg: '6개씩 4번 더해볼까후? 6+6+6+6은 얼마일까?'
+    });
+
+    statusMsg.textContent = '예시 내용을 채웠습니다. 마음에 들면 그대로 다운로드하거나, 자유롭게 수정하세요!';
+    setTimeout(() => { statusMsg.textContent = ''; }, 4000);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  fillExampleBtn.addEventListener('click', fillExample);
+
+  // ---------- 초기화 ----------
+  const resetBtn = document.getElementById('resetBtn');
+
+  function resetForm() {
+    ['buddyName','buddyIdentity','buddyPersonality','buddyCatchphrase','buddyEmoji',
+     'greeting','badgeName','celebrateText','fallback1','fallback2','resetText'].forEach((id) => {
+      document.getElementById(id).value = '';
+    });
+    subjectSelect.value = '수학';
+    subjectOther.value = '';
+    subjectOther.style.display = 'none';
+
+    conceptList.innerHTML = '';
+    conceptSeq = 0;
+    addConcept();
+
+    statusMsg.textContent = '입력한 내용을 모두 초기화했습니다.';
+    setTimeout(() => { statusMsg.textContent = ''; }, 3000);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  resetBtn.addEventListener('click', resetForm);
+
+  function escapeForFilename(str) {
+    return str.replace(/[\\/:*?"<>|]/g, '').trim();
+  }
+
+  function buildMarkdown() {
+    const name = document.getElementById('buddyName').value.trim() || '(이름 미입력)';
+    const identity = document.getElementById('buddyIdentity').value.trim() || '(정체 미입력)';
+    const personality = document.getElementById('buddyPersonality').value.trim() || '(성격 미입력)';
+    const catchphrase = document.getElementById('buddyCatchphrase').value.trim() || '(말버릇 미입력)';
+    const emoji = document.getElementById('buddyEmoji').value.trim() || '✨';
+    const subject = subjectSelect.value === '기타'
+      ? (subjectOther.value.trim() || '(과목 미입력)')
+      : subjectSelect.value;
+    const greeting = document.getElementById('greeting').value.trim() || '(첫 인사말 미입력)';
+    const badgeName = document.getElementById('badgeName').value.trim() || '(배지 이름 미입력)';
+    const celebrateText = document.getElementById('celebrateText').value.trim() || '(축하 멘트 미입력)';
+    const fallback1 = document.getElementById('fallback1').value.trim() || '(회피 대사 미입력)';
+    const fallback2 = document.getElementById('fallback2').value.trim() || '(회피 대사 미입력)';
+    const resetText = document.getElementById('resetText').value.trim() || '(초기화 멘트 미입력)';
+
+    const blocks = Array.from(conceptList.children);
+    let conceptMd = '';
+    blocks.forEach((block, i) => {
+      const cName = block.querySelector('.c-name').value.trim() || '(개념 이름 미입력)';
+      const explain = block.querySelector('.c-explain').value.trim() || '(설명 미입력)';
+      const example = block.querySelector('.c-example').value.trim() || '(예시 미입력)';
+      const question = block.querySelector('.c-question').value.trim() || '(퀴즈 질문 미입력)';
+      const choices = Array.from(block.querySelectorAll('.c-choice')).map((c, idx) => c.value.trim() || `(보기 ${idx + 1} 미입력)`);
+      const answer = block.querySelector('.c-answer').value;
+      const correctMsg = block.querySelector('.c-correct').value.trim() || '(칭찬 멘트 미입력)';
+      const hintMsg = block.querySelector('.c-hint').value.trim() || '(힌트 멘트 미입력)';
+
+      conceptMd += `### 개념 ${i + 1}: ${cName}\n`;
+      conceptMd += `- 쉬운 설명: ${explain}\n`;
+      conceptMd += `- 예시: ${example}\n`;
+      conceptMd += `- 퀴즈 질문: ${question}\n`;
+      conceptMd += `- 보기: 1) ${choices[0]}  2) ${choices[1]}  3) ${choices[2]}  4) ${choices[3]}\n`;
+      conceptMd += `- 정답: 보기 ${answer}\n`;
+      conceptMd += `- 정답 시 멘트: ${correctMsg}\n`;
+      conceptMd += `- 오답 시 힌트 멘트: ${hintMsg}\n\n`;
+    });
+    if (blocks.length === 0) {
+      conceptMd = '(등록된 개념 없음)\n\n';
+    }
+
+    return `# 학습 도우미 설계서
+
+//이 도우미의 구현 방법은: 캐릭터가 채팅창처럼 개념을 순서대로 설명 → 예시 제시 → 객관식 퀴즈 출제 순으로 진행하는 방식이야.
+정답이면 칭찬 멘트를 보여주고 다음 개념으로 자동 진행하고, 오답이면 힌트 멘트를 보여주고 같은 문제를 다시 풀게 해줘.
+단, 같은 문제를 두 번째도 틀리면 정답을 알려주고 다음 개념으로 넘어가줘.
+모든 개념을 마치면 완주 화면에서 배지와 축하 멘트를 보여줘.
+절대로 실패로 끝내거나(Game Over) 처음부터 다시 시키지 말고, 항상 다음 단계로 나아가게 해줘.
+사용자가 정해진 흐름과 관계없는 말을 입력하면 Fallback 대사 중 하나를 보여줘.
+
+## 도우미 기본 정보
+- 이름: ${name}
+- 정체: ${identity}
+- 성격: ${personality}
+- 말버릇: ${catchphrase}
+- 이모지: ${emoji}
+- 가르칠 과목: ${subject}
+- 첫 인사말: ${greeting}
+
+## 개념(학습 목표) 목록 (총 ${blocks.length}개)
+
+${conceptMd}## 완주 보상
+- 배지 이름: ${badgeName}
+- 완주 축하 멘트: ${celebrateText}
+
+## 자유 질문 회피 대사 (Fallback)
+- ① ${fallback1}
+- ② ${fallback2}
+
+## 초기화 멘트
+${resetText}
+`;
+  }
+
+  downloadBtn.addEventListener('click', () => {
+    const md = buildMarkdown();
+    const nameRaw = document.getElementById('buddyName').value.trim();
+    const filename = (nameRaw ? escapeForFilename(nameRaw) + '_학습도우미' : 'AI_학습_도우미_설계서') + '.md';
+
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    statusMsg.textContent = `"${filename}" 다운로드 완료!`;
+    setTimeout(() => { statusMsg.textContent = ''; }, 3000);
+  });
+})();
+</script>
+</body>
+</html>

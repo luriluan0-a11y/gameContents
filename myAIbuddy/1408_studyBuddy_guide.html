@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>가족과 함께하는 AI 바이브코딩 - 나만의 AI 학습 도우미 만들기</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: linear-gradient(180deg, #e7f6ff 0%, #eaf3ff 35%, #eafff2 100%);
+    color: #223354;
+    line-height: 1.8;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .jua { font-family: 'Jua', sans-serif; }
+
+  /* ── 배경 컨페티 ── */
+  .confetti-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .confetti { position: absolute; font-size: 1.6rem; opacity: 0.55; animation: floaty linear infinite; }
+  @keyframes floaty {
+    0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    8%   { opacity: 0.55; }
+    92%  { opacity: 0.55; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* ── 헤더 ── */
+  header {
+    position: relative;
+    background: linear-gradient(120deg, #4D96FF 0%, #5C9DFF 45%, #6BCB77 100%);
+    color: #fff;
+    padding: 56px 24px 44px;
+    text-align: center;
+    border-radius: 0 0 40px 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.3);
+    padding: 8px 22px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 14px;
+  }
+
+  header h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); text-shadow: 3px 3px 0 rgba(0,0,0,0.12); line-height: 1.4; }
+  header p { margin-top: 10px; font-size: 1.05rem; font-weight: 700; opacity: 0.95; }
+
+  .top-nav { margin-top: 26px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+  .top-nav a {
+    background: rgba(255,255,255,0.28); color: #fff; text-decoration: none; padding: 9px 18px;
+    border-radius: 50px; font-weight: 700; font-size: 0.9rem; border: 2px solid rgba(255,255,255,0.5);
+    transition: transform 0.15s, background 0.15s;
+  }
+  .top-nav a:hover { background: rgba(255,255,255,0.5); transform: translateY(-2px) scale(1.05); }
+
+  /* ── 컨테이너 ── */
+  .container { max-width: 780px; margin: -18px auto 0; padding: 0 18px 60px; position: relative; z-index: 1; }
+
+  .section {
+    background: #fff; border-radius: 26px; padding: 30px 28px; margin-bottom: 26px;
+    box-shadow: 0 10px 28px rgba(90,130,200,0.12); border: 3px solid transparent;
+  }
+  .section.c-blue   { border-color: #CBE2FF; }
+  .section.c-green  { border-color: #CDEFCF; }
+  .section.c-yellow { border-color: #FFF0B0; }
+  .section.c-purple { border-color: #E4D4FF; }
+  .section.c-pink   { border-color: #FFD0E4; }
+
+  .section-title { display: flex; align-items: center; gap: 12px; font-size: 1.5rem; color: #223354; margin-bottom: 16px; }
+  .section-icon {
+    width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  .icon-blue   { background: linear-gradient(135deg, #9BC4FF, #4D96FF); }
+  .icon-green  { background: linear-gradient(135deg, #A8E6A1, #6BCB77); }
+  .icon-yellow { background: linear-gradient(135deg, #FFE985, #FFD93D); }
+  .icon-purple { background: linear-gradient(135deg, #CBA3FF, #9D4EDD); }
+  .icon-pink   { background: linear-gradient(135deg, #FF9AC1, #FF6FA5); }
+
+  .section p, .section li { font-size: 0.98rem; color: #3a4a6b; }
+
+  .fun-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
+  .fun-list li { background: #f4f9ff; border-radius: 14px; padding: 12px 16px; display: flex; align-items: flex-start; gap: 10px; font-weight: 500; }
+  .fun-list li .dot { font-size: 1.1rem; flex-shrink: 0; }
+  .fun-list li .txt { flex: 1 1 0%; min-width: 0; }
+
+  /* ── 규칙 카드 ── */
+  .rule-grid { display:grid; grid-template-columns: 1fr; gap: 12px; margin: 14px 0; }
+  .rule-card { background:#f4f9ff; border-radius:16px; padding:16px 16px 14px 20px; position:relative; display:flex; align-items:flex-start; gap:14px; }
+  .rule-num { flex-shrink:0; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Jua', sans-serif; font-size:0.95rem; color:#fff; }
+  .rule-card p { font-size: 0.95rem; margin-top: 2px; }
+
+  /* ── 합체 카드 ── */
+  .combo-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center; margin: 16px 0; }
+  .combo-box { background:#f4f9ff; border-radius:16px; padding:14px 18px; font-weight:700; font-size:0.92rem; text-align:center; flex:1; min-width:140px; }
+  .combo-plus, .combo-eq { font-size:1.4rem; color:#9a8fbf; }
+
+  /* ── 기획서 작성기 CTA (중간) ── */
+  .mid-cta {
+    text-align: center; background: linear-gradient(135deg, #5C9DFF 0%, #6BCB77 100%);
+    border-radius: 20px; padding: 26px 22px; color: #fff; margin-top: 16px;
+    box-shadow: 0 10px 24px rgba(92,157,255,0.3);
+  }
+  .mid-cta .emoji-mid { font-size: 2.2rem; }
+  .mid-cta p { color: #fff; font-weight: 700; margin: 8px 0 14px; }
+  .btn-huge {
+    display: inline-flex; align-items: center; gap: 10px; background: #fff; color: #4D96FF; text-decoration: none;
+    font-family: 'Jua', sans-serif; font-size: 1.1rem; padding: 14px 30px; border-radius: 50px;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.2); transition: transform 0.15s;
+  }
+  .btn-huge:hover { transform: translateY(-4px) scale(1.04); }
+
+  /* ── 흐름도 ── */
+  .flow { display:flex; flex-direction:column; gap:8px; margin-top:16px; }
+  .flow-step { display:flex; align-items:center; gap:14px; background:#f4f9ff; border-radius:14px; padding:14px 18px; }
+  .flow-step .fnum { width:30px; height:30px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; color:#fff; font-family:'Jua', sans-serif; }
+  .flow-step p { font-size: 0.95rem; }
+  .flow-arrow { text-align:center; color:#9a8fbf; font-size:1.2rem; }
+
+  /* ── 완성작 CTA ── */
+  .final-cta { text-align: center; background: linear-gradient(135deg, #4D96FF 0%, #7cc4ff 60%, #6BCB77 100%); border-radius: 26px; padding: 40px 26px; color: #fff; box-shadow: 0 14px 34px rgba(77,150,255,0.35); }
+  .final-cta .emoji-big { font-size: 3rem; animation: bounce 1s infinite alternate; }
+  @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-12px); } }
+  .final-cta h2 { color: #fff; font-size: 1.6rem; margin: 10px 0 6px; }
+  .final-cta p { color: rgba(255,255,255,0.9); margin-bottom: 18px; font-weight: 500; }
+
+  footer { text-align: center; padding: 30px 20px 50px; color: #8fa0c4; font-size: 0.85rem; }
+
+  @media (max-width: 560px) {
+    .section { padding: 24px 18px; }
+    header { padding: 44px 18px 36px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="confetti-bg" id="confetti"></div>
+
+<header>
+  <div class="badge">🎓 경기공유학교 2026</div>
+  <h1>가족과 함께하는<br>AI 바이브코딩! 🧑‍🚀✨</h1>
+  <p>유한대학교 · Day05 · 나만의 AI 학습 도우미 만들기 🦉📚</p>
+  <div class="top-nav">
+    <a href="#goal">오늘의 목표</a>
+    <a href="#combo">학습 도우미란?</a>
+    <a href="#rules">설계 규칙</a>
+    <a href="#paper">설계서 작성기</a>
+    <a href="#steps">만드는 순서</a>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- 오늘의 목표 -->
+  <section class="section c-blue" id="goal">
+    <div class="section-title"><div class="section-icon icon-blue">🎯</div><h2>오늘 만들어볼 것은?</h2></div>
+    <ul class="fun-list">
+      <li><span class="dot">🦉</span><span class="txt"><strong>원하는 과목을 재미있게 가르쳐주는 나만의 AI 학습 도우미(튜터)</strong>를 만들어볼 거예요!</span></li>
+      <li><span class="dot">📚</span><span class="txt">내가 좋아하는 캐릭터가 개념을 쉽게 설명해주고, 바로 미니 퀴즈로 확인시켜줘요.</span></li>
+      <li><span class="dot">🏅</span><span class="txt">모든 개념을 다 배우면 배지를 받는 나만의 학습 도우미 앱을 완성해요.</span></li>
+    </ul>
+  </section>
+
+  <!-- 학습 도우미란? -->
+  <section class="section c-purple" id="combo">
+    <div class="section-title"><div class="section-icon icon-purple">🧩</div><h2>학습 도우미 = 캐릭터 챗봇 + 퀴즈 게임</h2></div>
+    <p>지금까지 만든 것들을 합치면 오늘의 학습 도우미가 완성돼요!</p>
+    <div class="combo-row">
+      <div class="combo-box">🐈 Day01<br>캐릭터 챗봇<br><span style="font-weight:400; font-size:0.8rem; color:#6a7a9b;">성격 있는 캐릭터</span></div>
+      <div class="combo-plus">+</div>
+      <div class="combo-box">🏆 Day02<br>퀴즈 게임<br><span style="font-weight:400; font-size:0.8rem; color:#6a7a9b;">정답/오답 채점</span></div>
+      <div class="combo-eq">=</div>
+      <div class="combo-box" style="background:linear-gradient(135deg,#dff3ff,#e8ffe9);">🦉 Day05<br>학습 도우미<br><span style="font-weight:400; font-size:0.8rem; color:#6a7a9b;">설명 + 확인 퀴즈</span></div>
+    </div>
+  </section>
+
+  <!-- 설계 규칙 -->
+  <section class="section c-yellow" id="rules">
+    <div class="section-title"><div class="section-icon icon-yellow">📋</div><h2>학습 콘텐츠 특화 설계 규칙</h2></div>
+    <div class="rule-grid">
+      <div class="rule-card"><div class="rule-num" style="background:#4D96FF">1</div><p>이 도우미가 <strong>무엇을 가르치는지</strong> 한 문장으로 말할 수 있어야 해요.</p></div>
+      <div class="rule-card"><div class="rule-num" style="background:#6BCB77">2</div><p><strong>틀렸다고 바로 실패시키지 않아요.</strong> 힌트를 주고 다시 도전하게 하고, 두 번째도 틀리면 정답을 알려주고 다음으로 넘어가요.</p></div>
+      <div class="rule-card"><div class="rule-num" style="background:#FFA94D">3</div><p>캐릭터의 <strong>말투와 이모지</strong>로 친근하게, 설명은 짧고 정확하게 만들어요.</p></div>
+    </div>
+  </section>
+
+  <!-- 설계서 작성기 -->
+  <section class="section c-green" id="paper">
+    <div class="section-title"><div class="section-icon icon-green">📝</div><h2>나만의 AI 학습 도우미 예시</h2></div>
+    <p>버튼을 클릭하면 오늘 만들어볼 나만의 AI 학습 도우미를 플레이해볼 수 있어요.</p>
+    <div class="mid-cta">
+      <div class="emoji-mid">🦉</div>
+      <p>피타의 구구단 마법 교실</p>
+      <a class="btn-huge" href="pitasMasicClass.html" target="_blank" rel="noopener">
+        🚀 피타의 구구단 마법 교실 바로가기
+      </a>
+    </div>
+  </section>
+
+  <!-- 만드는 순서 -->
+  <section class="section c-pink" id="steps">
+    <div class="section-title"><div class="section-icon icon-pink">🛠️</div><h2>이렇게 만들어요!</h2></div>
+    <div class="flow">
+      <div class="flow-step"><div class="fnum" style="background:#4D96FF">1</div><p>어떤 <strong>과목</strong>을, 어떤 <strong>캐릭터</strong>로 가르칠지 정해요.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="fnum" style="background:#6BCB77">2</div><p>설계서 작성기에 <strong>예시대로(또는 자유롭게) 기획서</strong>를 작성해요.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="fnum" style="background:#FFD93D">3</div><p>완성되면 <strong>마크다운 파일을 다운로드</strong>해요.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="fnum" style="background:#FFA94D">4</div><p>Antigravity IDE를 열고 <strong>"마크다운 파일을 읽고 html 단일 페이지로 개발해줘."</strong>라고 요청해요.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="fnum" style="background:#9D4EDD">5</div><p>완성되면 <strong>html 파일을 열어서</strong> 직접 배워봐요.</p></div>
+    </div>
+  </section>
+
+  <!-- 완성작 CTA -->
+  <div class="final-cta">
+    <div class="emoji-big">🦉📚</div>
+    <h2 class="jua">나만의 AI 학습 도우미 완성하기</h2>
+    <p>설계서를 완성했다면, 이제 나만의 학습 도우미를 직접 만들어봐요!</p>
+    <a class="btn-huge" href="studyBuddy_paper.html" target="_blank" rel="noopener">
+      🚀 설계서 작성기로 이동하기
+    </a>
+  </div>
+
+</div>
+
+<footer>
+  🎓 경기공유학교 2026 · 가족과 함께하는 AI 바이브코딩 (유한대학교) 📚
+</footer>
+
+<script>
+  // 배경 컨페티
+  const shapes = ['📚','🦉','✨','🧠','✏️','⭐','💫','🏅','🎓','☁️'];
+  const bg = document.getElementById('confetti');
+  for (let i = 0; i < 24; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.fontSize = (1 + Math.random() * 1.6) + 'rem';
+    el.style.animationDuration = (10 + Math.random() * 14) + 's';
+    el.style.animationDelay = (Math.random() * 14) + 's';
+    bg.appendChild(el);
+  }
+</script>
+
+</body>
+</html>
