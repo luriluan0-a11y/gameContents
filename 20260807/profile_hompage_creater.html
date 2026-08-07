@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>신중년 강사 프로필 홈페이지 생성기</title>
+<style>
+  :root{
+    --bg:#faf6f0;
+    --card:#ffffff;
+    --border:#e4dccf;
+    --text:#2b2620;
+    --muted:#6b6255;
+    --accent:#b6603f;
+    --accent-dark:#8f4a30;
+    --accent-soft:#f3e2d8;
+    --focus:#2b6e6e;
+    --danger:#b3413a;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    font-family:"Noto Sans KR","Malgun Gothic",sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    font-size:18px;
+    line-height:1.65;
+  }
+  header{
+    padding:28px 24px 20px;
+    text-align:center;
+    border-bottom:1px solid var(--border);
+    background:var(--card);
+  }
+  header h1{
+    margin:0 0 8px;
+    font-size:1.7rem;
+    color:var(--accent-dark);
+  }
+  header p{
+    margin:0;
+    color:var(--muted);
+    font-size:1rem;
+  }
+  .guide{
+    max-width:1200px;
+    margin:20px auto 0;
+    padding:16px 20px;
+    background:var(--accent-soft);
+    border:1px solid #e4c3ae;
+    border-radius:10px;
+    font-size:0.98rem;
+    color:#5a3722;
+  }
+  .guide strong{color:var(--accent-dark);}
+  main.layout{
+    max-width:1200px;
+    margin:20px auto 60px;
+    padding:0 20px;
+    display:grid;
+    grid-template-columns:1.1fr 0.9fr;
+    gap:24px;
+    align-items:start;
+  }
+  @media (max-width:900px){
+    main.layout{grid-template-columns:1fr;}
+  }
+  fieldset{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:18px 20px 20px;
+    margin:0 0 18px;
+  }
+  legend{
+    font-weight:700;
+    font-size:1.08rem;
+    color:var(--accent-dark);
+    padding:0 8px;
+  }
+  .hint{
+    margin:0 0 10px;
+    font-size:0.92rem;
+    color:var(--muted);
+  }
+  label{
+    display:block;
+    margin-bottom:14px;
+    font-weight:600;
+    font-size:0.98rem;
+  }
+  label .opt{font-weight:400;color:var(--muted);font-size:0.86rem;}
+  input[type=text],input[type=email],input[type=tel],input[type=url],textarea{
+    display:block;
+    width:100%;
+    margin-top:6px;
+    padding:10px 12px;
+    font-size:1rem;
+    font-family:inherit;
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:#fffdfb;
+    color:var(--text);
+  }
+  input:focus,textarea:focus{
+    outline:3px solid var(--focus);
+    outline-offset:1px;
+    border-color:var(--focus);
+  }
+  textarea{resize:vertical;min-height:70px;}
+  .repeater .row{
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    margin-bottom:10px;
+    flex-wrap:wrap;
+  }
+  .repeater .row input{flex:1 1 200px;margin-top:0;}
+  .remove-btn{
+    flex:0 0 auto;
+    background:#fff;
+    border:1px solid var(--danger);
+    color:var(--danger);
+    border-radius:8px;
+    padding:9px 12px;
+    font-size:0.88rem;
+    cursor:pointer;
+    min-height:40px;
+  }
+  .remove-btn:hover{background:#fbeceb;}
+  .add-btn{
+    background:var(--accent-soft);
+    border:1px dashed var(--accent);
+    color:var(--accent-dark);
+    border-radius:8px;
+    padding:10px 14px;
+    font-size:0.95rem;
+    font-weight:600;
+    cursor:pointer;
+    min-height:44px;
+    width:100%;
+  }
+  .add-btn:hover{background:#ecd2c1;}
+  .action-bar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:6px;
+  }
+  .action-bar button{
+    flex:1 1 auto;
+    min-height:48px;
+    font-size:1rem;
+    font-weight:700;
+    border-radius:10px;
+    cursor:pointer;
+    border:1px solid var(--border);
+    background:#fff;
+    color:var(--text);
+  }
+  #fillSample{border-color:var(--accent);color:var(--accent-dark);}
+  #clearAll{border-color:var(--danger);color:var(--danger);}
+  #copyBtn,#downloadBtn{background:var(--accent);color:#fff;border-color:var(--accent-dark);}
+  #copyBtn:hover,#downloadBtn:hover{background:var(--accent-dark);}
+  .action-bar button:hover{filter:brightness(0.97);}
+  .preview-pane{position:sticky;top:16px;}
+  .preview-tabs{display:flex;gap:6px;margin-bottom:10px;}
+  .tab-btn{
+    flex:1;
+    padding:10px;
+    border-radius:8px 8px 0 0;
+    border:1px solid var(--border);
+    background:#f0e9df;
+    color:var(--muted);
+    font-weight:700;
+    cursor:pointer;
+    min-height:44px;
+  }
+  .tab-btn.active{background:var(--card);color:var(--accent-dark);border-bottom-color:var(--card);}
+  .preview-box{
+    display:none;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:0 0 12px 12px;
+    padding:20px;
+    min-height:400px;
+    max-height:60vh;
+    overflow:auto;
+  }
+  .preview-box.show{display:block;}
+  #renderedView h1{color:var(--accent-dark);margin-top:0;}
+  #renderedView h2{color:var(--accent-dark);border-bottom:2px solid var(--accent-soft);padding-bottom:4px;margin-top:28px;}
+  #renderedView img{max-width:100%;border-radius:10px;}
+  #renderedView blockquote{
+    margin:10px 0;padding:10px 14px;
+    background:var(--accent-soft);
+    border-left:4px solid var(--accent);
+    border-radius:6px;
+    color:#5a3722;
+  }
+  #renderedView ul{padding-left:22px;}
+  #markdownView{
+    width:100%;height:60vh;
+    font-family:"JetBrains Mono",Consolas,monospace;
+    font-size:0.88rem;
+    border:1px solid var(--border);
+    border-radius:0 0 12px 12px;
+    padding:16px;
+    background:#fffdfb;
+  }
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:var(--accent-dark);color:#fff;
+    padding:12px 22px;border-radius:30px;
+    font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,0.2);
+    opacity:0;pointer-events:none;transition:opacity 0.25s;
+    z-index:100;
+  }
+  .toast.show{opacity:1;}
+  .save-note{
+    text-align:center;font-size:0.82rem;color:var(--muted);margin-top:8px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>신중년 강사 프로필 홈페이지 생성기</h1>
+  <p>아래 항목을 채우면 오른쪽에서 나만의 프로필 페이지를 바로 확인하고, 마크다운(.md) 파일로 저장할 수 있어요.</p>
+</header>
+
+<div class="guide">
+  <strong>사용 방법</strong> — ① 아래 항목을 편하게 채워주세요 (모르는 항목은 비워두셔도 됩니다) · ② 오른쪽 "미리보기"에서 결과를 바로 확인하세요 · ③ 완성되면 아래 버튼으로 복사하거나 파일로 저장하세요. 입력한 내용은 이 브라우저에 자동 저장되어, 나중에 다시 열어도 이어서 작성할 수 있습니다.
+</div>
+
+<main class="layout">
+  <section class="form-pane">
+    <form id="profileForm" onsubmit="return false;">
+
+      <fieldset>
+        <legend>1. 기본 정보</legend>
+        <label>이름
+          <input type="text" id="name" placeholder="예: 김영희">
+        </label>
+        <label>활동명 / 직함
+          <input type="text" id="title" placeholder="예: 인생 2막 코치, 원예치료 강사">
+        </label>
+        <label>한 줄 소개(캐치프레이즈)
+          <input type="text" id="tagline" placeholder="예: 은퇴 후 새로운 꿈을 찾아드립니다">
+        </label>
+        <label>사진 URL <span class="opt">(선택, 인터넷에 올려둔 사진 주소)</span>
+          <input type="url" id="photoUrl" placeholder="https://...">
+        </label>
+        <label>활동 지역 <span class="opt">(선택)</span>
+          <input type="text" id="region" placeholder="예: 경기 수원">
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>2. 나의 이야기</legend>
+        <p class="hint">이 길을 걷게 된 계기, 인생의 전환점 등을 자유롭게 적어주세요.</p>
+        <textarea id="story" rows="5" placeholder="예: 30년간 초등학교 교사로 일하다 퇴직 후, 평소 좋아하던 화초 가꾸기를 살려 원예치료를 공부하게 되었습니다..."></textarea>
+      </fieldset>
+
+      <fieldset>
+        <legend>3. 강의 철학 / 가치관</legend>
+        <textarea id="philosophy" rows="3" placeholder="예: 나이는 숫자일 뿐, 배움에는 끝이 없다고 믿습니다."></textarea>
+      </fieldset>
+
+      <fieldset>
+        <legend>4. 전문 분야</legend>
+        <div class="repeater" id="specialtyRepeater" data-fields='[{"name":"item","placeholder":"예: 은퇴설계 교육"}]'></div>
+        <button type="button" class="add-btn" data-target="specialtyRepeater">+ 전문 분야 추가</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>5. 대표 강의 주제</legend>
+        <div class="repeater" id="topicRepeater" data-fields='[{"name":"title","placeholder":"강의 제목 (예: 인생 2막, 나답게 사는 법)"},{"name":"desc","placeholder":"짧은 설명 (선택)"}]'></div>
+        <button type="button" class="add-btn" data-target="topicRepeater">+ 강의 주제 추가</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>6. 경력 & 활동</legend>
+        <div class="repeater" id="careerRepeater" data-fields='[{"name":"period","placeholder":"기간 (예: 2015~2020)"},{"name":"desc","placeholder":"내용 (예: OO기업 교육팀장)"}]'></div>
+        <button type="button" class="add-btn" data-target="careerRepeater">+ 경력 추가</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>7. 학력 & 자격증</legend>
+        <div class="repeater" id="eduRepeater" data-fields='[{"name":"item","placeholder":"예: OO대학교 평생교육원 원예치료사 과정 수료"}]'></div>
+        <button type="button" class="add-btn" data-target="eduRepeater">+ 학력/자격증 추가</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>8. 후기 & 성과</legend>
+        <div class="repeater" id="testiRepeater" data-fields='[{"name":"quote","placeholder":"후기 내용 (예: 강의를 듣고 삶의 태도가 달라졌어요)"},{"name":"author","placeholder":"이름 / 소속 (예: OO복지관 담당자)"}]'></div>
+        <button type="button" class="add-btn" data-target="testiRepeater">+ 후기 추가</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>9. 연락처 & SNS</legend>
+        <label>이메일 <span class="opt">(선택)</span>
+          <input type="email" id="email" placeholder="example@email.com">
+        </label>
+        <label>전화번호 <span class="opt">(선택)</span>
+          <input type="tel" id="phone" placeholder="010-0000-0000">
+        </label>
+        <label>블로그 <span class="opt">(선택)</span>
+          <input type="url" id="blog" placeholder="https://blog.naver.com/...">
+        </label>
+        <label>인스타그램 <span class="opt">(선택)</span>
+          <input type="text" id="instagram" placeholder="@instagram_id">
+        </label>
+        <label>유튜브 <span class="opt">(선택)</span>
+          <input type="url" id="youtube" placeholder="https://youtube.com/...">
+        </label>
+        <label>카카오톡 채널 <span class="opt">(선택)</span>
+          <input type="text" id="kakao" placeholder="카카오톡 채널명 또는 링크">
+        </label>
+      </fieldset>
+    </form>
+
+    <div class="action-bar">
+      <button type="button" id="fillSample">예시로 채워보기</button>
+      <button type="button" id="clearAll">모두 지우기</button>
+    </div>
+    <p class="save-note">입력 내용은 자동으로 이 브라우저에 저장됩니다 (다른 기기와는 공유되지 않아요).</p>
+  </section>
+
+  <section class="preview-pane">
+    <div class="preview-tabs">
+      <button type="button" class="tab-btn active" data-tab="rendered">미리보기</button>
+      <button type="button" class="tab-btn" data-tab="markdown">마크다운 코드</button>
+    </div>
+    <div id="renderedView" class="preview-box show"></div>
+    <textarea id="markdownView" class="preview-box markdown-box" readonly></textarea>
+    <div class="action-bar" style="margin-top:12px;">
+      <button type="button" id="copyBtn">📋 마크다운 복사하기</button>
+      <button type="button" id="downloadBtn">⬇ .md 파일로 저장</button>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var STORAGE_KEY = "srSeniorProfileGenerator_v1";
+
+  var simpleFieldIds = ["name","title","tagline","photoUrl","region","story","philosophy","email","phone","blog","instagram","youtube","kakao"];
+
+  var repeaterDefs = {
+    specialtyRepeater: [{name:"item",placeholder:"예: 은퇴설계 교육"}],
+    topicRepeater: [{name:"title",placeholder:"강의 제목 (예: 인생 2막, 나답게 사는 법)"},{name:"desc",placeholder:"짧은 설명 (선택)"}],
+    careerRepeater: [{name:"period",placeholder:"기간 (예: 2015~2020)"},{name:"desc",placeholder:"내용 (예: OO기업 교육팀장)"}],
+    eduRepeater: [{name:"item",placeholder:"예: OO대학교 평생교육원 원예치료사 과정 수료"}],
+    testiRepeater: [{name:"quote",placeholder:"후기 내용"},{name:"author",placeholder:"이름 / 소속"}]
+  };
+
+  function escapeHtml(s){
+    return (s||"").replace(/[&<>"']/g,function(c){
+      return ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c];
+    });
+  }
+
+  function inlineFormat(s){
+    var escaped = escapeHtml(s);
+    return escaped.replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>");
+  }
+
+  function makeRow(containerId, fields, values){
+    var container = document.getElementById(containerId);
+    var row = document.createElement("div");
+    row.className = "row";
+    fields.forEach(function(f){
+      var input = document.createElement("input");
+      input.type = "text";
+      input.name = f.name;
+      input.placeholder = f.placeholder;
+      if(values && values[f.name] !== undefined) input.value = values[f.name];
+      row.appendChild(input);
+    });
+    var removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "remove-btn";
+    removeBtn.textContent = "삭제";
+    removeBtn.addEventListener("click", function(){
+      row.remove();
+      updatePreview();
+      saveState();
+    });
+    row.appendChild(removeBtn);
+    container.appendChild(row);
+  }
+
+  function collectRepeater(containerId, fields){
+    var container = document.getElementById(containerId);
+    var rows = container.querySelectorAll(".row");
+    var result = [];
+    rows.forEach(function(row){
+      var obj = {};
+      var hasValue = false;
+      fields.forEach(function(f){
+        var input = row.querySelector('input[name="'+f.name+'"]');
+        var val = input ? input.value.trim() : "";
+        obj[f.name] = val;
+        if(val) hasValue = true;
+      });
+      if(hasValue) result.push(obj);
+    });
+    return result;
+  }
+
+  function val(id){
+    var el = document.getElementById(id);
+    return el ? el.value.trim() : "";
+  }
+
+  function buildMarkdown(){
+    var name = val("name");
+    var title = val("title");
+    var tagline = val("tagline");
+    var photoUrl = val("photoUrl");
+    var region = val("region");
+    var story = val("story");
+    var philosophy = val("philosophy");
+
+    var specialties = collectRepeater("specialtyRepeater", repeaterDefs.specialtyRepeater);
+    var topics = collectRepeater("topicRepeater", repeaterDefs.topicRepeater);
+    var career = collectRepeater("careerRepeater", repeaterDefs.careerRepeater);
+    var edu = collectRepeater("eduRepeater", repeaterDefs.eduRepeater);
+    var testi = collectRepeater("testiRepeater", repeaterDefs.testiRepeater);
+
+    var email = val("email"), phone = val("phone"), blog = val("blog"),
+        instagram = val("instagram"), youtube = val("youtube"), kakao = val("kakao");
+
+    var md = "";
+    md += "# " + (name || "이름을 입력해주세요") + "\n\n";
+
+    var subline = [title, region].filter(Boolean).join(" · ");
+    if(subline) md += "**" + subline + "**\n\n";
+    if(tagline) md += "> " + tagline + "\n\n";
+    if(photoUrl) md += "![" + (name || "프로필") + " 사진](" + photoUrl + ")\n\n";
+
+    if(story){
+      md += "## 저는 이런 사람입니다\n\n" + story + "\n\n";
+    }
+    if(philosophy){
+      md += "## 강의 철학\n\n" + philosophy + "\n\n";
+    }
+    if(specialties.length){
+      md += "## 전문 분야\n\n";
+      specialties.forEach(function(s){ md += "- " + s.item + "\n"; });
+      md += "\n";
+    }
+    if(topics.length){
+      md += "## 대표 강의 주제\n\n";
+      topics.forEach(function(t){
+        md += "- **" + t.title + "**" + (t.desc ? " — " + t.desc : "") + "\n";
+      });
+      md += "\n";
+    }
+    if(career.length){
+      md += "## 경력 & 활동\n\n";
+      career.forEach(function(c){
+        md += "- " + (c.period ? c.period + " | " : "") + c.desc + "\n";
+      });
+      md += "\n";
+    }
+    if(edu.length){
+      md += "## 학력 & 자격증\n\n";
+      edu.forEach(function(e){ md += "- " + e.item + "\n"; });
+      md += "\n";
+    }
+    if(testi.length){
+      md += "## 후기 & 성과\n\n";
+      testi.forEach(function(t){
+        md += "> \"" + t.quote + "\"\n> — " + t.author + "\n\n";
+      });
+    }
+
+    var contactLines = [];
+    if(email) contactLines.push("- 이메일: " + email);
+    if(phone) contactLines.push("- 전화: " + phone);
+    if(blog) contactLines.push("- 블로그: " + blog);
+    if(instagram) contactLines.push("- 인스타그램: " + instagram);
+    if(youtube) contactLines.push("- 유튜브: " + youtube);
+    if(kakao) contactLines.push("- 카카오톡 채널: " + kakao);
+    if(contactLines.length){
+      md += "## 연락처\n\n" + contactLines.join("\n") + "\n";
+    }
+
+    return md.trim() + "\n";
+  }
+
+  function mdToHtml(md){
+    var lines = md.split("\n");
+    var html = "";
+    var inList = false;
+    lines.forEach(function(line){
+      var m;
+      if((m = line.match(/^# (.*)$/))){
+        if(inList){ html += "</ul>"; inList=false; }
+        html += "<h1>" + inlineFormat(m[1]) + "</h1>";
+      } else if((m = line.match(/^## (.*)$/))){
+        if(inList){ html += "</ul>"; inList=false; }
+        html += "<h2>" + inlineFormat(m[1]) + "</h2>";
+      } else if((m = line.match(/^### (.*)$/))){
+        if(inList){ html += "</ul>"; inList=false; }
+        html += "<h3>" + inlineFormat(m[1]) + "</h3>";
+      } else if((m = line.match(/^!\[(.*?)\]\((.*?)\)$/))){
+        if(inList){ html += "</ul>"; inList=false; }
+        html += '<img alt="' + escapeHtml(m[1]) + '" src="' + escapeHtml(m[2]) + '">';
+      } else if((m = line.match(/^- (.*)$/))){
+        if(!inList){ html += "<ul>"; inList=true; }
+        html += "<li>" + inlineFormat(m[1]) + "</li>";
+      } else if((m = line.match(/^> (.*)$/))){
+        if(inList){ html += "</ul>"; inList=false; }
+        html += "<blockquote>" + inlineFormat(m[1]) + "</blockquote>";
+      } else if(line.trim() === ""){
+        if(inList){ html += "</ul>"; inList=false; }
+      } else if((m = line.match(/^\*\*(.*)\*\*$/))){
+        if(inList){ html += "</ul>"; inList=false; }
+        html += "<p>" + inlineFormat(line) + "</p>";
+      } else {
+        if(inList){ html += "</ul>"; inList=false; }
+        html += "<p>" + inlineFormat(line) + "</p>";
+      }
+    });
+    if(inList) html += "</ul>";
+    return html;
+  }
+
+  function updatePreview(){
+    var md = buildMarkdown();
+    document.getElementById("markdownView").value = md;
+    document.getElementById("renderedView").innerHTML = mdToHtml(md);
+  }
+
+  function showToast(msg){
+    var t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(function(){ t.classList.remove("show"); }, 1800);
+  }
+
+  function collectState(){
+    var state = {};
+    simpleFieldIds.forEach(function(id){ state[id] = val(id); });
+    Object.keys(repeaterDefs).forEach(function(cid){
+      state[cid] = collectRepeater(cid, repeaterDefs[cid]);
+    });
+    return state;
+  }
+
+  var saveTimer = null;
+  function saveState(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function(){
+      try{
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(collectState()));
+      }catch(e){}
+    }, 300);
+  }
+
+  function clearRepeater(containerId){
+    document.getElementById(containerId).innerHTML = "";
+  }
+
+  function loadState(state, isSample){
+    simpleFieldIds.forEach(function(id){
+      var el = document.getElementById(id);
+      if(el && state[id] !== undefined) el.value = state[id];
+    });
+    Object.keys(repeaterDefs).forEach(function(cid){
+      clearRepeater(cid);
+      var rows = (state[cid] && state[cid].length) ? state[cid] : [{}];
+      rows.forEach(function(rowVals){
+        makeRow(cid, repeaterDefs[cid], rowVals);
+      });
+    });
+    updatePreview();
+    if(!isSample) return;
+  }
+
+  function initEmpty(){
+    Object.keys(repeaterDefs).forEach(function(cid){
+      clearRepeater(cid);
+      makeRow(cid, repeaterDefs[cid], {});
+    });
+  }
+
+  function sampleData(){
+    return {
+      name: "김영희",
+      title: "원예치료 강사 · 인생 2막 코치",
+      tagline: "은퇴 후, 흙을 만지며 다시 피어나는 법을 나눕니다",
+      photoUrl: "",
+      region: "경기 수원",
+      story: "30년간 초등학교 교사로 아이들을 가르치다 정년퇴직했습니다. 평소 화초를 가꾸며 마음을 다스리던 취미가 계기가 되어, 퇴직 후 원예치료사 자격을 취득했습니다. 지금은 같은 신중년 세대와 어르신들께 식물을 통해 마음을 돌보는 법을 전하고 있습니다.",
+      philosophy: "배움에는 정년이 없습니다. 작은 화분 하나를 돌보는 마음으로, 나 자신도 천천히 돌볼 수 있다고 믿습니다.",
+      specialtyRepeater: [{item:"원예치료"},{item:"은퇴설계 교육"},{item:"자존감 회복 프로그램"}],
+      topicRepeater: [
+        {title:"인생 2막, 나답게 사는 법", desc:"퇴직 후 정체성 찾기 워크숍"},
+        {title:"화분 속 마음 돌보기", desc:"원예치료 체험 강의"}
+      ],
+      careerRepeater: [
+        {period:"1993~2023", desc:"OO초등학교 교사"},
+        {period:"2023~현재", desc:"OO복지관 원예치료 강사"}
+      ],
+      eduRepeater: [{item:"OO대학교 평생교육원 원예치료사 2급"},{item:"평생교육사 2급"}],
+      testiRepeater: [{quote:"강의를 듣고 은퇴 후 막막했던 마음이 한결 가벼워졌어요.", author:"OO복지관 프로그램 담당자"}],
+      email: "example@email.com",
+      phone: "010-0000-0000",
+      blog: "https://blog.naver.com/example",
+      instagram: "@youngheekim_garden",
+      youtube: "",
+      kakao: ""
+    };
+  }
+
+  // tab switching
+  document.querySelectorAll(".tab-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.querySelectorAll(".tab-btn").forEach(function(b){ b.classList.remove("active"); });
+      document.querySelectorAll(".preview-box").forEach(function(b){ b.classList.remove("show"); });
+      btn.classList.add("active");
+      var tab = btn.getAttribute("data-tab");
+      document.getElementById(tab === "rendered" ? "renderedView" : "markdownView").classList.add("show");
+    });
+  });
+
+  // add-row buttons
+  document.querySelectorAll(".add-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var target = btn.getAttribute("data-target");
+      makeRow(target, repeaterDefs[target], {});
+      saveState();
+    });
+  });
+
+  // live update on any input
+  document.addEventListener("input", function(e){
+    if(e.target.closest("#profileForm")){
+      updatePreview();
+      saveState();
+    }
+  });
+
+  document.getElementById("fillSample").addEventListener("click", function(){
+    loadState(sampleData(), true);
+    saveState();
+    showToast("예시 내용으로 채웠어요");
+  });
+
+  document.getElementById("clearAll").addEventListener("click", function(){
+    if(!confirm("입력하신 모든 내용을 지울까요? 되돌릴 수 없습니다.")) return;
+    simpleFieldIds.forEach(function(id){ document.getElementById(id).value = ""; });
+    initEmpty();
+    updatePreview();
+    try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+    showToast("모두 지웠어요");
+  });
+
+  document.getElementById("copyBtn").addEventListener("click", function(){
+    var md = document.getElementById("markdownView").value;
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(md).then(function(){
+        showToast("마크다운이 복사되었어요!");
+      }).catch(function(){
+        fallbackCopy(md);
+      });
+    } else {
+      fallbackCopy(md);
+    }
+  });
+
+  function fallbackCopy(text){
+    var ta = document.getElementById("markdownView");
+    ta.focus();
+    ta.select();
+    try{
+      document.execCommand("copy");
+      showToast("마크다운이 복사되었어요!");
+    }catch(e){
+      showToast("복사에 실패했어요. 직접 선택해 복사해주세요.");
+    }
+  }
+
+  document.getElementById("downloadBtn").addEventListener("click", function(){
+    var md = document.getElementById("markdownView").value;
+    var name = val("name") || "프로필";
+    var blob = new Blob([md], {type: "text/markdown;charset=utf-8"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = name + "_프로필.md";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast("파일이 저장되었어요!");
+  });
+
+  // init
+  var saved = null;
+  try{
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) saved = JSON.parse(raw);
+  }catch(e){}
+
+  if(saved){
+    loadState(saved, false);
+  } else {
+    initEmpty();
+    updatePreview();
+  }
+})();
+</script>
+</body>
+</html>
