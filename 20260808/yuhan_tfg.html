@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>유한대에 숨겨진 보물을 찾아라!</title>
+  <meta name="description" content="유한대학교 주변을 탐험하며 중간고사 시험지 힌트를 찾아 A+를 달성하는 탐험 웹게임">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@300;400;600;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --bg-card: rgba(30, 41, 59, 0.85);
+      --bg-card-hover: rgba(51, 65, 85, 0.9);
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent: #f59e0b;
+      --accent-glow: rgba(245, 158, 11, 0.4);
+      --success: #10b981;
+      --danger: #ef4444;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: rgba(255, 255, 255, 0.12);
+      --glass-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(245, 158, 11, 0.12) 0%, transparent 40%);
+    }
+
+    /* Header Styling */
+    header {
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      font-size: 28px;
+      background: linear-gradient(135deg, #f59e0b, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 8px rgba(245, 158, 11, 0.4));
+    }
+
+    .brand-title h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(to right, #ffffff, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-title p {
+      font-size: 0.75rem;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* Controls & Actions */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border-color);
+      background: rgba(30, 41, 59, 0.8);
+      color: var(--text-main);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .btn:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #4338ca);
+      border: none;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #4f46e5, #3730a3);
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-accent {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border: none;
+      color: #0f172a;
+    }
+
+    .btn-accent:hover {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+    }
+
+    .file-input-wrapper {
+      position: relative;
+    }
+    .file-input-wrapper input[type="file"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    /* Main Content Container */
+    main {
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+    }
+
+    @media (max-width: 1024px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Map Display Container */
+    .map-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: var(--glass-shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .map-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .map-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+      font-size: 0.8rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse-dot 1.5s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.6; }
+    }
+
+    /* Interactive Map Frame */
+    .map-viewport {
+      position: relative;
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #000;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .map-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+      transition: filter 0.3s ease;
+    }
+
+    /* Hotspot Markers */
+    .hotspot {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Hotspot Pin Icon */
+    .hotspot-pin {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: white;
+      position: relative;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+      border: 2px solid rgba(255,255,255,0.8);
+      transition: all 0.3s ease;
+    }
+
+    .hotspot-ring {
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      right: -8px;
+      bottom: -8px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      pointer-events: none;
+    }
+
+    /* States for Hotspots */
+    /* Locked */
+    .hotspot.locked {
+      opacity: 0.45;
+      filter: grayscale(80%);
+      cursor: not-allowed;
+    }
+    .hotspot.locked .hotspot-pin {
+      background: linear-gradient(135deg, #475569, #1e293b);
+      border-color: #64748b;
+    }
+
+    /* Active / Current Unlocked */
+    .hotspot.active {
+      z-index: 20;
+      opacity: 1;
+      filter: none;
+      animation: bounce-pin 1.6s ease-in-out infinite;
+    }
+    .hotspot.active .hotspot-pin {
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      border-color: #ffffff;
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.8);
+    }
+    .hotspot.active .hotspot-ring {
+      border-color: var(--accent);
+      animation: ping-ring 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    /* Solved / Completed */
+    .hotspot.completed {
+      opacity: 0.9;
+      filter: none;
+    }
+    .hotspot.completed .hotspot-pin {
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-color: #a7f3d0;
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+    }
+
+    @keyframes bounce-pin {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    @keyframes ping-ring {
+      75%, 100% {
+        transform: scale(1.6);
+        opacity: 0;
+      }
+    }
+
+    /* Hotspot Labels */
+    .hotspot-label {
+      margin-top: 6px;
+      padding: 4px 10px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(4px);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: white;
+      white-space: nowrap;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .hotspot:hover .hotspot-label {
+      background: rgba(30, 41, 59, 0.95);
+      border-color: var(--accent);
+      transform: scale(1.05);
+    }
+
+    .hotspot.locked .hotspot-label {
+      color: var(--text-muted);
+    }
+
+    .hotspot.active .hotspot-label {
+      border-color: var(--accent);
+      color: #fbbf24;
+    }
+
+    .hotspot.completed .hotspot-label {
+      border-color: var(--success);
+      color: #6ee7b7;
+    }
+
+    /* Sidebar Panel */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .side-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: var(--glass-shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-main);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+
+    /* Progress Section */
+    .progress-bar-container {
+      width: 100%;
+      height: 10px;
+      background: rgba(15, 23, 42, 0.8);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 20%;
+      background: linear-gradient(90deg, #6366f1, #f59e0b, #10b981);
+      border-radius: 10px;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Current Goal Box */
+    .current-goal-box {
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px dashed rgba(99, 102, 241, 0.4);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .goal-tag {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .goal-text {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.4;
+    }
+
+    /* Collected Clues Drawer List */
+    .clue-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 380px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .clue-list::-webkit-scrollbar {
+      width: 5px;
+    }
+    .clue-list::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.2);
+      border-radius: 4px;
+    }
+
+    .clue-item {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 0.82rem;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .clue-item.locked {
+      opacity: 0.5;
+      background: rgba(15, 23, 42, 0.3);
+    }
+
+    .clue-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .clue-item-body {
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-container {
+      background: #1e293b;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 540px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      transform: scale(0.9) translateY(20px);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-overlay.active .modal-container {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-header {
+      background: rgba(15, 23, 42, 0.8);
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-main);
+    }
+
+    .modal-close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .modal-close-btn:hover {
+      color: white;
+    }
+
+    .modal-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    /* Dialogue & Story Box */
+    .story-box {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #cbd5e1;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .story-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    /* Quiz / Input Controls */
+    .puzzle-box {
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .puzzle-question {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--accent);
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: rgba(15, 23, 42, 0.8);
+      color: white;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-field:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+    }
+
+    .choice-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .choice-btn {
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: rgba(15, 23, 42, 0.7);
+      color: var(--text-main);
+      text-align: left;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .choice-btn:hover {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: var(--primary);
+      transform: translateX(4px);
+    }
+
+    .modal-footer {
+      padding: 16px 20px;
+      background: rgba(15, 23, 42, 0.8);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* Dramatic Fail / Success Screen */
+    .ending-overlay {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .ending-icon {
+      font-size: 4rem;
+      margin-bottom: 8px;
+    }
+
+    .ending-fail .ending-icon {
+      color: var(--danger);
+      animation: shake 0.5s ease-in-out;
+    }
+
+    .ending-success .ending-icon {
+      color: var(--accent);
+      animation: bounce-pin 1s ease infinite;
+    }
+
+    .ending-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    .ending-fail .ending-title {
+      color: #f87171;
+    }
+
+    .ending-success .ending-title {
+      color: #34d399;
+    }
+
+    .ending-desc {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-10px); }
+      40%, 80% { transform: translateX(10px); }
+    }
+
+    /* Confetti Canvas */
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 2000;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1100;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast {
+      background: rgba(30, 41, 59, 0.95);
+      border: 1px solid var(--border-color);
+      backdrop-filter: blur(10px);
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      animation: slide-toast 0.3s ease-out forwards;
+      max-width: 320px;
+    }
+
+    @keyframes slide-toast {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Music / Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Header Banner -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+      <div class="brand-title">
+        <h1>유한대에 숨겨진 보물을 찾아라!</h1>
+        <p><i class="fa-solid fa-ghost"></i> 귀신의 중간고사 시험지 힌트를 추적하자</p>
+      </div>
+    </div>
+    
+    <div class="header-actions">
+      <button class="btn" id="btn-intro" title="게임 시놉시스 보기">
+        <i class="fa-solid fa-book-open"></i> 시놉시스
+      </button>
+
+      <button class="btn btn-accent" id="btn-hint" title="현재 단계 힌트 받기">
+        <i class="fa-regular fa-lightbulb"></i> 힌트 보기
+      </button>
+
+      <div class="file-input-wrapper">
+        <button class="btn" title="배경 맵 이미지 변경">
+          <i class="fa-solid fa-image"></i> 맵 변경
+        </button>
+        <input type="file" id="map-upload" accept="image/*">
+      </div>
+
+      <button class="btn" id="btn-reset" title="게임 처음부터 재시작">
+        <i class="fa-solid fa-rotate-right"></i> 재도전
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Game Dashboard -->
+  <main>
+    <!-- Map Canvas Card -->
+    <section class="map-card">
+      <div class="map-header">
+        <div class="map-status-pill">
+          <span class="status-dot"></span>
+          <span id="map-status-text">장소를 선택하여 조사를 시작하세요</span>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">
+          <i class="fa-solid fa-hand-pointer"></i> 반짝이는 핫스팟 클릭
+        </div>
+      </div>
+
+      <!-- Interactive Map Frame -->
+      <div class="map-viewport" id="map-viewport">
+        <img src="map.png" alt="유한대학교 주변 지도" class="map-img" id="map-img" onerror="handleMapError(this)">
+        
+        <!-- Hotspots Overlay (Positions set via JS/percentages) -->
+        <div id="hotspot-container"></div>
+      </div>
+    </section>
+
+    <!-- Sidebar Dashboard -->
+    <aside class="sidebar">
+      <!-- Progress Card -->
+      <div class="side-card">
+        <div class="card-title">
+          <i class="fa-solid fa-compass" style="color: var(--primary);"></i>
+          탐험 진행 상황
+        </div>
+
+        <div class="progress-info">
+          <span>진행률</span>
+          <span id="progress-text" style="font-weight: 700; color: var(--accent);">0 / 5 (0%)</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="progress-fill" style="width: 0%;"></div>
+        </div>
+
+        <!-- Current Target Goal -->
+        <div class="current-goal-box">
+          <span class="goal-tag"><i class="fa-solid fa-bullseye"></i> 현재 목표</span>
+          <span class="goal-text" id="current-goal-text">유한대학교 정문 조사를 진행하세요.</span>
+        </div>
+      </div>
+
+      <!-- Collected Clues Drawer Card -->
+      <div class="side-card">
+        <div class="card-title">
+          <i class="fa-solid fa-box-archive" style="color: var(--accent);"></i>
+          수집한 단서함
+        </div>
+
+        <div class="clue-list" id="clue-list">
+          <!-- Clue items populated dynamically -->
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Modal Overlay for Dialogs/Puzzles -->
+  <div class="modal-overlay" id="game-modal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="modal-title"><i class="fa-solid fa-location-dot"></i> 장소 정보</h3>
+        <button class="modal-close-btn" id="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <!-- Content inserted dynamically -->
+      </div>
+      <div class="modal-footer" id="modal-footer">
+        <button class="btn btn-primary" id="modal-primary-btn">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Game Script -->
+  <script>
+    /* ============================================================
+       1. GAME DATA & CONFIGURATION
+       ============================================================ */
+    const STAGES = [
+      {
+        id: 1,
+        title: "유한대학교 정문",
+        subtitle: "힌트의 시작점",
+        type: "대화",
+        x: 48,
+        y: 44,
+        icon: "fa-door-open",
+        story: "중간고사가 코앞으로 다가왔다! 악명높은 교수님의 시험 문제를 맞추기 위해 유한대학교 정문 주변을 샅샅이 조사해보자. 문 옆을 유심히 보니 작은 쪽지 하나가 붙어있다...",
+        clueTitle: "정문 옆 쪽지 발견",
+        clueDesc: "길 건너 버스 정류장에 귀신이 나타나 자꾸만 '9...' 라고 외친다고 한다.",
+        puzzleQuestion: "정문 문 옆에 붙은 작은 쪽지를 읽으시겠습니까?",
+        hint: "정문 옆 붙은 쪽지를 읽고 길 건너 버스정류장으로 이동하세요."
+      },
+      {
+        id: 2,
+        title: "버스정류장: 9가 뭘까...",
+        subtitle: "숫자 9의 비밀",
+        type: "퍼즐",
+        x: 46,
+        y: 38,
+        icon: "fa-bus-simple",
+        story: "유한대 앞 버스정류장에 도착했다. 으스스한 분위기 속에 귀신의 소리가 들리는 듯하다... '3X3은?... 3이 3개 있어야 9가 되지...'",
+        clueTitle: "9의 연산 공식 해독",
+        clueDesc: "3이 3개 있어야 9가 된다! 33번 버스를 타고 3정거장을 가면 비밀의 장소가 나온다.",
+        puzzleQuestion: "3X3=9의 정답을 바탕으로 3이 3개 필요하다면, 몇 번 버스를 타고 몇 정거장을 가야 할까?",
+        options: [
+          { text: "11번 버스를 타고 9정거장 가기", correct: false },
+          { text: "33번 버스를 타고 3정거장 가기", correct: true },
+          { text: "99번 버스를 타고 1정거장 가기", correct: false },
+          { text: "30번 버스를 타고 3정거장 가기", correct: false }
+        ],
+        hint: "3이 3개 있어야 9가 되는 논리! 33번 버스를 타고 3정거장을 이용하세요."
+      },
+      {
+        id: 3,
+        title: "역곡역 버스정류장: 역곡역에 도착했다.",
+        subtitle: "돌아온 수수께끼",
+        type: "단서",
+        x: 24,
+        y: 25,
+        icon: "fa-train-subway",
+        story: "33번 버스를 타고 3정거장을 지나 역곡역 버스정류장에 도착했다! '바로 걸어오면 되는데 왜 삥 돌아서 33번 버스를 타라고 했을까?' 정류장을 살펴보니 오래된 쪽지 하나가 붙어 있다.",
+        clueTitle: "역곡역 쪽지 확인",
+        clueDesc: "쪽지에 적힌 지시: '근처 알라딘 중고서점에 가보아라!'",
+        puzzleQuestion: "정류장에 붙은 쪽지를 떼어내어 지시 사항을 확인하세요.",
+        hint: "역곡역 버스정류장의 쪽지를 확인하여 알라딘 중고서점으로 향하세요."
+      },
+      {
+        id: 4,
+        title: "알라딘 중고서점",
+        subtitle: "초성 퀴즈 퍼즐",
+        type: "퍼즐",
+        x: 17,
+        y: 43,
+        icon: "fa-book-bookmark",
+        story: "알라딘 중고서점에 들어서자 서점 주인 귀신이 나타나 퀴즈를 낸다! 초성 퀴즈를 맞추지 못하면 시험지 힌트를 얻을 수 없다.",
+        clueTitle: "초성퀴즈 통과",
+        clueDesc: "정답 '강아지'를 맞췄더니 귀신이 '유한대학교 도서관으로 이동하라'는 최종 지시를 내렸다.",
+        puzzleQuestion: "초성 퀴즈: [ ㄱ ㅇ ㅈ ] 은(는) 무엇일까요? (정답 입력)",
+        answer: "강아지",
+        hint: "귀여운 멍멍이! 초성 'ㄱㅇㅈ'의 정답은 '강아지'입니다."
+      },
+      {
+        id: 5,
+        title: "유한대학교 도서관",
+        subtitle: "최종 시험지의 향방",
+        type: "퍼즐",
+        x: 64,
+        y: 58,
+        icon: "fa-graduation-cap",
+        story: "다시 유한대학교 도서관으로 돌아왔다! 도서관 바닥에 소설책 『내 심장을 쏴라』가 떨어진 것을 발견했다. 책을 집어들자 접혀진 A4 용지가 툭 떨어졌다. 마법이 걸린 시험지 힌트다!",
+        clueTitle: "마법의 A4 용지 해독",
+        clueDesc: "36을 5로 나누면 남는 나머지 숫자는 바로 1!",
+        puzzleQuestion: "마법의 숫자를 적어라: 36을 5로 나누면 몇이 남을까? (나머지 숫자 입력)",
+        answer: "1",
+        hint: "36 ÷ 5 = 7... 나머지 1입니다!"
+      }
+    ];
+
+    /* ============================================================
+       2. STATE MANAGEMENT
+       ============================================================ */
+    let gameState = {
+      currentStep: 1, // 1 to 5
+      completedSteps: [],
+      collectedClues: []
+    };
+
+    /* Web Audio API Synthesizer Sound Generator */
+    const SoundEngine = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+      },
+      playClick() {
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.08);
+      },
+      playSuccess() {
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + i * 0.09);
+          gain.gain.setValueAtTime(0.25, now + i * 0.09);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.09 + 0.3);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + i * 0.09);
+          osc.stop(now + i * 0.09 + 0.3);
+        });
+      },
+      playFail() {
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        [300, 260, 220].forEach((freq, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(freq, now + i * 0.12);
+          gain.gain.setValueAtTime(0.3, now + i * 0.12);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.12 + 0.2);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + i * 0.12);
+          osc.stop(now + i * 0.12 + 0.2);
+        });
+      }
+    };
+
+    /* ============================================================
+       3. UI RENDER FUNCTIONS
+       ============================================================ */
+    const container = document.getElementById('hotspot-container');
+    const clueListEl = document.getElementById('clue-list');
+    const progressFill = document.getElementById('progress-fill');
+    const progressText = document.getElementById('progress-text');
+    const currentGoalText = document.getElementById('current-goal-text');
+    const mapStatusText = document.getElementById('map-status-text');
+
+    function renderHotspots() {
+      container.innerHTML = '';
+      STAGES.forEach(stage => {
+        const isCompleted = gameState.completedSteps.includes(stage.id);
+        const isActive = gameState.currentStep === stage.id && !isCompleted;
+        const isLocked = stage.id > gameState.currentStep;
+
+        const el = document.createElement('div');
+        el.className = `hotspot ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''} ${isLocked ? 'locked' : ''}`;
+        el.style.left = `${stage.x}%`;
+        el.style.top = `${stage.y}%`;
+
+        let iconClass = stage.icon;
+        if (isCompleted) iconClass = "fa-check";
+        else if (isLocked) iconClass = "fa-lock";
+
+        el.innerHTML = `
+          <div class="hotspot-pin">
+            <i class="fa-solid ${iconClass}"></i>
+            <div class="hotspot-ring"></div>
+          </div>
+          <div class="hotspot-label">
+            <span>${stage.id}. ${stage.title.split(':')[0]}</span>
+          </div>
+        `;
+
+        el.addEventListener('click', () => {
+          SoundEngine.playClick();
+          if (isLocked) {
+            showToast(`🔒 이전 장소 퍼즐을 먼저 완료해야 해금됩니다!`, 'warning');
+          } else {
+            openStageModal(stage);
+          }
+        });
+
+        container.appendChild(el);
+      });
+    }
+
+    function renderProgress() {
+      const solvedCount = gameState.completedSteps.length;
+      const percentage = Math.round((solvedCount / STAGES.length) * 100);
+      
+      progressFill.style.width = `${percentage}%`;
+      progressText.textContent = `${solvedCount} / ${STAGES.length} (${percentage}%)`;
+
+      if (solvedCount < STAGES.length) {
+        const currentStage = STAGES.find(s => s.id === gameState.currentStep);
+        currentGoalText.textContent = `[단계 ${currentStage.id}] ${currentStage.title} 조사를 진행하세요.`;
+        mapStatusText.textContent = `현재 목표: ${currentStage.title}`;
+      } else {
+        currentGoalText.textContent = `🎉 축하합니다! 모든 힌트를 얻고 시험지를 획득했습니다!`;
+        mapStatusText.textContent = `모든 퍼즐 해결 완료!`;
+      }
+
+      // Render Clue Inventory
+      clueListEl.innerHTML = '';
+      STAGES.forEach(stage => {
+        const isUnlocked = gameState.completedSteps.includes(stage.id);
+        const item = document.createElement('div');
+        item.className = `clue-item ${isUnlocked ? '' : 'locked'}`;
+        item.innerHTML = `
+          <div class="clue-item-header">
+            <span>${stage.id}. ${stage.title.split(':')[0]}</span>
+            <span>${isUnlocked ? '<i class="fa-solid fa-key"></i> 획득' : '<i class="fa-solid fa-lock"></i> 잠김'}</span>
+          </div>
+          <div class="clue-item-body">
+            ${isUnlocked ? stage.clueDesc : '아직 발견되지 않은 단서입니다.'}
+          </div>
+        `;
+        clueListEl.appendChild(item);
+      });
+    }
+
+    /* ============================================================
+       4. MODAL DIALOG CONTROLLER
+       ============================================================ */
+    const modalOverlay = document.getElementById('game-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalBody = document.getElementById('modal-body');
+    const modalFooter = document.getElementById('modal-footer');
+    const modalCloseBtn = document.getElementById('modal-close');
+
+    function closeModal() {
+      modalOverlay.classList.remove('active');
+    }
+    modalCloseBtn.addEventListener('click', closeModal);
+
+    function openStageModal(stage) {
+      const isCompleted = gameState.completedSteps.includes(stage.id);
+      
+      modalTitle.innerHTML = `<i class="fa-solid ${stage.icon}"></i> ${stage.title}`;
+      
+      let html = `
+        <div class="story-box">
+          <div class="story-avatar"><i class="fa-solid fa-ghost"></i></div>
+          <div>${stage.story}</div>
+        </div>
+      `;
+
+      if (isCompleted) {
+        html += `
+          <div class="puzzle-box" style="border-color: var(--success); background: rgba(16, 185, 129, 0.1);">
+            <div class="puzzle-question" style="color: #6ee7b7;"><i class="fa-solid fa-circle-check"></i> 이미 해결된 장소입니다!</div>
+            <div style="font-size: 0.88rem; color: var(--text-main);">${stage.clueDesc}</div>
+          </div>
+        `;
+        modalFooter.innerHTML = `<button class="btn btn-primary" onclick="closeModal()">확인</button>`;
+      } else {
+        // Active Stage Interaction
+        if (stage.options) {
+          // Multiple Choice Puzzle
+          html += `
+            <div class="puzzle-box">
+              <div class="puzzle-question"><i class="fa-solid fa-circle-question"></i> ${stage.puzzleQuestion}</div>
+              <div class="choice-group">
+                ${stage.options.map((opt, idx) => `
+                  <button class="choice-btn" onclick="submitChoiceAnswer(${stage.id}, ${opt.correct})">
+                    <span>${idx + 1}. ${opt.text}</span>
+                    <i class="fa-solid fa-chevron-right" style="font-size: 0.8rem; color: var(--text-muted);"></i>
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          `;
+          modalFooter.innerHTML = `<button class="btn" onclick="closeModal()">닫기</button>`;
+        } else if (stage.answer) {
+          // Text Input Puzzle
+          html += `
+            <div class="puzzle-box">
+              <div class="puzzle-question"><i class="fa-solid fa-puzzle-piece"></i> ${stage.puzzleQuestion}</div>
+              <input type="text" id="puzzle-input" class="input-field" placeholder="정답을 입력하세요" autocomplete="off" onkeypress="if(event.key==='Enter') submitTextAnswer(${stage.id})">
+            </div>
+          `;
+          modalFooter.innerHTML = `
+            <button class="btn" onclick="closeModal()">닫기</button>
+            <button class="btn btn-accent" onclick="submitTextAnswer(${stage.id})">정답 제출</button>
+          `;
+        } else {
+          // Story / Clue Investigation Stage
+          html += `
+            <div class="puzzle-box">
+              <div class="puzzle-question"><i class="fa-solid fa-magnifying-glass"></i> ${stage.puzzleQuestion}</div>
+            </div>
+          `;
+          modalFooter.innerHTML = `
+            <button class="btn" onclick="closeModal()">닫기</button>
+            <button class="btn btn-accent" onclick="completeStage(${stage.id})">단서 확인 & 이동</button>
+          `;
+        }
+      }
+
+      modalBody.innerHTML = html;
+      modalOverlay.classList.add('active');
+
+      // Auto focus text input if available
+      setTimeout(() => {
+        const inp = document.getElementById('puzzle-input');
+        if (inp) inp.focus();
+      }, 200);
+    }
+
+    /* ============================================================
+       5. GAME LOGIC HANDLERS (SOLVE, FAIL, WIN)
+       ============================================================ */
+    function submitChoiceAnswer(stageId, isCorrect) {
+      if (isCorrect) {
+        completeStage(stageId);
+      } else {
+        handleFailure("잘못된 이동 수단을 선택하셨습니다! 귀신의 함정에 빠졌습니다.");
+      }
+    }
+
+    function submitTextAnswer(stageId) {
+      const input = document.getElementById('puzzle-input');
+      if (!input) return;
+      const stage = STAGES.find(s => s.id === stageId);
+      const val = input.value.trim();
+
+      if (val === stage.answer) {
+        completeStage(stageId);
+      } else {
+        handleFailure(`'${val}'은(는) 정답이 아닙니다.`);
+      }
+    }
+
+    function completeStage(stageId) {
+      SoundEngine.playSuccess();
+      closeModal();
+      
+      if (!gameState.completedSteps.includes(stageId)) {
+        gameState.completedSteps.push(stageId);
+      }
+
+      const stage = STAGES.find(s => s.id === stageId);
+      showToast(`✨ [${stage.title}] 완료! 새로운 단서를 수집했습니다.`, 'success');
+
+      if (stageId === STAGES.length) {
+        // Trigger Success Ending
+        setTimeout(triggerVictoryEnding, 400);
+      } else {
+        gameState.currentStep = stageId + 1;
+        renderHotspots();
+        renderProgress();
+      }
+    }
+
+    function handleFailure(reasonText) {
+      SoundEngine.playFail();
+      closeModal();
+
+      setTimeout(() => {
+        modalTitle.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color: var(--danger);"></i> 게임 오버`;
+        modalBody.innerHTML = `
+          <div class="ending-overlay ending-fail">
+            <div class="ending-icon"><i class="fa-solid fa-skull-crossbones"></i></div>
+            <div class="ending-title">중간고사는 망했습니다.</div>
+            <div class="ending-desc">
+              ${reasonText}<br>
+              악명높은 교수님의 시험지 앞에서 무릎을 꿇고 말았습니다... 다시 도전해 보시겠습니까?
+            </div>
+          </div>
+        `;
+        modalFooter.innerHTML = `
+          <button class="btn btn-accent" style="width: 100%; justify-content: center; padding: 12px;" onclick="resetGame()">
+            <i class="fa-solid fa-rotate-right"></i> 다시 도전하기
+          </button>
+        `;
+        modalOverlay.classList.add('active');
+      }, 300);
+    }
+
+    function triggerVictoryEnding() {
+      SoundEngine.playSuccess();
+      renderHotspots();
+      renderProgress();
+      launchConfetti();
+
+      modalTitle.innerHTML = `<i class="fa-solid fa-trophy" style="color: var(--accent);"></i> 탐험 완료!`;
+      modalBody.innerHTML = `
+        <div class="ending-overlay ending-success">
+          <div class="ending-icon"><i class="fa-solid fa-scroll"></i></div>
+          <div class="ending-title">시험지를 획득하였습니다!</div>
+          <div class="ending-desc">
+            <strong style="color: #6ee7b7; font-size: 1.1rem;">중간고사 시험은 만점 예감! 🎓 A+ 학점 달성!</strong><br><br>
+            귀신의 모든 수수께끼를 풀고 유한대학교 최고 명예의 시험 힌트를 모두 찾아냈습니다!
+          </div>
+        </div>
+      `;
+      modalFooter.innerHTML = `
+        <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="closeModal()">
+          <i class="fa-solid fa-check"></i> 영광의 결과 확인
+        </button>
+      `;
+      modalOverlay.classList.add('active');
+    }
+
+    function resetGame() {
+      gameState.currentStep = 1;
+      gameState.completedSteps = [];
+      gameState.collectedClues = [];
+      closeModal();
+      renderHotspots();
+      renderProgress();
+      showToast(`🔄 게임이 초기화되었습니다. 처음부터 탐험을 시작합니다.`, 'info');
+    }
+
+    /* ============================================================
+       6. HINT & SYNOPSIS SYSTEM
+       ============================================================ */
+    document.getElementById('btn-hint').addEventListener('click', () => {
+      SoundEngine.playClick();
+      const currentStage = STAGES.find(s => s.id === gameState.currentStep);
+      modalTitle.innerHTML = `<i class="fa-regular fa-lightbulb" style="color: var(--accent);"></i> 현재 단계 힌트`;
+      modalBody.innerHTML = `
+        <div class="story-box" style="border-color: var(--accent); background: rgba(245, 158, 11, 0.1);">
+          <div class="story-avatar" style="background: linear-gradient(135deg, #f59e0b, #d97706);">💡</div>
+          <div>
+            <strong style="color: var(--accent); font-size: 1rem;">[${currentStage.id}단계: ${currentStage.title}]</strong><br><br>
+            ${currentStage.hint}
+          </div>
+        </div>
+      `;
+      modalFooter.innerHTML = `<button class="btn btn-primary" onclick="closeModal()">이해했습니다</button>`;
+      modalOverlay.classList.add('active');
+    });
+
+    document.getElementById('btn-intro').addEventListener('click', showSynopsisModal);
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      if (confirm('게임 진행 상황을 초기화하시겠습니까?')) {
+        resetGame();
+      }
+    });
+
+    function showSynopsisModal() {
+      modalTitle.innerHTML = `<i class="fa-solid fa-book-open"></i> 게임 시놉시스`;
+      modalBody.innerHTML = `
+        <div class="story-box">
+          <div class="story-avatar"><i class="fa-solid fa-graduation-cap"></i></div>
+          <div style="line-height: 1.7;">
+            중간고사 시험이 코앞으로 다가왔다!!!<br>
+            악명높은 교수님은 시험 문제를 수업에서 알려주지 않고, 시험의 난이도가 무척 어렵다는 소문이 있다.<br><br>
+            선배들은 중간고사는 포기하라고 하지만 포기할 수 없다! 이번 학기는 반드시 <strong>A+</strong>를 받고야 말겠다.<br><br>
+            그런데 유한대 주변에 귀신의 소행인지 중간고사 힌트가 있다는 소문이 돈다. 지도 상의 핫스팟을 순서대로 조사하여 시험지의 힌트를 찾아보자!
+          </div>
+        </div>
+      `;
+      modalFooter.innerHTML = `<button class="btn btn-accent" style="width:100%; justify-content:center;" onclick="closeModal()">탐험 시작하기!</button>`;
+      modalOverlay.classList.add('active');
+    }
+
+    /* ============================================================
+       7. CUSTOM MAP UPLOAD HANDLER
+       ============================================================ */
+    const mapUploadInput = document.getElementById('map-upload');
+    const mapImg = document.getElementById('map-img');
+
+    mapUploadInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          mapImg.src = evt.target.result;
+          showToast(`🗺️ 커스텀 배경 지도가 적용되었습니다!`, 'success');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function handleMapError(img) {
+      console.warn("map.png image load failed, fallback background active.");
+      showToast("map.png 로드 실패: 기본 플레이스홀더 맵이 표시됩니다.", "warning");
+    }
+
+    /* ============================================================
+       8. TOAST NOTIFICATION & CONFETTI UTILS
+       ============================================================ */
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      
+      let icon = 'fa-circle-info';
+      let color = 'var(--primary)';
+      if (type === 'success') { icon = 'fa-circle-check'; color = 'var(--success)'; }
+      if (type === 'warning') { icon = 'fa-triangle-exclamation'; color = 'var(--accent)'; }
+      
+      toast.innerHTML = `<i class="fa-solid ${icon}" style="color: ${color}; font-size: 1.1rem;"></i> <span>${msg}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    /* Simple Particle Confetti Effect */
+    function launchConfetti() {
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const particles = [];
+      const colors = ['#f59e0b', '#10b981', '#6366f1', '#ec4899', '#3b82f6'];
+
+      for (let i = 0; i < 120; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          size: Math.random() * 8 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          vx: (Math.random() - 0.5) * 4,
+          vy: Math.random() * 4 + 2,
+          rotation: Math.random() * 360,
+          vRot: (Math.random() - 0.5) * 6
+        });
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let active = false;
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rotation += p.vRot;
+          if (p.y < canvas.height) active = true;
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+          ctx.restore();
+        });
+
+        if (active) requestAnimationFrame(animate);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      animate();
+    }
+
+    /* ============================================================
+       9. INITIALIZATION
+       ============================================================ */
+    window.addEventListener('DOMContentLoaded', () => {
+      renderHotspots();
+      renderProgress();
+      // Show intro on initial load
+      setTimeout(showSynopsisModal, 500);
+    });
+  </script>
+</body>
+</html>
