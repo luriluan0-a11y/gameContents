@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>우리동네 보물찾기 기획서 생성기</title>
+<style>
+  :root {
+    --bg: #10241d;
+    --panel: #163429;
+    --panel-2: #1c4032;
+    --border: #2f5f4b;
+    --accent: #e8c15b;
+    --accent-2: #7fbf8f;
+    --text: #eef5ee;
+    --text-dim: #9fc2ac;
+    --danger: #ff8b7a;
+    --ok: #7fe0a0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Pretendard", "Malgun Gothic", "Segoe UI", sans-serif;
+    background: radial-gradient(circle at top, #1b4234 0%, var(--bg) 60%);
+    color: var(--text);
+    padding: 32px 16px 80px;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; }
+  h1 {
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 4px;
+    background: linear-gradient(90deg, #e8c15b, #7fe0a0, #7fbf8f);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .subtitle {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 28px;
+  }
+  section.card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+  }
+  section.card > h2 {
+    margin: 0 0 4px;
+    font-size: 1.1rem;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hint {
+    color: var(--text-dim);
+    font-size: 0.82rem;
+    margin: 0 0 14px;
+    line-height: 1.5;
+  }
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 12px 0 6px;
+    color: var(--text);
+  }
+  label:first-of-type { margin-top: 0; }
+  input[type="text"], textarea, select {
+    width: 100%;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    padding: 10px 12px;
+    font-size: 0.92rem;
+    font-family: inherit;
+    resize: vertical;
+  }
+  input[type="text"]:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--accent-2);
+    box-shadow: 0 0 0 3px rgba(127,191,143,0.25);
+  }
+  textarea { min-height: 64px; }
+  .example {
+    color: var(--text-dim);
+    font-size: 0.78rem;
+    margin-top: 4px;
+  }
+  .item-block {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .item-block .item-title {
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+  }
+  .remove-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: transparent;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.78rem;
+    cursor: pointer;
+  }
+  .remove-btn:hover { background: rgba(255,139,122,0.15); }
+  .remove-btn-inline {
+    background: transparent;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    flex: 0 0 auto;
+  }
+  .add-btn {
+    display: block;
+    width: 100%;
+    background: transparent;
+    border: 1.5px dashed var(--accent-2);
+    color: var(--accent);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .add-btn:hover { background: rgba(127,191,143,0.12); }
+  .empty-note {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    font-style: italic;
+    margin-bottom: 12px;
+  }
+  .clue-row, .fail-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .clue-row input, .fail-row input { flex: 1; }
+  .download-btn {
+    display: block;
+    width: 100%;
+    background: linear-gradient(90deg, #e8c15b, #7fe0a0);
+    border: none;
+    color: #10241d;
+    font-weight: 800;
+    font-size: 1rem;
+    padding: 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 12px;
+    box-shadow: 0 6px 20px rgba(127,191,143,0.3);
+  }
+  .download-btn:hover { filter: brightness(1.08); }
+  .status-msg {
+    text-align: center;
+    color: var(--ok);
+    font-size: 0.85rem;
+    height: 1.2em;
+    margin-top: 8px;
+  }
+  .action-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .fill-example-btn {
+    flex: 2;
+    background: rgba(127, 224, 160, 0.12);
+    border: 1.5px solid var(--ok);
+    color: var(--ok);
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 13px;
+    border-radius: 12px;
+    cursor: pointer;
+  }
+  .fill-example-btn:hover { background: rgba(127, 224, 160, 0.22); }
+  .reset-btn {
+    flex: 1;
+    background: rgba(255, 139, 122, 0.1);
+    border: 1.5px solid var(--danger);
+    color: var(--danger);
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 13px;
+    border-radius: 12px;
+    cursor: pointer;
+  }
+  .reset-btn:hover { background: rgba(255, 139, 122, 0.2); }
+  .locked-box {
+    background: var(--panel-2);
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    line-height: 1.7;
+    white-space: pre-wrap;
+  }
+  .locked-tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    color: var(--bg);
+    background: var(--accent-2);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>우리동네 보물찾기 기획서 생성기</h1>
+  <p class="subtitle">항목을 입력하고 하단에서 마크다운 파일로 다운로드하세요.</p>
+
+  <div class="action-row">
+    <button type="button" class="fill-example-btn" id="fillExampleBtn">✨ 예시대로 채우기 (뭘 써야 할지 모르겠으면 눌러보세요!)</button>
+    <button type="button" class="reset-btn" id="resetBtn">🔄 초기화</button>
+  </div>
+
+  <section class="card">
+    <h2>기본 정보</h2>
+    <label for="gameTitle">게임 제목</label>
+    <input type="text" id="gameTitle" placeholder="예) 우리동네 보물찾기">
+
+    <label for="tagline">한 줄 소개</label>
+    <input type="text" id="tagline" placeholder="예) 가족과 함께 동네를 탐험하며 단서를 모아 보물상자를 여는 웹 게임">
+
+    <label for="genre">장르</label>
+    <input type="text" id="genre" placeholder="예) 가족용 탐험·퍼즐 게임">
+
+    <label for="audience">대상</label>
+    <input type="text" id="audience" placeholder="예) 어린이·가족·우리반 친구들">
+  </section>
+
+  <section class="card">
+    <h2>시놉시스</h2>
+    <p class="hint">왜 보물을 찾아야 하는지, 어떤 이야기로 시작하는지 자유롭게 적어주세요.</p>
+    <textarea id="synopsis" placeholder="예) 어느 날 우리동네에 숨겨진 보물지도가 사라졌습니다. 동네 우체통에서 발견한 편지는 보물이 우리동네를 가장 잘 아는 사람에게만 모습을 보인다고 알려줍니다..."></textarea>
+  </section>
+
+  <section class="card">
+    <h2>장소와 기능</h2>
+    <p class="hint">
+      탐험할 장소를 순서대로 추가하세요. <b>대화</b>는 이야기만 보여주고, <b>단서</b>는 다음 장소로 가는 힌트를 주고,
+      <b>퍼즐</b>은 직접 풀어야 통과할 수 있어요. <b>마지막 장소는 보통 보물상자예요!</b>
+    </p>
+    <div id="locationList"></div>
+    <p class="empty-note" id="emptyNote">아직 추가된 장소가 없습니다. 아래 버튼을 눌러 추가하세요.</p>
+    <button type="button" class="add-btn" id="addLocationBtn">+ 장소 추가</button>
+  </section>
+
+  <section class="card">
+    <h2>단서와 정답</h2>
+    <p class="hint">각 장소에서 얻는 단서를 순서대로 한 줄씩 적고, 최종 암호를 정해주세요.</p>
+    <div id="clueList"></div>
+    <button type="button" class="add-btn" id="addClueBtn">+ 단서 추가</button>
+    <label for="finalCode" style="margin-top:16px;">최종 암호</label>
+    <input type="text" id="finalCode" placeholder="예) 317">
+  </section>
+
+  <section class="card">
+    <h2>실패 조건</h2>
+    <p class="hint">어떤 경우에 실패하는지 한 줄씩 적어주세요.</p>
+    <div id="failList"></div>
+    <button type="button" class="add-btn" id="addFailBtn">+ 실패 조건 추가</button>
+    <label for="failText" style="margin-top:16px;">실패했을 때 보여줄 문구</label>
+    <textarea id="failText" placeholder="예) 아쉽지만 다시 도전해보세요. 단서를 다시 확인하고 천천히 풀어보세요."></textarea>
+  </section>
+
+  <section class="card">
+    <h2>성공 엔딩</h2>
+    <label for="endingText">보물을 찾았을 때 보여줄 문구 (여러 줄 가능)</label>
+    <textarea id="endingText" placeholder="예) 축하합니다! 우리동네 곳곳의 단서를 모아 보물을 찾았습니다.
+가족과 함께 동네를 천천히 관찰하면 평범한 하루도 멋진 모험이 됩니다."></textarea>
+  </section>
+
+  <section class="card">
+    <h2>구현 지시문 <span class="locked-tag">고정</span></h2>
+    <p class="hint">AI에게 게임을 만들어달라고 할 때 필요한 고정 지시문이에요. 그대로 기획서에 포함됩니다.</p>
+    <div class="locked-box" id="implNote"></div>
+  </section>
+
+  <section class="card">
+    <h2>UI 요구사항 <span class="locked-tag">고정</span></h2>
+    <p class="hint">화면 디자인에 대한 공통 요구사항이에요. 그대로 기획서에 포함됩니다.</p>
+    <div class="locked-box" id="uiNote"></div>
+  </section>
+
+  <button type="button" class="download-btn" id="downloadBtn">📄 마크다운 파일 다운로드</button>
+  <p class="status-msg" id="statusMsg"></p>
+</div>
+
+<script>
+(function () {
+  const locationList = document.getElementById('locationList');
+  const emptyNote = document.getElementById('emptyNote');
+  const addLocationBtn = document.getElementById('addLocationBtn');
+  const clueList = document.getElementById('clueList');
+  const addClueBtn = document.getElementById('addClueBtn');
+  const failList = document.getElementById('failList');
+  const addFailBtn = document.getElementById('addFailBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const statusMsg = document.getElementById('statusMsg');
+  const fillExampleBtn = document.getElementById('fillExampleBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  let locationSeq = 0;
+
+  const IMPL_LINES = [
+    '//게임은 동네 배경 위에 장소 오브젝트를 핫스팟 버튼으로 배치하고, 각 오브젝트를 클릭하면 대화·단서·퍼즐이 실행되는 방식으로 구현한다.',
+    '//퍼즐을 해결한 장소만 다음 장소가 해금되도록 상태를 관리한다.',
+    '//기본 배경은 외부 이미지 없이도 실행되어야 하며, 사용자가 배경 이미지를 업로드하면 장면 배경으로 적용한다.',
+    '//단일 HTML 파일 안에 HTML·CSS·JavaScript를 모두 포함하고, 성공·실패·재도전 흐름을 구현한다.'
+  ];
+  const UI_LINES = [
+    '장소 오브젝트는 움직이는 핫스팟으로 표시한다.',
+    '잠긴 장소는 흐리게 표시한다.',
+    '해결한 장소는 체크 표시와 초록색 상태로 표시한다.',
+    '현재 힌트 버튼을 제공한다.',
+    '진행률과 수집한 단서를 화면에 표시한다.',
+    '모바일에서도 장소를 쉽게 누를 수 있도록 한다.',
+    '사용자가 배경 이미지를 업로드할 수 있도록 한다.'
+  ];
+  document.getElementById('implNote').textContent = IMPL_LINES.join('\n');
+  document.getElementById('uiNote').textContent = UI_LINES.map(l => '- ' + l).join('\n');
+
+  function updateEmptyNote() {
+    emptyNote.style.display = locationList.children.length === 0 ? 'block' : 'none';
+  }
+
+  function renumber() {
+    Array.from(locationList.children).forEach((block, i) => {
+      block.querySelector('.item-title').textContent = (i + 1) + '번째 장소';
+    });
+  }
+
+  function applyTypeLabels(typeSelect, contentArea, contentExample) {
+    if (typeSelect.value === '퍼즐') {
+      contentArea.placeholder = '예) 파랑 → 노랑 → 빨강 색깔 순서를 맞힌다.';
+      contentExample.textContent = '예) 퍼즐형 장소는 직접 풀어야 다음 장소가 열립니다.';
+    } else if (typeSelect.value === '단서') {
+      contentArea.placeholder = '예) 책갈피에서 숫자 1을 발견한다.';
+      contentExample.textContent = '예) 단서형 장소는 다음 장소를 찾을 힌트를 줍니다.';
+    } else {
+      contentArea.placeholder = '예) 편지를 보여주고 공원으로 안내한다.';
+      contentExample.textContent = '예) 대화형 장소는 이야기만 보여줍니다.';
+    }
+  }
+
+  function addLocation(prefill) {
+    locationSeq += 1;
+    const block = document.createElement('div');
+    block.className = 'item-block';
+    block.dataset.id = locationSeq;
+    block.innerHTML = `
+      <button type="button" class="remove-btn">삭제</button>
+      <div class="item-title">장소</div>
+
+      <label>장소(오브젝트) 이름</label>
+      <input type="text" class="loc-name" placeholder="예) 동네 우체통 / 햇살 공원 / 보물상자">
+
+      <label>종류</label>
+      <select class="loc-type">
+        <option value="대화">대화 (이야기만 보여줌)</option>
+        <option value="단서">단서 (다음 힌트 제공)</option>
+        <option value="퍼즐">퍼즐 (직접 풀어야 통과)</option>
+      </select>
+
+      <label>내용</label>
+      <textarea class="loc-content"></textarea>
+      <p class="example loc-example"></p>
+    `;
+    locationList.appendChild(block);
+
+    const removeBtn = block.querySelector('.remove-btn');
+    const typeSelect = block.querySelector('.loc-type');
+    const contentArea = block.querySelector('.loc-content');
+    const contentExample = block.querySelector('.loc-example');
+
+    removeBtn.addEventListener('click', () => {
+      block.remove();
+      renumber();
+      updateEmptyNote();
+    });
+
+    typeSelect.addEventListener('change', () => applyTypeLabels(typeSelect, contentArea, contentExample));
+
+    if (prefill) {
+      block.querySelector('.loc-name').value = prefill.name || '';
+      typeSelect.value = prefill.type || '대화';
+      contentArea.value = prefill.content || '';
+    }
+    applyTypeLabels(typeSelect, contentArea, contentExample);
+
+    renumber();
+    updateEmptyNote();
+  }
+
+  addLocationBtn.addEventListener('click', () => addLocation());
+  addLocation();
+
+  function addClue(value) {
+    const row = document.createElement('div');
+    row.className = 'clue-row';
+    row.innerHTML = `
+      <input type="text" class="clue-text" placeholder="예) 첫 번째 단서: 공원 미끄럼틀 아래의 색깔 순서">
+      <button type="button" class="remove-btn-inline">삭제</button>
+    `;
+    if (value) row.querySelector('.clue-text').value = value;
+    row.querySelector('.remove-btn-inline').addEventListener('click', () => row.remove());
+    clueList.appendChild(row);
+  }
+  addClueBtn.addEventListener('click', () => addClue());
+  addClue();
+
+  function addFail(value) {
+    const row = document.createElement('div');
+    row.className = 'fail-row';
+    row.innerHTML = `
+      <input type="text" class="fail-text" placeholder="예) 색깔 퍼즐에서 순서를 틀린 경우">
+      <button type="button" class="remove-btn-inline">삭제</button>
+    `;
+    if (value) row.querySelector('.fail-text').value = value;
+    row.querySelector('.remove-btn-inline').addEventListener('click', () => row.remove());
+    failList.appendChild(row);
+  }
+  addFailBtn.addEventListener('click', () => addFail());
+  addFail();
+
+  // ---------- 예시로 전체 채우기 ----------
+  function fillExample() {
+    document.getElementById('gameTitle').value = '우리동네 보물찾기';
+    document.getElementById('tagline').value = '가족과 함께 동네를 탐험하며 단서를 모아 보물상자를 여는 웹 게임';
+    document.getElementById('genre').value = '가족용 탐험·퍼즐 게임';
+    document.getElementById('audience').value = '어린이·가족·AI 바이브코딩 체험 참가자';
+    document.getElementById('synopsis').value =
+      '어느 날 우리동네에 숨겨진 보물지도가 사라졌습니다.\n동네 우체통에서 발견한 편지는 보물이 우리동네를 가장 잘 아는 사람에게만 모습을 보인다고 알려줍니다.\n플레이어는 우체통, 공원, 도서관, 빵집을 차례로 탐험하며 단서를 모아 마지막 보물상자를 열어야 합니다.';
+
+    locationList.innerHTML = '';
+    locationSeq = 0;
+    addLocation({ name: '동네 우체통', type: '대화', content: '편지를 보여주고 공원으로 안내한다.' });
+    addLocation({ name: '햇살 공원', type: '퍼즐', content: '파랑 → 노랑 → 빨강 색깔 순서를 맞힌다.' });
+    addLocation({ name: '작은 도서관', type: '단서', content: '책갈피에서 숫자 1을 발견한다.' });
+    addLocation({ name: '별빵집', type: '단서', content: '최종 암호 조합 3-1-7을 확인한다.' });
+    addLocation({ name: '보물상자', type: '퍼즐', content: '세 자리 암호를 입력해 성공 엔딩을 본다.' });
+
+    clueList.innerHTML = '';
+    addClue('첫 번째 단서: 공원 미끄럼틀 아래의 색깔 순서');
+    addClue('색깔 퍼즐 정답: 파랑 → 노랑 → 빨강');
+    addClue('두 번째 단서: 책갈피 숫자 1');
+    addClue('세 번째 단서: 빵집 간판의 별 7개');
+    document.getElementById('finalCode').value = '317';
+
+    failList.innerHTML = '';
+    addFail('색깔 퍼즐에서 순서를 틀린 경우');
+    addFail('보물상자에 잘못된 암호를 입력한 경우');
+    document.getElementById('failText').value = '아쉽지만 다시 도전해보세요. 단서를 다시 확인하고 천천히 풀어보세요.';
+
+    document.getElementById('endingText').value =
+      '축하합니다! 우리동네 곳곳의 단서를 모아 보물을 찾았습니다.\n가족과 함께 동네를 천천히 관찰하면 평범한 하루도 멋진 모험이 됩니다.';
+
+    statusMsg.textContent = '예시 내용을 채웠습니다. 마음에 들면 그대로 다운로드하거나, 자유롭게 수정하세요!';
+    setTimeout(() => { statusMsg.textContent = ''; }, 4000);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  fillExampleBtn.addEventListener('click', fillExample);
+
+  // ---------- 초기화 ----------
+  function resetForm() {
+    ['gameTitle','tagline','genre','audience','synopsis','finalCode','failText','endingText'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    locationList.innerHTML = ''; locationSeq = 0; addLocation();
+    clueList.innerHTML = ''; addClue();
+    failList.innerHTML = ''; addFail();
+
+    statusMsg.textContent = '입력한 내용을 모두 초기화했습니다.';
+    setTimeout(() => { statusMsg.textContent = ''; }, 3000);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  resetBtn.addEventListener('click', resetForm);
+
+  function escapeForFilename(str) {
+    return str.replace(/[\\/:*?"<>|]/g, '').trim();
+  }
+
+  function verbFor(type) {
+    if (type === '퍼즐') return '퍼즐 해결';
+    if (type === '단서') return '단서 확인';
+    return '대화 확인';
+  }
+
+  function buildFlow(locations, finalCode) {
+    if (locations.length === 0) return '(등록된 장소 없음)';
+    const lines = [`${locations[0].name || '첫 장소'} 조사`];
+    locations.forEach((loc, i) => {
+      if (i === 0) return;
+      const name = loc.name || '다음 장소';
+      lines.push(`${name} 해금`);
+      const isLast = i === locations.length - 1;
+      if (isLast && finalCode) {
+        lines.push(`암호 ${finalCode} 입력`);
+      } else {
+        lines.push(`${name} ${verbFor(loc.type)}`);
+      }
+    });
+    lines.push('성공 엔딩');
+    return lines.join('\n→ ');
+  }
+
+  function buildMarkdown() {
+    const title = document.getElementById('gameTitle').value.trim() || '(제목 미입력)';
+    const tagline = document.getElementById('tagline').value.trim();
+    const genre = document.getElementById('genre').value.trim() || '(장르 미입력)';
+    const audience = document.getElementById('audience').value.trim() || '(대상 미입력)';
+    const synopsis = document.getElementById('synopsis').value.trim() || '(시놉시스 미입력)';
+    const finalCode = document.getElementById('finalCode').value.trim();
+    const failText = document.getElementById('failText').value.trim() || '(실패 문구 미입력)';
+    const endingText = document.getElementById('endingText').value.trim() || '(성공 엔딩 미입력)';
+
+    const locations = Array.from(locationList.children).map(block => ({
+      name: block.querySelector('.loc-name').value.trim(),
+      type: block.querySelector('.loc-type').value,
+      content: block.querySelector('.loc-content').value.trim()
+    }));
+
+    let tableRows = '';
+    locations.forEach((loc, i) => {
+      tableRows += `| ${i + 1} | ${loc.name || '(이름 미입력)'} | ${loc.type} | ${loc.content || '(내용 미입력)'} |\n`;
+    });
+    if (locations.length === 0) tableRows = '| - | (등록된 장소 없음) | - | - |\n';
+
+    const clues = Array.from(clueList.querySelectorAll('.clue-text'))
+      .map(el => el.value.trim()).filter(Boolean);
+    let clueMd = clues.map(c => `- ${c}`).join('\n');
+    if (finalCode) clueMd += (clueMd ? '\n' : '') + `- 최종 암호: ${finalCode}`;
+    if (!clueMd) clueMd = '(등록된 단서 없음)';
+
+    const fails = Array.from(failList.querySelectorAll('.fail-text'))
+      .map(el => el.value.trim()).filter(Boolean);
+    let failMd = fails.map(f => `- ${f}`).join('\n');
+    if (!failMd) failMd = '(등록된 실패 조건 없음)';
+
+    const endingMd = endingText.split('\n').map(l => `> ${l}`).join('\n');
+
+    const implMd = IMPL_LINES.join('\n');
+    const uiMd = UI_LINES.map(l => `- ${l}`).join('\n');
+
+    return `# ${title} 게임 기획서
+
+${tagline ? `> ${tagline}\n\n` : ''}## 1. 기본 정보
+
+- 게임 제목: ${title}
+- 장르: ${genre}
+- 형식: 단일 HTML 웹앱
+- 플레이 방식: 장면 위의 장소 오브젝트를 클릭하고 단서를 모아 순서대로 퍼즐 해결
+- 대상: ${audience}
+
+## 2. 시놉시스
+
+${synopsis}
+
+## 3. 구현 지시문
+
+${implMd}
+
+## 4. 장소와 기능
+
+| 순서 | 오브젝트 | 종류 | 내용 |
+|---|---|---|---|
+${tableRows}
+## 5. 게임 상태 흐름
+
+\`\`\`text
+${buildFlow(locations, finalCode)}
+\`\`\`
+
+## 6. 단서와 정답
+
+${clueMd}
+
+## 7. 실패 조건
+
+${failMd}
+
+실패 시 다음 문구를 표시합니다.
+
+> ${failText}
+
+재도전 버튼을 누르면 모든 장소와 퍼즐이 초기 상태로 돌아갑니다.
+
+## 8. 성공 엔딩
+
+${endingMd}
+
+## 9. UI 요구사항
+
+${uiMd}
+`;
+  }
+
+  downloadBtn.addEventListener('click', () => {
+    const md = buildMarkdown();
+    const titleRaw = document.getElementById('gameTitle').value.trim();
+    const filename = (titleRaw ? escapeForFilename(titleRaw) : '우리동네_보물찾기_기획서') + '.md';
+
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    statusMsg.textContent = `"${filename}" 다운로드 완료!`;
+    setTimeout(() => { statusMsg.textContent = ''; }, 3000);
+  });
+})();
+</script>
+</body>
+</html>

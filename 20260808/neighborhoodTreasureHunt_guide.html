@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>가족과 함께하는 AI 바이브코딩 - 우리동네 보물찾기 앱 만들기</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: linear-gradient(180deg, #fff8e0 0%, #eafbf0 35%, #eaf3ff 100%);
+    color: #223a2c;
+    line-height: 1.8;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .jua { font-family: 'Jua', sans-serif; }
+
+  /* ── 배경 컨페티 ── */
+  .confetti-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .confetti { position: absolute; font-size: 1.6rem; opacity: 0.55; animation: floaty linear infinite; }
+  @keyframes floaty {
+    0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    8%   { opacity: 0.55; }
+    92%  { opacity: 0.55; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* ── 헤더 ── */
+  header {
+    position: relative;
+    background: linear-gradient(120deg, #2f6b4f 0%, #4f9d6b 45%, #e8c15b 100%);
+    color: #fff;
+    padding: 56px 24px 44px;
+    text-align: center;
+    border-radius: 0 0 40px 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.3);
+    padding: 8px 22px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 14px;
+  }
+
+  header h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); text-shadow: 3px 3px 0 rgba(0,0,0,0.12); line-height: 1.4; }
+  header p { margin-top: 10px; font-size: 1.05rem; font-weight: 700; opacity: 0.95; }
+  header .date-badge {
+    display: inline-block; margin-top: 12px; background: rgba(0,0,0,0.18);
+    padding: 6px 18px; border-radius: 50px; font-size: 0.92rem; font-weight: 700;
+  }
+
+  .top-nav { margin-top: 26px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+  .top-nav a {
+    background: rgba(255,255,255,0.28); color: #fff; text-decoration: none; padding: 9px 18px;
+    border-radius: 50px; font-weight: 700; font-size: 0.9rem; border: 2px solid rgba(255,255,255,0.5);
+    transition: transform 0.15s, background 0.15s;
+  }
+  .top-nav a:hover { background: rgba(255,255,255,0.5); transform: translateY(-2px) scale(1.05); }
+
+  /* ── 컨테이너 ── */
+  .container { max-width: 780px; margin: -18px auto 0; padding: 0 18px 60px; position: relative; z-index: 1; }
+
+  .section {
+    background: #fff; border-radius: 26px; padding: 30px 28px; margin-bottom: 26px;
+    box-shadow: 0 10px 28px rgba(60,120,90,0.12); border: 3px solid transparent;
+  }
+  .section.c-green  { border-color: #CDEFCF; }
+  .section.c-blue   { border-color: #CBE2FF; }
+  .section.c-orange { border-color: #FFE0BE; }
+  .section.c-pink   { border-color: #FFD0E4; }
+
+  .section-title { display: flex; align-items: center; gap: 12px; font-size: 1.5rem; color: #223a2c; margin-bottom: 16px; }
+  .section-icon {
+    width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  .icon-green  { background: linear-gradient(135deg, #A8E6A1, #6BCB77); }
+  .icon-blue   { background: linear-gradient(135deg, #9BC4FF, #4D96FF); }
+  .icon-orange { background: linear-gradient(135deg, #FFC98B, #FFA94D); }
+  .icon-pink   { background: linear-gradient(135deg, #FF9AC1, #FF6FA5); }
+
+  .section p, .section li { font-size: 0.98rem; color: #3f4f45; }
+
+  .fun-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
+  .fun-list li { background: #f6fbf6; border-radius: 14px; padding: 12px 16px; display: flex; align-items: flex-start; gap: 10px; font-weight: 500; }
+  .fun-list li .dot { font-size: 1.1rem; flex-shrink: 0; }
+  .fun-list li .txt { flex: 1 1 0%; min-width: 0; }
+
+  /* ── 장소 카드 ── */
+  .places { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 14px 0; }
+  .place-card { background: #f6fbf6; border: 1px solid #d7ecd7; border-radius: 14px; padding: 14px; font-weight: 800; text-align: center; }
+  .place-card small { display: block; font-weight: 500; color: #6d8c76; margin-top: 4px; }
+
+  /* ── 규칙 카드 ── */
+  .rule-grid { display:grid; grid-template-columns: 1fr; gap: 12px; margin: 14px 0; }
+  .rule-card { background:#f6fbf6; border-radius:16px; padding:16px 16px 14px 20px; position:relative; display:flex; align-items:flex-start; gap:14px; }
+  .rule-num { flex-shrink:0; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Jua', sans-serif; font-size:0.95rem; color:#fff; }
+  .rule-card p { font-size: 0.95rem; margin-top: 2px; }
+
+  /* ── CTA (중간) ── */
+  .mid-cta {
+    text-align: center; background: linear-gradient(135deg, #4f9d6b 0%, #2f6b4f 100%);
+    border-radius: 20px; padding: 26px 22px; color: #fff; margin-top: 16px;
+    box-shadow: 0 10px 24px rgba(79,157,107,0.3);
+  }
+  .mid-cta .emoji-mid { font-size: 2.2rem; }
+  .mid-cta p { color: #fff; font-weight: 700; margin: 8px 0 14px; }
+  .btn-huge {
+    display: inline-flex; align-items: center; gap: 10px; background: #fff; color: #2f6b4f; text-decoration: none;
+    font-family: 'Jua', sans-serif; font-size: 1.1rem; padding: 14px 30px; border-radius: 50px;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.2); transition: transform 0.15s;
+  }
+  .btn-huge:hover { transform: translateY(-4px) scale(1.04); }
+
+  /* ── 흐름도 ── */
+  .flow { display:flex; flex-direction:column; gap:8px; margin-top:16px; }
+  .flow-step { display:flex; align-items:center; gap:14px; background:#f6fbf6; border-radius:14px; padding:14px 18px; }
+  .flow-step .fnum { width:30px; height:30px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; color:#fff; font-family:'Jua', sans-serif; }
+  .flow-step p { font-size: 0.95rem; }
+  .flow-arrow { text-align:center; color:#8fae9a; font-size:1.2rem; }
+
+  /* ── 완성작 CTA ── */
+  .final-cta { text-align: center; background: linear-gradient(135deg, #2f6b4f 0%, #4f9d6b 60%, #e8c15b 100%); border-radius: 26px; padding: 40px 26px; color: #fff; box-shadow: 0 14px 34px rgba(47,107,79,0.35); }
+  .final-cta .emoji-big { font-size: 3rem; animation: bounce 1s infinite alternate; }
+  @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-12px); } }
+  .final-cta h2 { color: #fff; font-size: 1.6rem; margin: 10px 0 6px; }
+  .final-cta p { color: rgba(255,255,255,0.9); margin-bottom: 18px; font-weight: 500; }
+
+  footer { text-align: center; padding: 30px 20px 50px; color: #7a9384; font-size: 0.85rem; }
+
+  @media (max-width: 560px) {
+    .section { padding: 24px 18px; }
+    header { padding: 44px 18px 36px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="confetti-bg" id="confetti"></div>
+
+<header>
+  <div class="badge">🗺️ 경기공유학교 2026</div>
+  <h1>가족과 함께하는<br>AI 바이브코딩! 🧑‍🚀✨</h1>
+  <p>유한대학교 · Day06 · 우리동네 보물찾기 앱 만들기 🗺️🧭</p>
+  <div class="date-badge">📅 2026.08.08</div>
+  <div class="top-nav">
+    <a href="#goal">오늘의 목표</a>
+    <a href="#demo">완성 예시</a>
+    <a href="#rules">설계 규칙</a>
+    <a href="#steps">만드는 순서</a>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- 오늘의 목표 -->
+  <section class="section c-green" id="goal">
+    <div class="section-title"><div class="section-icon icon-green">🎯</div><h2>오늘 만들어볼 것은?</h2></div>
+    <ul class="fun-list">
+      <li><span class="dot">🗺️</span><span class="txt"><strong>우리동네 곳곳을 탐험하며 단서를 모아 보물상자를 여는 보물찾기 게임</strong>을 만들어볼 거예요!</span></li>
+      <li><span class="dot">📮</span><span class="txt">우체통, 공원, 도서관, 빵집처럼 우리 동네에 있을 법한 장소를 직접 골라 게임 속 장소로 만들어요.</span></li>
+      <li><span class="dot">🤖</span><span class="txt">AI의 도움을 받아 나만의 이야기, 단서, 퍼즐을 직접 설계해볼 거예요.</span></li>
+    </ul>
+  </section>
+
+  <!-- 완성 예시 -->
+  <section class="section c-blue" id="demo">
+    <div class="section-title"><div class="section-icon icon-blue">🎮</div><h2>먼저 완성된 보물찾기를 플레이해볼까요?</h2></div>
+    <p>버튼을 누르면 오늘 만들어볼 것과 같은 형태의 완성작을 직접 플레이해볼 수 있어요.</p>
+    <div class="places">
+      <div class="place-card">📮 동네 우체통<br><small>첫 번째 편지</small></div>
+      <div class="place-card">🛝 햇살 공원<br><small>색깔 퍼즐</small></div>
+      <div class="place-card">📚 작은 도서관<br><small>책갈피 단서</small></div>
+      <div class="place-card">🥐 별빵집<br><small>최종 암호</small></div>
+      <div class="place-card">🧰 보물상자<br><small>성공 엔딩</small></div>
+    </div>
+    <div class="mid-cta">
+      <div class="emoji-mid">🧭</div>
+      <p>우리동네 보물찾기 플레이하기</p>
+      <a class="btn-huge" href="neighborhoodTreasureHunt_app.html" target="_blank" rel="noopener">
+        🚀 완성작 플레이하기
+      </a>
+    </div>
+  </section>
+
+  <!-- 설계 규칙 -->
+  <section class="section c-orange" id="rules">
+    <div class="section-title"><div class="section-icon icon-orange">📋</div><h2>보물찾기 특화 설계 규칙</h2></div>
+    <div class="rule-grid">
+      <div class="rule-card"><div class="rule-num" style="background:#4f9d6b">1</div><p>장소는 <strong>실제로 우리 동네에 있을 법한 곳</strong>(공원, 도서관, 빵집, 놀이터 등)으로 정하면 훨씬 몰입감이 생겨요.</p></div>
+      <div class="rule-card"><div class="rule-num" style="background:#e8c15b">2</div><p>앞 장소를 조사하거나 퍼즐을 풀어야 <strong>다음 장소가 열리도록</strong> 순서를 만들어요. (단서 → 다음 힌트 → 최종 암호)</p></div>
+      <div class="rule-card"><div class="rule-num" style="background:#4D96FF">3</div><p>실패해도 <strong>다시 도전할 수 있게 재도전 버튼</strong>을 꼭 넣어줘요.</p></div>
+    </div>
+  </section>
+
+  <!-- 만드는 순서 -->
+  <section class="section c-pink" id="steps">
+    <div class="section-title"><div class="section-icon icon-pink">🛠️</div><h2>이렇게 만들어요!</h2></div>
+    <div class="flow">
+      <div class="flow-step"><div class="fnum" style="background:#4f9d6b">1</div><p>우리 동네에서 탐험할 <strong>장소 4~5곳</strong>을 정해요.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="fnum" style="background:#e8c15b">2</div><p>기획서 작성기에 <strong>예시대로(또는 자유롭게) 기획서</strong>를 작성해요.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="fnum" style="background:#4D96FF">3</div><p>완성되면 <strong>마크다운 파일을 다운로드</strong>해요.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="fnum" style="background:#FFA94D">4</div><p>Antigravity IDE를 열고 <strong>"마크다운 파일을 읽고 html 단일 페이지로 개발해줘."</strong>라고 요청해요.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="fnum" style="background:#FF6FA5">5</div><p>완성되면 <strong>html 파일을 열어서</strong> 직접 확인해봐요.</p></div>
+    </div>
+  </section>
+
+  <!-- 완성작 CTA -->
+  <div class="final-cta">
+    <div class="emoji-big">🗺️🧰</div>
+    <h2 class="jua">나만의 보물찾기 게임 완성하기</h2>
+    <p>기획서를 완성했다면, 이제 나만의 보물찾기 게임을 직접 만들어봐요!</p>
+    <a class="btn-huge" href="neighborhoodTreasureHunt_paper.html" target="_blank" rel="noopener">
+      🚀 기획서 작성기로 이동하기
+    </a>
+  </div>
+
+</div>
+
+<footer>
+  🗺️ 경기공유학교 2026 · 가족과 함께하는 AI 바이브코딩 (유한대학교) · Day06 2026.08.08 🧭
+</footer>
+
+<script>
+  // 배경 컨페티
+  const shapes = ['🗺️','🧭','📮','🧩','🔑','✨','⭐','💫','🧰','☁️'];
+  const bg = document.getElementById('confetti');
+  for (let i = 0; i < 24; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.fontSize = (1 + Math.random() * 1.6) + 'rem';
+    el.style.animationDuration = (10 + Math.random() * 14) + 's';
+    el.style.animationDelay = (Math.random() * 14) + 's';
+    bg.appendChild(el);
+  }
+</script>
+
+</body>
+</html>
