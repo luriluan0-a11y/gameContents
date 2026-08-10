@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows 필수 단축키 가이드</title>
+    <style>
+        :root {
+            --primary-color: #0078d4;
+            --primary-hover: #106ebe;
+            --bg-color: #f3f3f3;
+            --card-bg: #ffffff;
+            --text-color: #242424;
+            --text-secondary: #616161;
+            --border-color: #e0e0e0;
+            --kbd-bg: #f8f9fa;
+            --kbd-border: #d1d5db;
+            --accent-light: #eff6ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, #0078d4, #00bcd4);
+            color: white;
+            padding: 40px 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 120, 212, 0.15);
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        header p {
+            font-size: 1.05rem;
+            opacity: 0.9;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 480px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--accent-light);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .shortcut-list {
+            list-style: none;
+        }
+
+        .shortcut-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .shortcut-item:last-child {
+            border-bottom: none;
+        }
+
+        .shortcut-desc {
+            font-size: 0.95rem;
+            color: var(--text-color);
+        }
+
+        .shortcut-desc small {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .key-group {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            flex-shrink: 0;
+            margin-left: 12px;
+        }
+
+        kbd {
+            background-color: var(--kbd-bg);
+            border: 1px solid var(--kbd-border);
+            border-bottom-width: 2px;
+            border-radius: 6px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            color: #374151;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 4px 8px;
+            white-space: nowrap;
+        }
+
+        .tip-box {
+            background-color: var(--accent-light);
+            border-left: 4px solid var(--primary-color);
+            padding: 20px;
+            border-radius: 0 12px 12px 0;
+            margin-top: 20px;
+        }
+
+        .tip-box h3 {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tip-box p {
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>🪟 Windows 필수 단축키 가이드</h1>
+            <p>작업 속도와 생산성을 2배로 올려주는 핵심 단축키 모음</p>
+        </header>
+
+        <div class="grid-container">
+            <!-- 1. 기본 단축키 -->
+            <div class="card">
+                <div class="card-header">
+                    <span style="font-size: 1.4rem;">📋</span>
+                    <h2 class="card-title">자주 쓰는 필수 단축키</h2>
+                </div>
+                <ul class="shortcut-list">
+                    <li class="shortcut-item">
+                        <span class="shortcut-desc">복사</span>
+                        <div class="key-group"><kbd>Ctrl</kbd> + <kbd>C</kbd></div>
+                    </li>
+                    <li class="shortcut-item">
+                        <span class="shortcut-desc">붙여넣기</span>
+                        <div class="key-group"><kbd>Ctrl</kbd> + <kbd>V</kbd></div>
+                    </li>
+                    <li class="shortcut-item">
+                        <span class="shortcut-desc">잘라내기</span>
+                        <div class="key-group"><kbd>Ctrl</kbd> + <kbd>X</kbd></div>
+                    </li>
+                    <li class="shortcut-item">
+                        <span class="shortcut-desc">실행 취소 <small>(이전 작업으로)</small></span>
+                        <div class="key-group"><kbd>Ctrl</kbd> + <kbd>Z</kbd></div>
+                    </li>
+                    <li class="shortcut-item">
+                        <span class="shortcut-desc">다시 실행 <small>(취소한 작업 되돌리기)</small></span>
+                        <div class="key-group"><kbd>Ctrl</kbd> + <kbd>Y</kbd></div>
+                    </li>
+                    <li class="shortcut-item">
+                        <span class="shortcut-desc">전체 선택</span>
+                        <div class="key-group"><kbd>Ctrl</kbd> + <kbd>A</kbd></div>
+                    </li>
+                    <li class="shortcut-item">
+                        <span class="shortcut-desc">찾기 <small>(단어/문자열 검색)</small></span>
+                        <div class="key-group"><kbd>Ctrl</kbd> + <kbd>F</kbd></div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 2. 윈도우 키 조합 -->
+            <div class="card">
+                <div class="card-header">
+                    <span style="font-size: 1.4rem;">🚀</span>
+                    <h2 class="card-title">생산성 윈도우 키 (Win)</h2>
+                </div>
+                <ul class="shortcut-list">
+                    <li class="shortcut-item">
+                        <span class="shortcut-desc">파일 탐색기 열기</span>
+                        <div class="key-group"><kbd>Win</kbd> + <kbd>E</kbd></div>
+                    </li>
+                    <li class="shortcut-item">
+                        <span class="shortcut-desc">바탕화면 바로 가기</span>
+                        <div class="key-group"><kbd>Win</kbd> + <kbd>D</kbd></div>
+                    </li>
+                    <li class="shortcut-item">
+                        <span class="shortcut-desc">클립보드 기록 열기</span>
+                        <div class="key-group"><kbd>Win</kbd> + <kbd>V</kbd></div>
+                    </li>
+                    <li class="shortcut-item">
+                        <span class="shortcut-desc">화면 캡처 <small>(영역 지정)</small></span>
+                        <div class="key-group"><kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd></div>
+                    </li>
+                    <li class="shortcut-item">
+                        <span class="shortcut-desc">화면 잠금 <small>(자리 비울 때)</small></span>
+                        <div class="key-group"><kbd>Win</kbd> + <kbd>L</kbd></div>
+                    </li>
+                    <li class="shortcut-item">
+                        <span class="shortcut-desc">작업 보기 <small>(가상 바탕화면)</small></span>
+                        <div class="key-group"><kbd>Win</kbd> + <kbd>Tab</kbd></div>
+                    </li>
+                    <li class="shortcut-item">
+                        <span class="shortcut-desc">이모지 / 특수문자 창</span>
+                        <div class="key-group"><kbd>Win</kbd> + <kbd>.</kbd></div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 3. 창 관리 및 화면 분할 -->
+            <div class="card">
+                <div class="card-header">
+                    <span style="font-size: 1.4rem;">🖥️</span>
+                    <h2 class="card-title">창 관리 및 화면 분할</h2>
+                </div>
+                <ul class="shortcut-list">
+                    <li class="shortcut-item">
+                        <span class="shortcut-desc">창 좌/우 반할 정렬</span>
+                        <div class="key-group"><kbd>Win</kbd> + <kbd>←</kbd> / <kbd>→</kbd></div>
+                    </li>
+                    <li class="shortcut-item">
+                        <span class="shortcut-desc">창 최대화 / 최소화</span>
+                        <div class="key-group"><kbd>Win</kbd> + <kbd>↑</kbd> / <kbd>↓</kbd></div>
+                    </li>
+                    <li class="shortcut-item">
+                        <span class="shortcut-desc">실행 중인 창 전환</span>
+                        <div class="key-group"><kbd>Alt</kbd> + <kbd>Tab</kbd></div>
+                    </li>
+                    <li class="shortcut-item">
+                        <span class="shortcut-desc">현재 창 닫기 / 종료</span>
+                        <div class="key-group"><kbd>Alt</kbd> + <kbd>F4</kbd></div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 4. 브라우저 및 기타 -->
+            <div class="card">
+                <div class="card-header">
+                    <span style="font-size: 1.4rem;">🌐</span>
+                    <h2 class="card-title">웹 브라우저 & 시스템</h2>
+                </div>
+                <ul class="shortcut-list">
+                    <li class="shortcut-item">
+                        <span class="shortcut-desc">작업 관리자 열기</span>
+                        <div class="key-group"><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Esc</kbd></div>
+                    </li>
+                    <li class="shortcut-item">
+                        <span class="shortcut-desc">브라우저 새 탭 열기</span>
+                        <div class="key-group"><kbd>Ctrl</kbd> + <kbd>T</kbd></div>
+                    </li>
+                    <li class="shortcut-item">
+                        <span class="shortcut-desc">현재 탭/창 닫기</span>
+                        <div class="key-group"><kbd>Ctrl</kbd> + <kbd>W</kbd></div>
+                    </li>
+                    <li class="shortcut-item">
+                        <span class="shortcut-desc">닫은 탭 다시 열기</span>
+                        <div class="key-group"><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>T</kbd></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 추천 팁 -->
+        <div class="tip-box">
+            <h3>💡 강력 추천하는 핵심 팁</h3>
+            <p><strong>Win + V (클립보드 기록)</strong> 기능은 꼭 활성화해 보세요! 이전에 복사해 두었던 여러 개의 텍스트나 이미지를 목록에서 골라 자유롭게 붙여넣을 수 있어 작업 시간을 크게 단축해 줍니다.</p>
+        </div>
+
+        <footer>
+            <p>Windows Shortcut Cheat Sheet • Single File HTML Guide</p>
+        </footer>
+    </div>
+
+</body>
+</html>
