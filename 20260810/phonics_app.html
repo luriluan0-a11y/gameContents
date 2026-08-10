@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>파닉스 단어 학습 & 퀴즈</title>
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-light: #EEF2FF;
+            --secondary: #10B981;
+            --accent: #F59E0B;
+            --bg: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text: #1E293B;
+            --text-muted: #64748B;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            padding: 32px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Screen Switcher */
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Titles & Header */
+        h1 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background-color: var(--primary-light);
+            border-radius: 5px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        /* Flip Card (Learning Phase) */
+        .card-container {
+            perspective: 1000px;
+            width: 100%;
+            height: 280px;
+            margin-bottom: 24px;
+            cursor: pointer;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 2px solid var(--primary-light);
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 18px;
+            padding: 20px;
+            background: white;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            background: var(--primary-light);
+        }
+
+        .word-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .phonics-text {
+            font-size: 1.5rem;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .meaning-text {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .example-text {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .audio-btn {
+            background: var(--primary-light);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: transform 0.2s, background-color 0.2s;
+            margin-top: 10px;
+        }
+
+        .audio-btn:hover {
+            transform: scale(1.1);
+            background: #E0E7FF;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px 24px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #4338CA;
+        }
+
+        .btn-secondary {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* Quiz Phase */
+        .quiz-question {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 24px;
+        }
+
+        .option-btn {
+            padding: 20px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: white;
+            border: 2px solid var(--primary-light);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .option-btn.correct {
+            background-color: #D1FAE5 !important;
+            border-color: var(--secondary) !important;
+            color: #065F46;
+        }
+
+        .option-btn.wrong {
+            background-color: #FEE2E2 !important;
+            border-color: #EF4444 !important;
+            color: #991B1B;
+        }
+
+        /* Result Screen */
+        .score-display {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 20px 0;
+        }
+
+        .hint-tag {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- 1. START SCREEN -->
+        <div id="start-screen" class="screen active">
+            <h1>🔤 파닉스 단어 마스터</h1>
+            <p class="subtitle">음가 규칙을 익히고 매일 10개씩 단어를 정복해 보세요!</p>
+            <div style="font-size: 5rem; margin: 30px 0;">🔤 ➔ 🎯</div>
+            <button class="btn btn-primary" onclick="startLearning()">학습 시작하기</button>
+        </div>
+
+        <!-- 2. LEARNING SCREEN -->
+        <div id="learn-screen" class="screen">
+            <div class="progress-bar-container">
+                <div id="learn-progress" class="progress-bar"></div>
+            </div>
+            <p id="learn-step-text" style="color: var(--text-muted); margin-bottom: 12px; font-weight:600;">단어 1 / 10</p>
+            
+            <div class="card-container" onclick="flipCard()">
+                <div id="card" class="card">
+                    <div class="card-face card-front">
+                        <div id="card-word" class="word-title">Cat</div>
+                        <div id="card-phonics" class="phonics-text">[c - a - t]</div>
+                        <button class="audio-btn" onclick="speakCurrentWord(event)">🔊</button>
+                        <span class="hint-tag">💡 카드를 클릭하면 뜻을 확인할 수 있어요</span>
+                    </div>
+                    <div class="card-face card-back">
+                        <div id="card-meaning" class="meaning-text">고양이</div>
+                        <div id="card-example" class="example-text">"A cute cat"</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="prevCard()">이전</button>
+                <button id="next-learn-btn" class="btn btn-primary" onclick="nextCard()">다음</button>
+            </div>
+        </div>
+
+        <!-- 3. QUIZ SCREEN -->
+        <div id="quiz-screen" class="screen">
+            <div class="progress-bar-container">
+                <div id="quiz-progress" class="progress-bar"></div>
+            </div>
+            <p id="quiz-step-text" style="color: var(--text-muted); margin-bottom: 12px; font-weight:600;">퀴즈 1 / 10</p>
+            
+            <div class="quiz-question" id="quiz-question-container">
+                <span id="quiz-word" style="color: var(--primary);">Cat</span>의 뜻은?
+                <br>
+                <button class="audio-btn" style="margin: 10px auto 0 auto;" onclick="speakQuizWord()">🔊</button>
+            </div>
+
+            <div class="options-grid" id="options-container">
+                <!-- 4 Options generated dynamically -->
+            </div>
+        </div>
+
+        <!-- 4. RESULT SCREEN -->
+        <div id="result-screen" class="screen">
+            <h1>🎉 학습 완료!</h1>
+            <p class="subtitle">오늘의 파닉스 퀴즈 결과입니다.</p>
+            
+            <div id="score" class="score-display">100점</div>
+            <p id="result-comment" style="font-size: 1.2rem; margin-bottom: 30px;">완벽해요! 모든 단어를 정확히 맞췄습니다.</p>
+
+            <button class="btn btn-primary" onclick="restartApp()">새로운 단어로 다시하기</button>
+        </div>
+
+    </div>
+
+    <script>
+        // 파닉스 단어 데이터베이스
+        const wordPool = [
+            { word: "Cat", phonics: "[c - æ - t]", meaning: "고양이", example: "A cute cat" },
+            { word: "Dog", phonics: "[d - ɒ - g]", meaning: "개", example: "A friendly dog" },
+            { word: "Sun", phonics: "[s - ʌ - n]", meaning: "태양/해", example: "The bright sun" },
+            { word: "Bed", phonics: "[b - e - d]", meaning: "침대", example: "A soft bed" },
+            { word: "Pig", phonics: "[p - ɪ - g]", meaning: "돼지", example: "A pink pig" },
+            { word: "Box", phonics: "[b - ɒ - ks]", meaning: "상자", example: "A big box" },
+            { word: "Hat", phonics: "[h - æ - t]", meaning: "모자", example: "A red hat" },
+            { word: "Bus", phonics: "[b - ʌ - s]", meaning: "버스", example: "A yellow bus" },
+            { word: "Cup", phonics: "[k - ʌ - p]", meaning: "컵", example: "A hot cup" },
+            { word: "Pen", phonics: "[p - e - n]", meaning: "펜/볼펜", example: "A blue pen" },
+            { word: "Fox", phonics: "[f - ɒ - ks]", meaning: "여우", example: "A sly fox" },
+            { word: "Map", phonics: "[m - æ - p]", meaning: "지도", example: "A world map" },
+            { word: "Nut", phonics: "[n - ʌ - t]", meaning: "견과류", example: "A hard nut" },
+            { word: "Web", phonics: "[w - e - b]", meaning: "거미줄/웹", example: "A spider web" },
+            { word: "Zip", phonics: "[z - ɪ - p]", meaning: "지퍼", example: "Zip it up" }
+        ];
+
+        let selectedWords = [];
+        let currentIndex = 0;
+        let score = 0;
+        let isAnswered = false;
+
+        // TTS 발음 재생 함수 (Web Speech API)
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // 이전 음성 중단
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.8; // 천천히 명확하게
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // 화면 전환
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // 10개 랜덤 단어 추출
+        function startLearning() {
+            // 단어 무작위 셔플 후 10개 선택
+            const shuffled = [...wordPool].sort(() => 0.5 - Math.random());
+            selectedWords = shuffled.slice(0, 10);
+            
+            currentIndex = 0;
+            showScreen('learn-screen');
+            updateLearnCard();
+        }
+
+        // 카드리버스
+        function flipCard() {
+            document.getElementById('card').classList.toggle('flipped');
+        }
+
+        // 학습 카드 업데이트
+        function updateLearnCard() {
+            const current = selectedWords[currentIndex];
+            document.getElementById('card').classList.remove('flipped');
+            
+            document.getElementById('card-word').textContent = current.word;
+            document.getElementById('card-phonics').textContent = current.phonics;
+            document.getElementById('card-meaning').textContent = current.meaning;
+            document.getElementById('card-example').textContent = `"${current.example}"`;
+
+            // 진행도 바
+            const progress = ((currentIndex + 1) / 10) * 100;
+            document.getElementById('learn-progress').style.width = `${progress}%`;
+            document.getElementById('learn-step-text').textContent = `단어 ${currentIndex + 1} / 10`;
+
+            // 다음 버튼 텍스트 변경
+            const nextBtn = document.getElementById('next-learn-btn');
+            if (currentIndex === 9) {
+                nextBtn.textContent = "퀴즈 풀기 🎯";
+            } else {
+                nextBtn.textContent = "다음";
+            }
+
+            // 자동 발음 재생
+            speak(current.word);
+        }
+
+        function speakCurrentWord(e) {
+            e.stopPropagation(); // 카드 뒤집기 방지
+            speak(selectedWords[currentIndex].word);
+        }
+
+        function nextCard() {
+            if (currentIndex < 9) {
+                currentIndex++;
+                updateLearnCard();
+            } else {
+                startQuiz();
+            }
+        }
+
+        function prevCard() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateLearnCard();
+            }
+        }
+
+        // 퀴즈 시작
+        function startQuiz() {
+            currentIndex = 0;
+            score = 0;
+            showScreen('quiz-screen');
+            updateQuiz();
+        }
+
+        function updateQuiz() {
+            isAnswered = false;
+            const current = selectedWords[currentIndex];
+            
+            document.getElementById('quiz-word').textContent = current.word;
+            document.getElementById('quiz-progress').style.width = `${((currentIndex + 1) / 10) * 100}%`;
+            document.getElementById('quiz-step-text').textContent = `퀴즈 ${currentIndex + 1} / 10`;
+
+            // 오답 보기 만들기 (현재 단어 제외하고 3개 무작위 선택)
+            const otherWords = wordPool.filter(w => w.word !== current.word);
+            const wrongOptions = [...otherWords].sort(() => 0.5 - Math.random()).slice(0, 3);
+            
+            // 정답 포함 4개 옵션 셔플
+            const options = [...wrongOptions, current].sort(() => 0.5 - Math.random());
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = opt.meaning;
+                btn.onclick = () => checkAnswer(btn, opt.meaning === current.meaning);
+                container.appendChild(btn);
+            });
+
+            speak(current.word);
+        }
+
+        function speakQuizWord() {
+            speak(selectedWords[currentIndex].word);
+        }
+
+        function checkAnswer(selectedBtn, isCorrect) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            if (isCorrect) {
+                selectedBtn.classList.add('correct');
+                score += 10;
+            } else {
+                selectedBtn.classList.add('wrong');
+                // 정답 표시
+                const currentMeaning = selectedWords[currentIndex].meaning;
+                document.querySelectorAll('.option-btn').forEach(btn => {
+                    if (btn.textContent === currentMeaning) {
+                        btn.classList.add('correct');
+                    }
+                });
+            }
+
+            setTimeout(() => {
+                if (currentIndex < 9) {
+                    currentIndex++;
+                    updateQuiz();
+                } else {
+                    showResult();
+                }
+            }, 1200);
+        }
+
+        function showResult() {
+            showScreen('result-screen');
+            document.getElementById('score').textContent = `${score}점`;
+
+            const comment = document.getElementById('result-comment');
+            if (score === 100) {
+                comment.textContent = "🎉 완벽해요! 모든 단어를 완벽히 마스터했습니다!";
+            } else if (score >= 80) {
+                comment.textContent = "👍 참 잘했어요! 조금만 더 연습하면 100점이에요.";
+            } else {
+                comment.textContent = "💪 다시 한번 복습하고 도전해 보세요!";
+            }
+        }
+
+        function restartApp() {
+            startLearning();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>존댓말 프롬프트와 토큰 소모의 진실</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --primary: #38bdf8;
+            --primary-light: #bae6fd;
+            --accent-green: #34d399;
+            --accent-amber: #fbbf24;
+            --accent-purple: #c084fc;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.7;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 24px;
+            background: linear-gradient(135deg, #0284c7, #3b82f6, #6366f1);
+            border-radius: 24px;
+            margin-bottom: 36px;
+            box-shadow: 0 20px 25px -5px rgba(56, 189, 248, 0.25);
+        }
+
+        header h1 {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 12px;
+            word-break: keep-all;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        .answer-badge {
+            display: inline-block;
+            background-color: #ef4444;
+            color: #ffffff;
+            font-weight: 800;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+        }
+
+        .intro-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            color: var(--primary-light);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 28px;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 14px;
+        }
+
+        .card-icon {
+            font-size: 1.8rem;
+        }
+
+        .card-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .card-list {
+            list-style: none;
+        }
+
+        .card-list li {
+            position: relative;
+            padding-left: 24px;
+            margin-bottom: 14px;
+            color: var(--text-main);
+        }
+
+        .card-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .card-list li::before {
+            content: "•";
+            position: absolute;
+            left: 8px;
+            color: var(--primary);
+            font-size: 1.4rem;
+            line-height: 1;
+            top: 2px;
+        }
+
+        .card-list li strong {
+            color: #ffffff;
+        }
+
+        .code-comparison {
+            background-color: #020617;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-top: 12px;
+            font-size: 0.95rem;
+        }
+
+        .code-row {
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .code-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .code-tag {
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            width: fit-content;
+        }
+
+        .tag-red { background-color: #991b1b; color: #fca5a5; }
+        .tag-green { background-color: #166534; color: #86efac; }
+
+        /* 테이블 스타일 */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            text-align: left;
+        }
+
+        .comparison-table th, .comparison-table td {
+            padding: 12px 16px;
+            border: 1px solid var(--card-border);
+        }
+
+        .comparison-table th {
+            background-color: #0f172a;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+
+        .comparison-table td {
+            font-size: 0.95rem;
+        }
+
+        .summary-box {
+            margin-top: 36px;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(52, 211, 153, 0.15));
+            border: 1px solid var(--primary);
+            border-radius: 16px;
+            padding: 28px;
+            text-align: center;
+        }
+
+        .summary-box h3 {
+            color: var(--accent-green);
+            font-size: 1.25rem;
+            margin-bottom: 12px;
+        }
+
+        .summary-box p {
+            color: var(--text-main);
+            font-size: 1.05rem;
+            line-height: 1.8;
+            word-break: keep-all;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div><span class="answer-badge">결론: 맞습니다!</span></div>
+            <h1>💬 존댓말로 프롬프트를 길게 쓰면<br>토큰 소모가 많을까?</h1>
+            <p>LLM 토큰화 메커니즘과 효율적인 프롬프트 작성 전략</p>
+        </header>
+
+        <div class="intro-card">
+            💡 <strong>실제로 존댓말과 길게 늘어놓은 문장은 토큰 소모를 늘립니다.</strong><br>
+            하지만 무조건 나쁜 것은 아니며, 토큰화 원리와 작성 목적을 이해하면 비용과 답변 품질을 모두 잡을 수 있습니다.
+        </div>
+
+        <div class="section-grid">
+
+            <!-- 1. 이유 설명 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">⚙️</span>
+                    <h2 class="card-title">1. 왜 존댓말과 긴 문장은 토큰을 더 쓸까?</h2>
+                </div>
+                <ul class="card-list">
+                    <li><strong>언어 처리 방식(Tokenization):</strong> AI는 글자가 아닌 '토큰' 단위로 인지합니다. 한국어는 조사와 어미 변화 때문에 영어보다 동일 의미 대비 토큰 발생량이 높습니다 (1.5~3배).</li>
+                    <li><strong>존댓말 어미의 추가 토큰:</strong> 격식 체계와 공손한 어미가 추가되면서 동일한 의도라도 토큰 수가 2~3배로 늘어납니다.</li>
+                </ul>
+
+                <div class="code-comparison">
+                    <div class="code-row">
+                        <span class="code-tag tag-green">간결/명령조 (~4-5 토큰)</span>
+                        <code>"파이썬 코드 작성해줘"</code>
+                    </div>
+                    <div class="code-row" style="margin-top: 12px;">
+                        <span class="code-tag tag-red">존댓말/장문 (~10-12 토큰)</span>
+                        <code>"파이썬 코드를 작성해 주시면 정말 감사하겠습니다."</code>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 비교 분석 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">⚖️</span>
+                    <h2 class="card-title">2. 존댓말 vs 반말/명사형 비교</h2>
+                </div>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>구분</th>
+                            <th>존댓말 / 친절한 장문</th>
+                            <th>반말 / 키워드·명사형</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>토큰 소모</strong></td>
+                            <td>많음 (비용/속도 손해)</td>
+                            <td><strong style="color: var(--accent-green);">적음 (비용/속도 이득)</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>작성 편의성</strong></td>
+                            <td>평소 대화하듯 편하게 작성</td>
+                            <td>의식적으로 요약 필요</td>
+                        </tr>
+                        <tr>
+                            <td><strong>답변 톤앤매너</strong></td>
+                            <td>친절하고 정중함</td>
+                            <td>직관적이고 핵심 위주</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="margin-top: 16px; font-size: 0.95rem; color: var(--text-muted);">
+                    💡 <strong>참고:</strong> AI는 감정을 느끼지 않으므로 존댓말을 쓴다고 답변 정확도가 높아지지 않습니다. 중요한 것은 <strong>'맥락(Context)의 명확성'</strong>입니다.
+                </p>
+            </div>
+
+            <!-- 3. 실전 팁 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">💡</span>
+                    <h2 class="card-title">3. 실전 프롬프트 절약 팁</h2>
+                </div>
+                <ul class="card-list">
+                    <li><strong>불필요한 인삿말 생략:</strong> "안녕하세요, 혹시 시간 되실 때~" 대신 바로 핵심 요구사항 전달.</li>
+                    <li><strong>개조식(Bullet points) 작성:</strong> 역할, 조건, 출력 형식을 나누어 작성하면 토큰도 아끼고 AI 이해도도 상승.</li>
+                    <li><strong>대용량 문맥 입력 시 단정함 유지:</strong> 참조 문서(RAG 노트 등)가 길수록 프롬프트 자체는 간결하게 유지하는 것이 비용과 토큰 한도 관리에 유리.</li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- 핵심 요약 -->
+        <div class="summary-box">
+            <h3>📌 핵심 요약</h3>
+            <p>
+                존댓말은 토큰을 더 소모하는 것이 <strong>사실</strong>입니다.<br>
+                비용과 처리 속도를 절약하려면 <strong>불필요한 인삿말을 빼고 명확한 개조식 문장</strong>으로 전달하세요!
+            </p>
+        </div>
+
+        <footer>
+            <p>Prompt Token Efficiency Guide • Single File HTML Guide</p>
+        </footer>
+    </div>
+
+</body>
+</html>
