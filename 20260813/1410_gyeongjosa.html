@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="경조사 안내 페이지 만들기 — 결혼식·돌잔치·부고 등 경조사 안내를 AI와 함께 모바일 한 페이지로 만들고 카카오톡·문자로 공유하는 흐름 정리">
+  <title>경조사 안내 페이지 만들기 · 2026</title>
+  <style>
+    :root{--paper:#f4f1e9;--card:#fffdf8;--ink:#17211d;--muted:#68716b;--line:#d9d7cc;--green:#1f6b55;--green2:#dcebe4;--orange:#dc6b34;--orange2:#f7e2d4;--navy:#203a5f;--shadow:0 18px 50px rgba(23,33,29,.09)}
+    :root[data-theme="dark"]{--paper:#111714;--card:#18201c;--ink:#edf2ed;--muted:#a8b0aa;--line:#303a34;--green:#76c9ad;--green2:#203c32;--orange:#f09a6d;--orange2:#432a20;--navy:#a8c6ef;--shadow:0 18px 50px rgba(0,0,0,.25)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 "Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif}button,a{font:inherit}a{color:inherit}.mono{font-family:"Cascadia Code","D2Coding",Consolas,monospace}
+    .progress{position:fixed;z-index:20;inset:0 0 auto;height:4px;background:var(--green);transform-origin:left;transform:scaleX(0)}
+    .top{position:sticky;z-index:10;top:0;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+    .top-inner{max-width:1120px;margin:auto;height:58px;padding:0 22px;display:flex;align-items:center;gap:22px}.brand{font-weight:700;white-space:nowrap}.brand em{color:var(--orange);font-style:normal}.nav{display:flex;gap:8px;overflow:auto;scrollbar-width:none;margin-left:auto}.nav a{padding:7px 10px;text-decoration:none;color:var(--muted);font-size:13px;white-space:nowrap}.nav a:hover{color:var(--green)}.theme{border:1px solid var(--line);background:var(--card);color:var(--ink);width:36px;height:36px;border-radius:50%;cursor:pointer;flex:none}
+    .hero{max-width:1120px;margin:auto;padding:94px 22px 70px;display:grid;grid-template-columns:1.3fr .7fr;gap:70px;align-items:end}.eyebrow{font:600 13px/1 "IBM Plex Mono",monospace;color:var(--green);letter-spacing:.12em;text-transform:uppercase}.hero h1{font-size:clamp(30px,6.4vw,76px);line-height:1.08;letter-spacing:-.05em;margin:22px 0}.hero h1 span{display:block;color:var(--orange)}.hero h1 .nowrap{white-space:nowrap;color:var(--ink)}.lead{font-size:clamp(18px,2vw,23px);max-width:670px;color:var(--muted)}.meta{border-left:1px solid var(--line);padding-left:28px}.meta strong{display:block;font-size:20px}.meta span{color:var(--muted);font-size:14px}.path{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}.path span{border:1px solid var(--line);border-radius:99px;padding:5px 10px;font-size:12px}.path i{color:var(--orange);font-style:normal}
+    main{max-width:1120px;margin:auto;padding:0 22px 100px}.section{padding:82px 0;border-top:1px solid var(--line)}.section-head{display:grid;grid-template-columns:200px 1fr;gap:45px;margin-bottom:38px}.num{color:var(--orange);font:600 13px "IBM Plex Mono",monospace}.section h2{font-size:clamp(30px,4vw,48px);line-height:1.15;letter-spacing:-.04em;margin:0}.intro{color:var(--muted);font-size:18px;max-width:760px;margin:14px 0 0}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.concept{position:relative;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px;min-height:170px;box-shadow:var(--shadow)}.concept .tag{font:600 12px "IBM Plex Mono",monospace;color:var(--green)}.concept h3{font-size:22px;margin:16px 0 8px}.concept p{color:var(--muted);margin:0}
+    .callout{margin-top:20px;padding:22px 26px;border-left:4px solid var(--orange);background:var(--orange2);font-size:17px;font-weight:600}
+    .skill-builder{display:grid;grid-template-columns:.8fr 1.2fr;gap:18px}.steps{display:flex;flex-direction:column;gap:8px}.step{width:100%;text-align:left;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:15px 17px;color:var(--ink);cursor:pointer}.step b{display:inline-block;width:26px;color:var(--orange);font:600 13px "IBM Plex Mono",monospace}.step.active{border-color:var(--green);background:var(--green2)}.step-panel{border-radius:18px;background:var(--ink);color:var(--paper);padding:35px;min-height:280px}.step-panel .mono{color:var(--orange)}.step-panel h3{font-size:28px;margin:15px 0 10px}.step-panel p{opacity:.75}
+    .install-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.install-card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px;box-shadow:var(--shadow)}.install-card h3{font-size:22px;margin:0 0 10px}.install-card p{color:var(--muted);margin:0 0 18px}
+    .launch{display:inline-flex;align-items:center;gap:10px;border:0;border-radius:99px;padding:13px 20px;background:var(--orange);color:#fff;text-decoration:none;font-weight:700;box-shadow:0 8px 20px rgba(220,107,52,.25)}.launch:hover{transform:translateY(-2px)}.launch.alt{background:var(--navy)}
+    .code-box{position:relative;background:var(--ink);color:var(--paper);border-radius:18px;padding:30px 26px;font-size:15px;line-height:1.7;white-space:pre-wrap;overflow-wrap:break-word}
+    .copy-btn{position:absolute;top:16px;right:16px;background:var(--orange);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer}.copy-btn.copied{background:var(--green)}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:35px}.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px}.panel h3{margin-top:0}.panel ul{padding-left:20px;color:var(--muted)}
+    .checklist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}.checklist li{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 20px;cursor:pointer;user-select:none}.checklist li b{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:14px;color:transparent}.checklist li.done b{background:var(--green);border-color:var(--green);color:#fff}.checklist li.done span{color:var(--muted);text-decoration:line-through}
+    footer{border-top:1px solid var(--line);padding:35px 22px;color:var(--muted)}footer div{max-width:1120px;margin:auto;display:flex;justify-content:space-between}
+    @media(max-width:760px){.nav{display:none}.hero{grid-template-columns:1fr;padding-top:65px;gap:25px}.meta{border-left:0;border-top:1px solid var(--line);padding:20px 0 0}.section-head{grid-template-columns:1fr;gap:8px}.compare,.skill-builder,.install-grid,.two{grid-template-columns:1fr}footer div{display:block}}
+    @media(max-width:420px){.hero h1{font-size:clamp(24px,7.4vw,76px)}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+  </style>
+</head>
+<body>
+  <div class="progress" aria-hidden="true"></div>
+  <header class="top">
+    <div class="top-inner">
+      <div class="brand">경조사<em>안내</em></div>
+      <nav class="nav" aria-label="강의 목차">
+        <a href="#flow">오늘의 흐름</a><a href="#review">지난 시간</a><a href="#what">경조사 안내란</a><a href="#plan">기획하기</a><a href="#info">필수 정보</a><a href="#prompt">프롬프트</a><a href="#privacy">개인정보 주의</a><a href="#publish">공유하기</a><a href="#checklist">체크리스트</a>
+      </nav>
+      <button class="theme" aria-label="화면 테마 전환" title="화면 테마 전환">◐</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div>
+      <div class="eyebrow">AI Agent · Gyeongjosa Page</div>
+      <h1><span class="nowrap">결혼식부터 부고까지</span><span>경조사 안내를 직접 만들어보기.</span></h1>
+      <p class="lead">청첩장, 돌잔치 초대장, 부고 안내처럼 살면서 반복해서 마주치는 경조사 안내를 AI와 함께 모바일 한 페이지로 만들고, 카카오톡·문자로 바로 공유해봅니다.</p>
+      <div class="path"><span>지난 시간 복습</span><i>→</i><span>경조사 안내란</span><i>→</i><span>기획하기</span><i>→</i><span>필수 정보</span><i>→</i><span>프롬프트</span><i>→</i><span>개인정보 주의</span><i>→</i><span>공유하기</span></div>
+    </div>
+    <div class="meta"><span>2026. 08. 13</span><strong>한국폴리텍대학<br>성남캠퍼스</strong></div>
+  </section>
+
+  <main>
+    <section class="section" id="flow">
+      <div class="section-head"><div class="num">01 / FLOW</div><div><h2>오늘의 흐름</h2><p class="intro">항목을 눌러 각 단계에서 무엇을 하는지 확인해 보세요.</p></div></div>
+      <div class="skill-builder">
+        <div class="steps" role="tablist" aria-label="오늘의 흐름 5단계">
+          <button class="step active" data-i="0" role="tab"><b>1</b> 경조사 종류 정하기</button>
+          <button class="step" data-i="1" role="tab"><b>2</b> 필수 정보 정리</button>
+          <button class="step" data-i="2" role="tab"><b>3</b> AI에게 초안 요청</button>
+          <button class="step" data-i="3" role="tab"><b>4</b> 모바일 한 페이지 html 변환</button>
+          <button class="step" data-i="4" role="tab"><b>5</b> 카카오톡·문자로 공유</button>
+        </div>
+        <div class="step-panel" aria-live="polite"><div class="mono" id="panelLabel">STEP 1</div><h3 id="panelTitle">경조사 종류 정하기</h3><p id="panelText">결혼식, 돌잔치, 회갑·칠순, 부고, 개업·이전 중 오늘 만들 안내 페이지 종류를 정해봅니다.</p></div>
+      </div>
+      <div class="callout">AI를 활용하는 데 가장 유용한 것은, 내가 자주 반복하는 작업을 AI에게 시키는 것입니다.</div>
+    </section>
+
+    <section class="section" id="review">
+      <div class="section-head"><div class="num">02 / REVIEW</div><div><h2>지난 시간 복습</h2></div></div>
+      <div class="two">
+        <article class="panel"><h3>8/10에 한 일</h3><ul><li>뉴스레터 기획</li><li>AI에게 초안 요청</li><li>표 기반 html 변환</li><li>이메일·블로그로 발행</li></ul></article>
+        <article class="panel"><h3>오늘 이어서 할 일</h3><ul><li>형식만 다를 뿐 같은 흐름(기획 → 프롬프트 → html 변환 → 공유)을 경조사 안내 페이지에 적용</li></ul></article>
+      </div>
+      <div class="callout">뉴스레터는 표(table) 기반이었다면, 경조사 안내 페이지는 카카오톡·문자로 보는 모바일 한 페이지로 만드는 점이 다릅니다.</div>
+    </section>
+
+    <section class="section" id="what">
+      <div class="section-head"><div class="num">03 / WHAT</div><div><h2>경조사 안내 페이지란?</h2><p class="intro">인생의 중요한 순간을 알리는 모바일 한 페이지입니다. 업체에 맡기지 않고 직접 만들면 비용을 아끼고 원하는 대로 수정할 수 있습니다.</p></div></div>
+      <div class="compare">
+        <article class="concept"><div class="tag">결혼식</div><h3>청첩장</h3><p>신랑신부 소개, 예식 일시·장소, 갤러리, 참석 여부 응답까지 담을 수 있습니다.</p></article>
+        <article class="concept"><div class="tag">돌잔치 · 칠순</div><h3>초대장</h3><p>주인공 소개, 행사 일시·장소, 오시는 길을 간단히 안내합니다.</p></article>
+        <article class="concept"><div class="tag">부고</div><h3>부고 안내</h3><p>고인 소개, 발인·장지 안내, 조의금 계좌, 근조화환 안내를 정중하게 담습니다.</p></article>
+      </div>
+    </section>
+
+    <section class="section" id="plan">
+      <div class="section-head"><div class="num">04 / PLAN</div><div><h2>경조사 안내 기획하기</h2><p class="intro">글을 쓰기 전에 아래 세 가지를 먼저 정해봅니다.</p></div></div>
+      <div class="two">
+        <article class="panel"><h3>정해야 할 것</h3><ul>
+          <li><b>경조사 종류</b> — 예) 결혼식 / 돌잔치 / 회갑·칠순·팔순 / 부고 / 개업·이전</li>
+          <li><b>주인공 정보</b> — 이름, 관계(신랑신부, 상주 등)</li>
+          <li><b>말투</b> — 정중하고 차분한 존댓말로 통일</li>
+        </ul></article>
+        <article class="panel"><h3>개인정보 주의사항</h3><ul><li>계좌번호·전화번호 등 민감정보는 꼭 필요한 경우에만 넣기</li><li>검색엔진에 노출되는 공개 채널이 아니라 카카오톡·문자로 직접 전달하기</li></ul></article>
+      </div>
+    </section>
+
+    <section class="section" id="info">
+      <div class="section-head"><div class="num">05 / INFO</div><div><h2>필수 정보 체크</h2><p class="intro">경조사 종류에 상관없이 공통으로 필요한 정보와, 종류별로 추가되는 정보를 나눠 정리합니다.</p></div></div>
+      <div class="two">
+        <article class="panel"><h3>공통 정보</h3><ul>
+          <li>주인공 이름과 관계</li>
+          <li>일시(날짜, 시간)</li>
+          <li>장소(이름, 주소, 지도 링크)</li>
+          <li>연락처(문의받을 사람)</li>
+        </ul></article>
+        <article class="panel"><h3>경조사별 추가 정보</h3><ul>
+          <li>결혼식: 혼주 이름, 계좌번호(마음 전하실 곳), 식사 안내</li>
+          <li>돌잔치·칠순 등: 화환 안내, 주차 안내</li>
+          <li>부고: 발인 일시, 장지, 상주 이름, 조의금 계좌</li>
+        </ul></article>
+      </div>
+    </section>
+
+    <section class="section" id="prompt">
+      <div class="section-head"><div class="num">06 / PROMPT</div><div><h2>프롬프트 예시</h2><p class="intro">한 번에 다 시키지 않고, 먼저 정보를 마크다운으로 정리한 뒤 그걸 바탕으로 html을 요청하는 2단계로 진행합니다.</p></div></div>
+      <p class="intro" style="margin:0 0 14px;font-size:15px">STEP 1 — 정보를 마크다운 파일로 정리 요청</p>
+      <div class="code-box mono">
+        <button type="button" class="copy-btn" data-target="promptText1">복사하기</button>
+        <span id="promptText1">경조사 종류: (예: 결혼식 청첩장 / 돌잔치 초대장 / 부고 안내)
+주인공: (이름, 관계)
+필수 정보: 일시, 장소(주소+지도링크), 연락처, 계좌번호(선택)
+톤앤매너: 정중하고 차분한 존댓말로 통일해주세요.
+위 내용을 정리해서 마크다운 파일로 만들어주세요.</span>
+      </div>
+      <p class="intro" style="margin:35px 0 14px;font-size:15px">STEP 2 — 마크다운을 바탕으로 html 변환 요청</p>
+      <div class="code-box mono">
+        <button type="button" class="copy-btn" data-target="promptText2">복사하기</button>
+        <span id="promptText2">방금 만든 마크다운 파일을 바탕으로 경조사 안내 페이지를 만들어주세요.
+디자인: 형광색은 사용하지 말아주세요. 모바일 화면에 최적화해서 만들어주세요.
+공유 방식: 카카오톡, 문자로 링크를 보낼 예정이라 단일 html 파일로 만들어주세요.</span>
+      </div>
+    </section>
+
+    <section class="section" id="privacy">
+      <div class="section-head"><div class="num">07 / PRIVACY</div><div><h2>개인정보 주의사항</h2></div></div>
+      <div class="callout">경조사 안내 페이지는 이름·연락처·계좌번호 같은 민감정보가 함께 들어가는 경우가 많아, 만들 때부터 노출 범위를 신경 써야 합니다.</div>
+      <div class="install-grid">
+        <article class="install-card">
+          <h3>계좌번호는 받는 사람 이름과 함께</h3>
+          <p>계좌번호만 덩그러니 올리지 말고 받는 사람 이름을 정확히 함께 표기해, 사칭·사기 피해를 예방합니다.</p>
+        </article>
+        <article class="install-card">
+          <h3>비공개 링크로만 전달</h3>
+          <p>완성한 페이지는 검색엔진에 노출되지 않는 링크로 만들어, 카카오톡·문자로 필요한 사람에게만 직접 전달합니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="publish">
+      <div class="section-head"><div class="num">08 / PUBLISH</div><div><h2>공유해 보기</h2><p class="intro">완성한 경조사 안내 페이지를 실제로 공유해봅니다.</p></div></div>
+      <div class="two">
+        <article class="panel"><h3>카카오톡·문자로 공유</h3><ul>
+          <li>지난 시간에 배운 방법(깃허브 페이지, Vercel 등)으로 페이지를 호스팅</li>
+          <li>완성된 링크를 카카오톡 단체방·개인 메시지, 문자로 전달</li>
+        </ul></article>
+        <article class="install-card">
+          <h3>선택 실습 — QR코드 만들기</h3>
+          <p>링크를 QR코드로 만들면 청첩장·안내장 실물에 인쇄해서 함께 나눠줄 수도 있습니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="checklist">
+      <div class="section-head"><div class="num">09 / CHECK</div><div><h2>오늘의 체크리스트</h2><p class="intro">항목을 눌러 완료 표시를 해보세요.</p></div></div>
+      <ul class="checklist" id="checklist">
+        <li><b>✓</b><span>경조사 종류와 주인공 정보를 정리했다</span></li>
+        <li><b>✓</b><span>AI에게 초안을 요청해서 받았다</span></li>
+        <li><b>✓</b><span>모바일 화면에서 확인했다</span></li>
+        <li><b>✓</b><span>계좌번호 등 민감정보 노출 범위를 확인했다</span></li>
+        <li><b>✓</b><span>카카오톡·문자로 실제 공유까지 해봤다</span></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer><div><span>경조사 안내 페이지 만들기</span><span>2026.08.13 · 한국폴리텍대학 성남캠퍼스</span></div></footer>
+  <script>
+    const data=[
+      ["STEP 1","경조사 종류 정하기","결혼식, 돌잔치, 회갑·칠순, 부고, 개업·이전 중 오늘 만들 안내 페이지 종류를 정해봅니다."],
+      ["STEP 2","필수 정보 정리","주인공 이름·관계, 일시, 장소, 연락처 등 공통 정보와 경조사별 추가 정보를 정리해봅니다."],
+      ["STEP 3","AI에게 초안 요청","정해둔 정보와 톤을 바탕으로 AI에게 경조사 안내 페이지 초안을 요청해봅니다."],
+      ["STEP 4","모바일 한 페이지 html 변환","카카오톡·문자로 봐도 깨지지 않도록 모바일에 최적화한 단일 html 파일로 변환해봅니다."],
+      ["STEP 5","카카오톡·문자로 공유","완성한 페이지를 호스팅한 뒤, 링크를 카카오톡·문자로 실제 공유까지 해봅니다."]
+    ];
+    const steps=[...document.querySelectorAll(".step")];
+    steps.forEach(btn=>btn.addEventListener("click",()=>{
+      steps.forEach(x=>x.classList.remove("active"));btn.classList.add("active");
+      const d=data[+btn.dataset.i];
+      ["panelLabel","panelTitle","panelText"].forEach((id,i)=>document.getElementById(id).textContent=d[i]);
+    }));
+    const root=document.documentElement, saved=localStorage.getItem("gyeongjosa-theme");
+    if(saved)root.dataset.theme=saved;
+    document.querySelector(".theme").addEventListener("click",()=>{
+      const next=root.dataset.theme==="dark"?"light":"dark";root.dataset.theme=next;localStorage.setItem("gyeongjosa-theme",next);
+    });
+    const bar=document.querySelector(".progress");
+    addEventListener("scroll",()=>{const h=document.documentElement;bar.style.transform=`scaleX(${h.scrollTop/(h.scrollHeight-h.clientHeight)})`},{passive:true});
+    document.querySelectorAll(".copy-btn").forEach(copyBtn=>{
+      copyBtn.addEventListener("click",()=>{
+        const text=document.getElementById(copyBtn.dataset.target).textContent;
+        navigator.clipboard.writeText(text).then(()=>{
+          copyBtn.textContent="복사됨 ✓";copyBtn.classList.add("copied");
+          setTimeout(()=>{copyBtn.textContent="복사하기";copyBtn.classList.remove("copied");},1800);
+        });
+      });
+    });
+    document.querySelectorAll(".checklist li").forEach(li=>li.addEventListener("click",()=>li.classList.toggle("done")));
+  </script>
+</body>
+</html>
