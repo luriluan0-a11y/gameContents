@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>게임잡 QA·GM 채용공고 (2026-08-20)</title>
+<style>
+  :root{
+    --navy:#1a3a5c; --blue:#2e6da4; --orange:#f0a500;
+    --bg:#f4f6fa; --card:#ffffff; --line:#e1e6ee;
+    --text:#1f2937; --muted:#647089; --danger:#c0472e;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple SD Gothic Neo',system-ui,sans-serif;line-height:1.6}
+  header{background:linear-gradient(120deg,var(--navy),var(--blue));color:#fff;padding:36px 20px 30px}
+  .wrap{max-width:1040px;margin:0 auto}
+  header h1{margin:0 0 8px;font-size:26px;letter-spacing:-.02em}
+  header p{margin:0;color:#dce7f3;font-size:14px}
+  .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .meta-badge{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600}
+  main{padding:26px 20px 60px}
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:22px}
+  .toolbar input, .toolbar select{
+    border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;background:#fff;color:var(--text);
+  }
+  .toolbar input{flex:1 1 240px}
+  .toolbar select{flex:0 0 140px}
+  h2.section-title{font-size:19px;color:var(--navy);margin:30px 0 12px;padding-left:12px;border-left:5px solid var(--orange)}
+  .count-tag{color:var(--muted);font-weight:500;font-size:14px;margin-left:6px}
+  .cards{display:grid;gap:12px}
+  .job-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;box-shadow:0 4px 12px rgba(26,58,92,.05)}
+  .job-main{flex:1 1 320px;min-width:0}
+  .job-company{font-size:12px;color:var(--blue);font-weight:700;margin-bottom:3px}
+  .job-title{font-size:15.5px;font-weight:700;color:var(--text)}
+  .job-tags{display:flex;gap:6px;flex-wrap:wrap;flex:0 0 auto}
+  .tag{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
+  .tag-career{background:#eaf1fb;color:var(--blue)}
+  .tag-unknown{background:#f1f2f5;color:var(--muted)}
+  .tag-always{background:#eef7ee;color:#2f7a3d}
+  .tag-deadline{background:#fdeee9;color:var(--danger)}
+  .tag-soon{background:var(--danger);color:#fff}
+  .job-link{flex:0 0 auto}
+  .job-link a{display:inline-block;background:var(--navy);color:#fff;text-decoration:none;font-size:13px;font-weight:700;padding:8px 14px;border-radius:9px;transition:.15s background}
+  .job-link a:hover{background:var(--blue)}
+  .empty-msg{color:var(--muted);text-align:center;padding:30px;background:var(--card);border:1px dashed var(--line);border-radius:14px}
+  .note-box{background:#fff8e8;border:1px solid #f0dca0;border-radius:14px;padding:16px 20px;margin-top:34px;font-size:13.5px;color:#5c4a12}
+  .note-box ul{margin:8px 0 0;padding-left:20px}
+  footer{color:var(--muted);font-size:12.5px;text-align:center;padding:26px 20px 44px}
+  @media(max-width:560px){
+    .job-card{flex-direction:column;align-items:flex-start}
+    .job-link{width:100%}
+    .job-link a{width:100%;text-align:center}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>게임잡 QA · GM 채용공고</h1>
+    <p>gamejob.co.kr "게임운영·QA" 직종 카테고리 기준 정리 · 2026-08-20 갱신</p>
+    <div class="meta-row">
+      <span class="meta-badge">QA 29건</span>
+      <span class="meta-badge">GM/운영 4건</span>
+      <span class="meta-badge">총 33건</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="toolbar">
+    <input type="text" id="searchBox" placeholder="회사명 또는 공고 제목으로 검색...">
+    <select id="deadlineFilter">
+      <option value="all">전체 마감상태</option>
+      <option value="dated">마감일 지정</option>
+      <option value="always">상시채용</option>
+    </select>
+  </div>
+
+  <h2 class="section-title">QA / 테스터 <span class="count-tag" id="qaCount"></span></h2>
+  <div class="cards" id="qaList"></div>
+
+  <h2 class="section-title">GM / 게임운영 <span class="count-tag" id="gmCount"></span></h2>
+  <div class="cards" id="gmList"></div>
+
+
+</main>
+
+<footer>10_working/15_students/gameJob_QA_GM_2026-08-20.md 기반 · 정보 출처: gamejob.co.kr</footer>
+
+<script>
+const TODAY = new Date('2026-08-20T00:00:00');
+
+const qaJobs = [
+  {company:"㈜바운더리", title:"핵앤슬래시(PC/콘솔) 개발 QA 담당자 모집 [Project NUT]", career:"신입/경력무관", deadline:null, gi:283546},
+  {company:"스마일게이트 슈퍼크리에이티브", title:"[카오스 제로 나이트메어] 개발QA (6개월 계약직)", career:null, deadline:null, gi:283902},
+  {company:"에이블게임즈", title:"[메이플키우기] 게임 QA 모집", career:null, deadline:null, gi:282601},
+  {company:"㈜로드컴플릿", title:"[VOID DIVER] QA", career:null, deadline:null, gi:283940},
+  {company:"㈜겜프스엔", title:"[브라운더스트2] QA 모집", career:null, deadline:null, gi:283556},
+  {company:"디나미스원㈜", title:"[아스트라에 오라티오] QA 모집", career:null, deadline:null, gi:283799},
+  {company:"파이드픽셀즈", title:"신작 대형 IP 게임 QA 담당자 채용", career:null, deadline:null, gi:283441},
+  {company:"㈜위메이드", title:"게임 QA(계약직)", career:"신입/경력무관 (판교)", deadline:"2026-09-09", gi:283672},
+  {company:"㈜에피드게임즈", title:"[트릭컬 파티마] QA담당자 추가 모집", career:null, deadline:null, gi:283261},
+  {company:"스마일게이트", title:"[LOST ARK Mobile] FQA 담당", career:"경력 3년 이상 (판교)", deadline:null, gi:283314},
+  {company:"스마일게이트", title:"[CROSSFIRE] Test Engineer 담당 (계약직)", career:null, deadline:"2026-08-31", gi:283244},
+  {company:"네오플", title:"[던전앤파이터] 스크립트 AI QA 분석가 (계약직)", career:null, deadline:null, gi:282736},
+  {company:"컴투스", title:"[컴투스] 2026 모바일 QA 담당자 (계약직)", career:null, deadline:null, gi:282754},
+  {company:"스마일게이트", title:"[LOST ARK Mobile] 개발QA 담당 모집", career:null, deadline:null, gi:281315},
+  {company:"㈜시프트업", title:"[승리의 여신 니케] 전투 QA", career:null, deadline:null, gi:281977},
+  {company:"컴투스", title:"[서머너즈워] QA 담당자 (계약직)", career:null, deadline:null, gi:280694},
+  {company:"컴투스", title:"[컴투스프로야구 시리즈] QA 담당자 (계약직)", career:null, deadline:null, gi:280566},
+  {company:"㈜알트나인", title:"[SOL enchant] QA 채용", career:null, deadline:null, gi:280998},
+  {company:"무브인터렉티브", title:"QA팀 신입/경력 채용", career:"신입/경력", deadline:null, gi:282698},
+  {company:"㈜님블뉴런", title:"[이터널 리턴] 콘텐츠 QA 담당자 모집", career:null, deadline:null, gi:283945},
+  {company:"메타본엔터테인먼트㈜", title:"[판교][건틀렛] RPG QA/QC 및 운영", career:"경력", deadline:null, gi:282476},
+  {company:"㈜스탠드에그", title:"[Stand Egg] RPG QA 채용", career:null, deadline:null, gi:281524},
+  {company:"㈜이안게임즈", title:"개발 QA 담당 모집", career:null, deadline:null, gi:283943},
+  {company:"㈜큐로드", title:"[강남] 게임QA 경력직 채용", career:"경력직", deadline:"2026-08-24", gi:283903},
+  {company:"㈜아쿠아트리", title:"[아키텍트] 게임 QA 채용", career:"경력 3년 이상", deadline:null, gi:282634},
+  {company:"그렙게임즈", title:"[일본 IP 게임 라이브운영] QA 담당자 모집", career:null, deadline:null, gi:283695},
+  {company:"㈜리튬포어스", title:"콘솔 액션 게임 QA 담당자 채용", career:null, deadline:null, gi:283829},
+  {company:"민트로켓", title:"게임플레이 QA 채용 (계약직)", career:null, deadline:null, gi:283767},
+  {company:"㈜헥토큐앤엠", title:"RPG 게임QA 담당자 채용 (경력/계약직)", career:"경력", deadline:null, gi:283663},
+];
+
+const gmJobs = [
+  {company:"히든몬스터", title:"모바일 게임 운영 매니저 모집 (외국어 가능자)", career:"경력 1년 이상", deadline:"2026-09-02", gi:283410},
+  {company:"㈜드림아이디어소프트", title:"[대구] RPG 게임 고객센터 및 커뮤니티 고객 관리", career:null, deadline:null, gi:283844},
+  {company:"㈜드림아이디어소프트", title:"[대구] 게임 GM 채용 [원더킹][세피루스]", career:"신입/경력 무관", deadline:null, gi:283637},
+  {company:"㈜드림아이디어소프트", title:"[대구] PC, 모바일 게임 서비스 운영 (이벤트기획·마케터)", career:null, deadline:null, gi:283638},
+];
+
+function dDay(dateStr){
+  const d = new Date(dateStr+'T00:00:00');
+  const diff = Math.round((d - TODAY) / 86400000);
+  return diff;
+}
+
+function renderJob(j){
+  const el = document.createElement('div');
+  el.className = 'job-card';
+  el.dataset.search = (j.company + ' ' + j.title).toLowerCase();
+  el.dataset.deadlineType = j.deadline ? 'dated' : 'always';
+
+  let tagsHtml = '';
+  tagsHtml += j.career
+    ? `<span class="tag tag-career">${j.career}</span>`
+    : `<span class="tag tag-unknown">경력 미확인</span>`;
+
+  if(j.deadline){
+    const diff = dDay(j.deadline);
+    const label = diff >= 0 ? `마감 ${j.deadline} (D-${diff})` : `마감 ${j.deadline} (지남)`;
+    tagsHtml += `<span class="tag ${diff <= 7 ? 'tag-soon' : 'tag-deadline'}">${label}</span>`;
+  } else {
+    tagsHtml += `<span class="tag tag-always">상시채용</span>`;
+  }
+
+  el.innerHTML = `
+    <div class="job-main">
+      <div class="job-company">${j.company}</div>
+      <div class="job-title">${j.title}</div>
+    </div>
+    <div class="job-tags">${tagsHtml}</div>
+    <div class="job-link"><a href="https://www.gamejob.co.kr/Recruit/GI_Read/View?GI_No=${j.gi}" target="_blank" rel="noopener">공고 보기</a></div>
+  `;
+  return el;
+}
+
+const qaListEl = document.getElementById('qaList');
+const gmListEl = document.getElementById('gmList');
+
+function renderAll(){
+  qaListEl.innerHTML = '';
+  gmListEl.innerHTML = '';
+  qaJobs.forEach(j => qaListEl.appendChild(renderJob(j)));
+  gmJobs.forEach(j => gmListEl.appendChild(renderJob(j)));
+  document.getElementById('qaCount').textContent = `(${qaJobs.length}건)`;
+  document.getElementById('gmCount').textContent = `(${gmJobs.length}건)`;
+  applyFilters();
+}
+
+function applyFilters(){
+  const kw = document.getElementById('searchBox').value.trim().toLowerCase();
+  const deadlineMode = document.getElementById('deadlineFilter').value;
+  let qaVisible = 0, gmVisible = 0;
+
+  document.querySelectorAll('.job-card').forEach(card => {
+    const matchKw = !kw || card.dataset.search.includes(kw);
+    const matchDeadline = deadlineMode === 'all' || card.dataset.deadlineType === deadlineMode;
+    const show = matchKw && matchDeadline;
+    card.style.display = show ? '' : 'none';
+    if(show){
+      if(card.parentElement.id === 'qaList') qaVisible++;
+      else gmVisible++;
+    }
+  });
+
+  toggleEmptyState(qaListEl, qaVisible);
+  toggleEmptyState(gmListEl, gmVisible);
+}
+
+function toggleEmptyState(listEl, visibleCount){
+  let empty = listEl.querySelector('.empty-msg');
+  if(visibleCount === 0){
+    if(!empty){
+      empty = document.createElement('div');
+      empty.className = 'empty-msg';
+      empty.textContent = '조건에 맞는 공고가 없습니다.';
+      listEl.appendChild(empty);
+    }
+  } else if(empty){
+    empty.remove();
+  }
+}
+
+document.getElementById('searchBox').addEventListener('input', applyFilters);
+document.getElementById('deadlineFilter').addEventListener('change', applyFilters);
+
+renderAll();
+</script>
+
+</body>
+</html>
