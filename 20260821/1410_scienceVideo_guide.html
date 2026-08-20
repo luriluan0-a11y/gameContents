@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI로 만드는 과학 숏폼 영상</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a2129;
+    --ink-soft: #333c46;
+    --muted: #5c6875;
+    --paper: #f1f4f7;
+    --raised: #ffffff;
+    --line: #d8dee5;
+    --accent: #2e6da4;
+    --accent-strong: #1a3a5c;
+    --accent-soft: #dce8f2;
+    --warm: #d68c00;
+    --warm-soft: #f7ecd6;
+    --code-bg: #e7ecf1;
+    --shadow: rgba(26, 33, 41, 0.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #e7ebef;
+      --ink-soft: #c7d0da;
+      --muted: #93a0ab;
+      --paper: #10151b;
+      --raised: #181f27;
+      --line: #29323c;
+      --accent: #6fa8dc;
+      --accent-strong: #9cc4ea;
+      --accent-soft: #1c2a38;
+      --warm: #e8ab4a;
+      --warm-soft: #2c2313;
+      --code-bg: #1e2731;
+      --shadow: rgba(0, 0, 0, 0.45);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #e7ebef;
+    --ink-soft: #c7d0da;
+    --muted: #93a0ab;
+    --paper: #10151b;
+    --raised: #181f27;
+    --line: #29323c;
+    --accent: #6fa8dc;
+    --accent-strong: #9cc4ea;
+    --accent-soft: #1c2a38;
+    --warm: #e8ab4a;
+    --warm-soft: #2c2313;
+    --code-bg: #1e2731;
+    --shadow: rgba(0, 0, 0, 0.45);
+  }
+
+  * { box-sizing: border-box; }
+  html { background: var(--paper); }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    line-height: 1.75;
+    font-size: 16.5px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: 'IBM Plex Mono', 'D2Coding', ui-monospace, monospace; }
+
+  a { color: var(--accent-strong); }
+  a:hover { color: var(--warm); }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    padding: 5.2rem 1.5rem 3.6rem;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
+    background:
+      radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--accent) 20%, transparent) 1px, transparent 1.6px)
+      0 0 / 26px 26px;
+  }
+  .hero-inner { position: relative; max-width: 800px; margin: 0 auto; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 0.6em;
+    font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent-strong); margin: 0 0 1.3rem;
+  }
+  .hero-eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--warm); flex: none; }
+  h1.hero-title {
+    font-size: clamp(2rem, 5vw, 3rem); line-height: 1.22; font-weight: 700;
+    margin: 0 0 1rem; text-wrap: balance; letter-spacing: -0.01em;
+  }
+  h1.hero-title em { font-style: normal; color: var(--accent-strong); }
+  .hero-sub { color: var(--ink-soft); font-size: 1.05rem; max-width: 620px; margin: 0 0 1.2rem; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 0.5em 1.1em; color: var(--muted); font-size: 0.96rem; }
+
+  /* ---------- Page ---------- */
+  .page { max-width: 800px; margin: 0 auto; padding: 3.4rem 1.5rem 6rem; display: flex; flex-direction: column; gap: 3.4rem; }
+  section { scroll-margin-top: 2rem; }
+
+  .section-head { display: flex; align-items: baseline; gap: 0.9rem; margin-bottom: 1.4rem; padding-bottom: 0.9rem; border-bottom: 1px solid var(--line); }
+  .section-num { font-size: 0.85rem; color: var(--warm); letter-spacing: 0.06em; flex: none; }
+  .section-head h2 { font-size: clamp(1.35rem, 3vw, 1.65rem); margin: 0; font-weight: 700; letter-spacing: -0.01em; }
+
+  p { margin: 0.9em 0; color: var(--ink-soft); }
+  strong { color: var(--ink); font-weight: 600; }
+
+  ul.plain, ol.plain { margin: 0.8em 0; padding-left: 1.3em; color: var(--ink-soft); }
+  ul.plain li, ol.plain li { margin: 0.45em 0; }
+
+  /* ---------- Checklist ---------- */
+  .check-list { list-style: none; margin: 1.2rem 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+  .check-list li {
+    display: flex; align-items: flex-start; gap: 0.7rem;
+    background: var(--raised); border: 1px solid var(--line); border-radius: 9px;
+    padding: 0.7rem 0.95rem; font-size: 0.94rem; color: var(--ink-soft);
+  }
+  .check-list li::before {
+    content: "✓"; flex: none; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent-strong); font-size: 0.72rem;
+    display: flex; align-items: center; justify-content: center; font-weight: 700; margin-top: 0.1em;
+  }
+
+  .lead-callout {
+    background: linear-gradient(180deg, var(--accent-soft), var(--raised) 70%);
+    border: 1px solid var(--line); border-left: 3px solid var(--accent-strong);
+    border-radius: 10px; padding: 1.3rem 1.5rem; margin: 0 0 1.6rem;
+  }
+  .lead-callout p { margin: 0; color: var(--ink); font-size: 1.02rem; }
+  .lead-callout p + p { margin-top: 0.6em; }
+
+  /* ---------- Flow ---------- */
+  .flow { display: flex; flex-direction: column; gap: 0; margin: 1.4rem 0; }
+  .flow-step { display: flex; align-items: flex-start; gap: 1rem; background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 0.9rem 1.1rem; }
+  .flow-num {
+    flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-strong); color: #fff;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .flow-step p { margin: 0; font-size: 0.96rem; color: var(--ink-soft); }
+  .flow-step p strong { color: var(--ink); }
+  .flow-arrow { text-align: center; color: var(--muted); font-size: 1.1rem; padding: 4px 0; }
+
+  /* ---------- Role cards ---------- */
+  .role-grid { display: grid; grid-template-columns: 1fr; gap: 0.85rem; margin: 1.4rem 0; }
+  .role-card { background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.2rem; box-shadow: 0 1px 2px var(--shadow); }
+  .role-card .role-title { display: flex; align-items: center; gap: 0.6rem; font-weight: 700; color: var(--ink); margin-bottom: 0.35rem; font-size: 0.98rem; }
+  .role-card p { margin: 0; font-size: 0.92rem; color: var(--ink-soft); }
+
+  /* ---------- Prompt box ---------- */
+  .prompt-box {
+    background: var(--code-bg); border: 1px solid var(--line); border-radius: 9px;
+    padding: 1.1rem 1.3rem; margin: 1.2rem 0; font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.87rem; color: var(--ink-soft); white-space: pre-wrap; line-height: 1.65;
+  }
+  .prompt-box .tag { display: block; font-family: 'IBM Plex Sans KR', sans-serif; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--warm); margin-bottom: 0.55rem; font-weight: 600; }
+
+  /* ---------- Table ---------- */
+  .table-wrap { overflow-x: auto; margin: 1.5rem 0; border: 1px solid var(--line); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 0.9rem; }
+  th, td { border-bottom: 1px solid var(--line); padding: 0.7em 0.85em; text-align: left; vertical-align: top; }
+  th { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--accent-soft); }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+  td:nth-child(1) { color: var(--ink); font-weight: 600; white-space: nowrap; }
+
+  /* ---------- Callout ---------- */
+  .callout { position: relative; background: var(--raised); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 8px; padding: 1.1rem 1.3rem; margin: 1.5rem 0; }
+  .callout .label { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-strong); display: block; margin-bottom: 0.5rem; }
+  .callout p { margin: 0; color: var(--ink); font-size: 0.98rem; }
+  .callout.warm { border-left-color: var(--warm); background: linear-gradient(180deg, var(--warm-soft), var(--raised) 65%); }
+  .callout.warm .label { color: var(--warm); }
+
+  /* ---------- Download CTA ---------- */
+  .dl-callout { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
+  .dl-callout p { margin: 0.2rem 0 0; }
+  .dl-btn {
+    flex: none; display: inline-flex; align-items: center; gap: 0.5em;
+    background: var(--accent-strong); color: #fff; text-decoration: none;
+    font-size: 0.9rem; font-weight: 600; padding: 0.65rem 1.2rem; border-radius: 999px;
+    box-shadow: 0 4px 12px var(--shadow); transition: transform 0.15s, background 0.15s;
+  }
+  .dl-btn:hover { background: var(--warm); color: #fff; transform: translateY(-2px); }
+
+  /* ---------- Video ---------- */
+  .video-frame { max-width: 300px; margin: 1.4rem auto 0; }
+  .video-frame video {
+    width: 100%; display: block; background: #000; border-radius: 14px;
+    border: 1px solid var(--line); box-shadow: 0 8px 24px var(--shadow);
+  }
+
+  /* ---------- Rule grid (do / don't) ---------- */
+  .rule-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.4rem 0; }
+  @media (max-width: 620px) { .rule-grid { grid-template-columns: 1fr; } }
+  .rule-card { background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 1.1rem 1.25rem; }
+  .rule-card .tag { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: 0.5rem; }
+  .rule-card.do { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+  .rule-card.do .tag { color: var(--accent-strong); }
+  .rule-card.dont .tag { color: var(--warm); }
+  .rule-card ul { margin: 0; padding-left: 1.1em; font-size: 0.9rem; color: var(--ink-soft); }
+  .rule-card li { margin: 0.4em 0; }
+
+  /* ---------- Narration script ---------- */
+  .script-box { background: var(--raised); border: 1px solid var(--line); border-left: 3px solid var(--accent-strong); border-radius: 10px; padding: 1.4rem 1.6rem; margin: 1.4rem 0; }
+  .script-box p { margin: 0.9em 0; color: var(--ink); font-size: 0.98rem; }
+  .script-box p:first-child { margin-top: 0; }
+  .script-note { font-size: 0.84rem; color: var(--muted); margin-top: 0.8em; }
+
+  hr.rule { border: none; border-top: 1px solid var(--line); margin: 0; }
+
+  footer { max-width: 800px; margin: 0 auto; padding: 0 1.5rem 4rem; display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 0.85rem; font-family: 'IBM Plex Mono', monospace; flex-wrap: wrap; gap: 0.5rem; }
+
+  .ref-list { list-style: none; margin: 1rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+  .ref-list li { font-size: 0.9rem; }
+  .ref-list a { text-decoration: none; }
+  .ref-list a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <span class="hero-eyebrow mono">SNS 콘텐츠 제작 수업</span>
+    <h1 class="hero-title">AI로 만드는 <em>과학 숏폼</em> 영상</h1>
+    <p class="hero-sub">일상 속 과학 현상을 45~50초짜리 다큐 톤 숏폼으로 만듭니다. 기획·프롬프트는 ChatGPT, 비주얼 생성은 Reve, 자막·완성은 Canva — <strong>「AI 동화책 만들기」와 완전히 같은 방식</strong>을 그대로 씁니다.</p>
+    <div class="hero-meta mono">
+      <span>한국폴리텍대학교</span>
+      <span>2026.08.21</span>
+      <span>예시 주제 · 마이야르 반응</span>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- 01 -->
+  <section>
+    <div class="section-head"><span class="section-num mono">01</span><h2>오늘 만드는 것 &amp; 핵심 원칙</h2></div>
+
+    <div class="lead-callout">
+      <p><strong>AI 동화책 만들기</strong>에서는 ChatGPT로 이야기와 프롬프트를 만들고, Reve로 그림을 그리고, Canva로 글을 올려 동화책 페이지를 완성했습니다.</p>
+      <p>오늘은 똑같은 3단 워크플로우로 <strong>"이야기책 페이지" 대신 "과학 현상을 설명하는 45~50초 영상"</strong>을 만듭니다. 도구의 역할 분담은 하나도 바뀌지 않습니다.</p>
+    </div>
+
+    <div class="rule-grid">
+      <div class="rule-card do">
+        <span class="tag">동화책 만들기</span>
+        <ul>
+          <li>ChatGPT → 캐릭터·줄거리·페이지별 프롬프트</li>
+          <li>Reve → 페이지별 삽화 이미지 생성</li>
+          <li>Canva → 삽화 위에 글 올려서 완성</li>
+        </ul>
+      </div>
+      <div class="rule-card do" style="border-color: color-mix(in srgb, var(--warm) 40%, var(--line));">
+        <span class="tag" style="color: var(--warm);">과학 영상 만들기</span>
+        <ul>
+          <li>ChatGPT → 주제·대본·장면별 프롬프트</li>
+          <li>Reve → 장면별 비주얼(이미지·영상) 생성</li>
+          <li>Canva → 자막·나레이션·BGM 입혀서 완성</li>
+        </ul>
+      </div>
+    </div>
+
+    <p><strong>오늘의 체크리스트</strong></p>
+    <ul class="check-list">
+      <li>주제 선정·대본·장면 구성은 모두 ChatGPT 프로젝트에서 만든다</li>
+      <li>Reve는 장면별 비주얼을 생성하는 용도로만 사용한다</li>
+      <li>Reve로 만든 비주얼에는 텍스트·자막을 직접 넣지 않는다</li>
+      <li>프롬프트에는 Canva에서 자막을 올릴 여백·위치를 반드시 지정한다</li>
+      <li>Canva에서 자막·나레이션(TTS)·BGM을 넣어 최종 영상을 완성한다</li>
+      <li>영상 첫 3~4초는 시선을 붙잡는 훅으로 별도 설계한다</li>
+    </ul>
+  </section>
+
+  <hr class="rule">
+
+  <!-- 02 -->
+  <section>
+    <div class="section-head"><span class="section-num mono">02</span><h2>전체 제작 흐름</h2></div>
+    <div class="flow">
+      <div class="flow-step"><div class="flow-num">1</div><p>ChatGPT 프로젝트를 만듭니다.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-num">2</div><p>다룰 <strong>과학 현상(주제)</strong>을 정합니다. — 요리, 날씨, 몸의 반응처럼 일상에서 눈에 보이는 현상이 좋습니다.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-num">3</div><p><strong>45~50초 내레이션 대본</strong>을 정리합니다. — 훅 → 원리 설명 → 실전 팁 순서.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-num">4</div><p><strong>장면별 스토리보드</strong>를 정리합니다. — 시간대, 화면 구성, 필요한 소재.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-num">5</div><p>ChatGPT에서 <strong>장면별 Reve 프롬프트</strong>를 만듭니다.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-num">6</div><p>Reve에서 <strong>장면별 비주얼</strong>을 생성합니다.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-num">7</div><p>Canva에서 <strong>자막·나레이션·BGM</strong>을 입혀 최종 숏폼을 완성합니다.</p></div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- 03 -->
+  <section>
+    <div class="section-head"><span class="section-num mono">03</span><h2>ChatGPT 프로젝트 운영</h2></div>
+    <p>프로젝트 1개 안에 역할별 채팅창을 나누어 사용합니다. 동화책 만들기와 이름만 다를 뿐 구조는 같습니다.</p>
+
+    <div class="role-grid">
+      <div class="role-card"><div class="role-title">🔬 주제·대본 창</div><p>다룰 과학 현상, 배경 원리, 45~50초 내레이션 전체 대본을 정리합니다.</p></div>
+      <div class="role-card"><div class="role-title">🎬 스토리보드 창</div><p>시간대별 화면 구성, 첫 3~4초 훅 설계, 장면 전환을 정리합니다.</p></div>
+      <div class="role-card"><div class="role-title">🎨 비주얼 톤앤매너 창</div><p>다큐·교양 톤, 색감·조명·구도, Canva에서 자막을 올릴 여백 규칙을 정리합니다.</p></div>
+      <div class="role-card"><div class="role-title">🧩 프롬프트 제작 창</div><p>위 설정을 종합해 장면별 최종 Reve 프롬프트를 작성합니다.</p></div>
+      <div class="role-card"><div class="role-title">✅ 검수 창 (선택)</div><p>생성된 비주얼의 과학적 정확성과 톤 일관성을 확인합니다.</p></div>
+    </div>
+
+    <div class="callout">
+      <span class="label">각 채팅창은 작은 기준 문서</span>
+      <p>프롬프트 제작 창에서는 다른 창에서 합의한 설정을 다시 설명하지 않고, 그 내용을 바탕으로 최종 프롬프트만 작성합니다. 동화책 만들기 때와 동일한 방식입니다.</p>
+    </div>
+
+    <p><strong>프롬프트 제작 창 요청 예시</strong></p>
+    <div class="prompt-box"><span class="tag">요청 예시</span>지금까지 정리한 주제·대본·비주얼 톤앤매너를 바탕으로
+숏폼 3번째 장면용 Reve 프롬프트를 작성해줘.
+조건:
+- 9:16 세로
+- 이미지 안에는 텍스트를 넣지 않음
+- 하단 또는 중앙에 Canva 자막을 올릴 여백 확보
+- 다큐·교양 톤(어둡고 차분한 배경, 포인트 색 1개)
+- 기존 톤앤매너 유지</div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- 04 -->
+  <section>
+    <div class="section-head"><span class="section-num mono">04</span><h2>Reve — 장면별 비주얼 만들기</h2></div>
+    <p>Reve에서는 프롬프트를 새로 쓰지 않습니다. ChatGPT 프로젝트에서 완성한 프롬프트를 그대로 붙여넣어 이미지·영상만 생성합니다.</p>
+
+    <div class="rule-grid">
+      <div class="rule-card do">
+        <span class="tag">이렇게 만든다</span>
+        <ul>
+          <li>9:16 세로 비율로 통일</li>
+          <li>실제 촬영 영상이 있으면 최우선으로 사용 (신뢰도·몰입감 ↑)</li>
+          <li>생성 비주얼은 촬영이 어려운 장면(분자 구조, 과정 다이어그램 등)에 활용</li>
+          <li>전체 장면의 색감·조명 톤을 통일</li>
+        </ul>
+      </div>
+      <div class="rule-card dont">
+        <span class="tag">하지 않는다</span>
+        <ul>
+          <li>Reve 이미지 안에 직접 텍스트·숫자 생성</li>
+          <li>장면마다 다른 그림체·색감 섞어 쓰기</li>
+          <li>Canva 자막 영역 없이 여백을 꽉 채운 구도</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <div class="callout dl-callout">
+    <div>
+      <span class="label">다운로드</span>
+      <p>장면별 Reve 프롬프트 파일 예시</p>
+    </div>
+    <a class="dl-btn" href="마이야르_반응_Reve_프롬프트.md" download>⬇ 프롬프트 마크다운 다운로드</a>
+  </div>
+
+  <!-- 05 -->
+  <section>
+    <div class="section-head"><span class="section-num mono">05</span><h2>Canva — 자막·나레이션·BGM으로 완성</h2></div>
+    <p>Reve로 만든 비주얼 위에 텍스트와 소리를 올려 최종 리소스를 완성하는 단계입니다.</p>
+
+    <p><strong>실제 진행 순서 — Reve 이미지 8장으로 영상 만들기</strong></p>
+    <div class="flow">
+      <div class="flow-step"><div class="flow-num">1</div><p><strong>새 영상 프로젝트 만들기</strong> — Canva 홈에서 "동영상" 검색 → "Instagram Reel" 또는 "YouTube Shorts" 템플릿 선택 (세로 1080×1920px). 빈 템플릿으로 시작해도 무방합니다.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-num">2</div><p><strong>Reve 이미지 8장 업로드</strong> — 좌측 메뉴 "업로드 항목(Uploads)"에 장면1~8 이미지를 모두 올리고, 타임라인에 장면 순서대로 드래그해 배치합니다 (프레임이 하나씩 자동 생성됨).</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-num">3</div><p><strong>프레임 길이를 기획안 타이밍에 맞추기</strong> — 프레임 클릭 → 하단 길이 슬라이더로 조정. 장면1 4초 · 장면2 5초 · 장면3 8초 · 장면4 7초 · 장면5 9초 · 장면6 7초 · 장면7 8초 · 장면8 2초. 전환은 컷 또는 페이드만 사용합니다.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-num">4</div><p><strong>나레이션 넣기</strong> — 상단 메뉴 "오디오" → "텍스트 음성 변환(Text to Speech)"에 대본 전문을 붙여넣고 차분한 톤 보이스를 선택해 오디오 트랙에 배치합니다. 직접 녹음할 경우 "레코드" 버튼 사용.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-num">5</div><p><strong>자막 넣기</strong> — "자막(Captions)" 기능으로 나레이션 음성 기준 자동 자막을 생성한 뒤, 각 장면 이미지에 확보해둔 여백(하단/상단/중앙 등)과 겹치지 않도록 위치를 조정합니다.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-num">6</div><p><strong>장면별 보조 텍스트 넣기 (선택)</strong> — 장면2 타이틀 "마이야르 반응", 장면8 마무리 문구처럼 자동 자막과 별개로 올릴 텍스트는 "텍스트" 도구로 직접 추가합니다.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-num">7</div><p><strong>BGM·효과음 넣기</strong> — "오디오"에서 "documentary" 또는 "calm ambient" 검색 후 배경음을 추가하고 볼륨을 -15dB 정도로 낮춰 나레이션이 잘 들리게 조정합니다.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-num">8</div><p><strong>최종 확인 후 내보내기</strong> — 재생해서 자막 타이밍·장면 전환·소리 밸런스를 확인한 뒤 "공유" → "다운로드" → MP4, 1080p 이상, 9:16으로 내보냅니다.</p></div>
+    </div>
+
+    <p><strong>항목별 세부 가이드</strong></p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>항목</th><th>진행 방법</th></tr></thead>
+        <tbody>
+          <tr><td>템플릿</td><td>"Instagram Reel" / "YouTube Shorts" 검색 → 세로 1080×1920px 캔버스. 다큐 톤이면 어두운 배경 + 화이트·포인트 컬러 텍스트 템플릿 추천</td></tr>
+          <tr><td>자막</td><td>"자동 자막(Captions)" 기능으로 나레이션에 맞춰 자막 생성 후 타이밍 미세 조정. 폰트는 고딕 계열(Pretendard, Noto Sans KR), 강조만 볼드</td></tr>
+          <tr><td>나레이션</td><td>텍스트 음성 변환(Text to Speech)으로 차분한 톤 보이스 선택, 또는 직접 녹음(마이크와 30cm 거리, 문장 사이 짧게 쉬기)</td></tr>
+          <tr><td>BGM &amp; 효과음</td><td>오디오 라이브러리에서 "documentary", "calm ambient" 검색. 현장음(SFX)은 살리고 BGM은 -15dB 정도로 낮게</td></tr>
+          <tr><td>전환·타이밍</td><td>컷 또는 페이드만 사용. 각 장면 최소 3초 이상 유지해 자막 읽을 시간 확보</td></tr>
+          <tr><td>색상</td><td>배경 다크 + 포인트 컬러 1개, 총 2~3색 이내로 제한해 정보 신뢰도 유지</td></tr>
+          <tr><td>내보내기</td><td>MP4, 1080p 이상, 9:16. 하단 UI에 가려지는 자막 안전 영역을 고려해 텍스트는 화면 중앙~상단 배치</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- 06 -->
+  <section>
+    <div class="section-head"><span class="section-num mono">06</span><h2>실전 예시 — 마이야르 반응</h2></div>
+    <p>"고기가 맛있어지는 과학"을 주제로 위 흐름을 그대로 적용한 실제 기획안입니다. 세로형 숏폼, 약 45~50초, 다큐·교양 톤(나레이션 중심, 정보 신뢰도 우선).</p>
+
+    <p><strong>내레이션 전체 대본</strong></p>
+    <div class="script-box">
+      <p>지글지글— 팬 위에서 고기가 갈색으로 변하는 그 순간, 냄새부터 다릅니다.</p>
+      <p>이건 '마이야르 반응'이라는 화학 반응 때문입니다.</p>
+      <p>고기 속 아미노산과 당분이 열을 만나 서로 결합하면서, 완전히 새로운 향과 맛의 분자들이 만들어지죠.</p>
+      <p>이 반응은 보통 섭씨 140도 이상에서 시작됩니다. 그런데 고기 표면에 물기가 있으면, 그 물이 먼저 증발하느라 온도가 100도를 넘지 못해요. 그래서 겉면이 젖어 있으면 아무리 구워도 갈변이 잘 안 되는 겁니다.</p>
+      <p>표면이 마르고 고온이 유지되면, 아미노산과 당은 세 단계를 거쳐 변합니다. 먼저 결합하고, 재배열되고, 마지막엔 갈색 색소 '멜라노이딘'과 수백 가지의 향 분자로 갈라지죠.</p>
+      <p>이게 바로 겉바속촉 스테이크에서 나는 그 고소하고 복합적인 냄새의 정체입니다. 설탕만 타는 캐러멜화와는 전혀 다른, 단백질이 만들어내는 마법이에요.</p>
+      <p>그러니 다음에 고기를 구울 땐, 키친타월로 겉면을 바짝 닦고 센 불로 구워보세요. 마이야르 반응이 훨씬 잘 일어날 겁니다.</p>
+      <p class="script-note">글자수 기준 약 45~50초 분량. 30초로 줄이려면 4~6번째 문단만 남기고 나머지는 요약합니다.</p>
+    </div>
+
+    <p><strong>장면별 스토리보드</strong></p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>시간</th><th>내레이션 요약</th><th>화면 구성</th><th>Canva 소재 아이디어</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>0-4초</td><td>지글지글— 갈색으로 변하는 순간, 냄새부터 다릅니다</td><td>팬 위 고기 클로즈업, 지글거리는 소리 강조. 훅으로 시선 고정</td><td>"steak searing close up", "sizzling pan" 검색</td></tr>
+          <tr><td>2</td><td>4-9초</td><td>마이야르 반응이라는 화학 반응 때문</td><td>타이틀 텍스트 애니메이션 등장, 배경은 살짝 어둡게</td><td>텍스트 팝/페이드 애니메이션, 굵은 고딕 폰트</td></tr>
+          <tr><td>3</td><td>9-17초</td><td>아미노산 + 당 → 열 → 새로운 향미 분자</td><td>아이콘·다이어그램 애니메이션(아미노산→화살표→향 분자)</td><td>"chemistry icon", "molecule" 검색, 심플 도형 구성</td></tr>
+          <tr><td>4</td><td>17-24초</td><td>140도 이상, 물기 있으면 100도를 못 넘음</td><td>온도계 그래픽 + 물방울 증발 모션, 젖은 고기 vs 마른 고기 화면 분할</td><td>온도계 일러스트 Element, Split screen 템플릿</td></tr>
+          <tr><td>5</td><td>24-33초</td><td>3단계 → 멜라노이딘 색소 + 수백 가지 향 분자</td><td>3단계 프로세스 다이어그램, 마지막에 갈변된 고기로 전환</td><td>"process diagram" 템플릿, 숫자 스텝 레이아웃</td></tr>
+          <tr><td>6</td><td>33-40초</td><td>캐러멜화와는 다른, 단백질의 마법</td><td>캐러멜(설탕) vs 스테이크(단백질) 비교 컷</td><td>"caramel sugar" vs "grilled steak" 스톡 이미지</td></tr>
+          <tr><td>7</td><td>40-48초</td><td>키친타월로 물기 닦고, 센 불로</td><td>실전 팁 자막 카드 → 센 불에 굽는 장면</td><td>텍스트 카드 + "patting meat dry", "high heat searing"</td></tr>
+          <tr><td>8</td><td>48-50초</td><td>마무리 로고/구독 유도 (선택)</td><td>채널 로고 + "저장해두고 다음 요리에 써먹기"</td><td>Canva Outro 템플릿</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout warm">
+      <span class="label">참고 자료</span>
+      <ul class="ref-list">
+        <li><a href="https://science.snu.ac.kr/newsroom/view/2/11/1075" target="_blank" rel="noopener">마이야르 반응 — 서울대학교 자연과학대학 뉴스룸</a></li>
+        <li><a href="https://ko.wikipedia.org/wiki/%EB%A7%88%EC%9D%B4%EC%95%BC%EB%A5%B4_%EB%B0%98%EC%9D%91" target="_blank" rel="noopener">마이야르 반응 — 위키백과</a></li>
+        <li><a href="https://theonlinegrill.com/maillard-reaction/" target="_blank" rel="noopener">Maillard Reaction Explained — The Online Grill</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- 07 -->
+  <section>
+    <div class="section-head"><span class="section-num mono">07</span><h2>내 주제로 바꿔서 실습하기</h2></div>
+    <p>마이야르 반응 대신 각자 관심 있는 과학 현상을 골라 같은 순서로 만들어봅니다.</p>
+    <ol class="plain">
+      <li>일상에서 눈에 보이는 과학 현상 하나를 고른다 (예: 얼음이 미끄러운 이유, 사이다 거품, 무지개, 근육통, 커피 크레마)</li>
+      <li>ChatGPT 프로젝트의 <strong>주제·대본 창</strong>에서 45~50초 내레이션 대본을 만든다</li>
+      <li><strong>스토리보드 창</strong>에서 8개 안팎의 장면으로 쪼갠다 (훅 → 원리 → 팁)</li>
+      <li><strong>프롬프트 제작 창</strong>에서 장면별 Reve 프롬프트를 만든다</li>
+      <li>Reve에서 비주얼을 생성하고, Canva에서 자막·나레이션·BGM을 입혀 완성한다</li>
+    </ol>
+    <div class="callout">
+      <span class="label">기억할 것</span>
+      <p>도구는 바뀌어도 원칙은 하나입니다 — <strong>기획과 프롬프트는 ChatGPT, 비주얼은 생성 도구, 완성은 Canva.</strong> 세 도구의 역할을 섞지 않는 것이 가장 중요합니다.</p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- 08 -->
+  <section>
+    <div class="section-head"><span class="section-num mono">08</span><h2>완성 영상 — 마이야르 반응</h2></div>
+    <p>위 흐름대로 완성한 실제 결과물입니다. 아래에서 바로 재생해볼 수 있습니다.</p>
+    <div class="video-frame">
+      <video controls preload="metadata" playsinline poster="">
+        <source src="1410_scienceVideo.mp4" type="video/mp4">
+        브라우저가 video 태그를 지원하지 않습니다. <a href="1410_scienceVideo.mp4" download>영상 다운로드</a>
+      </video>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <span>과학 숏폼 영상 만들기 · SNS 콘텐츠 제작 수업</span>
+  <span>한국폴리텍대학교 · 2026.08.21</span>
+</footer>
+
+</body>
+</html>
