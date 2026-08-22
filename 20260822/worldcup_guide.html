@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>가족과 함께하는 AI 바이브코딩 - AI 이상형 월드컵 토너먼트 만들기</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: linear-gradient(180deg, #fff3e6 0%, #ffece8 35%, #fff8ea 100%);
+    color: #3a2418;
+    line-height: 1.8;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .jua { font-family: 'Jua', sans-serif; }
+
+  /* ── 배경 컨페티 ── */
+  .confetti-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .confetti { position: absolute; font-size: 1.6rem; opacity: 0.55; animation: floaty linear infinite; }
+  @keyframes floaty {
+    0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    8%   { opacity: 0.55; }
+    92%  { opacity: 0.55; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* ── 헤더 ── */
+  header {
+    position: relative;
+    background: linear-gradient(120deg, #ef4444 0%, #f0684a 45%, #f0a500 100%);
+    color: #fff;
+    padding: 56px 24px 44px;
+    text-align: center;
+    border-radius: 0 0 40px 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.3);
+    padding: 8px 22px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 14px;
+  }
+
+  header h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); text-shadow: 3px 3px 0 rgba(0,0,0,0.12); line-height: 1.4; }
+  header p { margin-top: 10px; font-size: 1.05rem; font-weight: 700; opacity: 0.95; }
+
+  .top-nav { margin-top: 26px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+  .top-nav a {
+    background: rgba(255,255,255,0.28); color: #fff; text-decoration: none; padding: 9px 18px;
+    border-radius: 50px; font-weight: 700; font-size: 0.9rem; border: 2px solid rgba(255,255,255,0.5);
+    transition: transform 0.15s, background 0.15s;
+  }
+  .top-nav a:hover { background: rgba(255,255,255,0.5); transform: translateY(-2px) scale(1.05); }
+
+  /* ── 컨테이너 ── */
+  .container { max-width: 780px; margin: -18px auto 0; padding: 0 18px 60px; position: relative; z-index: 1; }
+
+  .section {
+    background: #fff; border-radius: 26px; padding: 30px 28px; margin-bottom: 26px;
+    box-shadow: 0 10px 28px rgba(200,90,60,0.12); border: 3px solid transparent;
+  }
+  .section.c-red    { border-color: #FFD2CB; }
+  .section.c-orange { border-color: #FFE0BE; }
+  .section.c-gold   { border-color: #FFEBAE; }
+  .section.c-blue   { border-color: #CBE2FF; }
+  .section.c-pink   { border-color: #FFD0E4; }
+
+  .section-title { display: flex; align-items: center; gap: 12px; font-size: 1.5rem; color: #3a2418; margin-bottom: 16px; }
+  .section-icon {
+    width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  .icon-red    { background: linear-gradient(135deg, #FF9B8A, #EF4444); }
+  .icon-orange { background: linear-gradient(135deg, #FFC98B, #FFA94D); }
+  .icon-gold   { background: linear-gradient(135deg, #FFE985, #F0A500); }
+  .icon-blue   { background: linear-gradient(135deg, #9BC4FF, #4D96FF); }
+  .icon-pink   { background: linear-gradient(135deg, #FF9AC1, #FF6FA5); }
+
+  .section p, .section li { font-size: 0.98rem; color: #55402f; }
+
+  .fun-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
+  .fun-list li { background: #fff6ee; border-radius: 14px; padding: 12px 16px; display: flex; align-items: flex-start; gap: 10px; font-weight: 500; }
+  .fun-list li .dot { font-size: 1.1rem; flex-shrink: 0; }
+  .fun-list li .txt { flex: 1 1 0%; min-width: 0; }
+
+  /* ── 장소/주제 카드 ── */
+  .topics { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin: 14px 0; }
+  .topic-card { background: #fff6ee; border: 1px solid #ffe4d2; border-radius: 16px; padding: 16px; display: flex; gap: 14px; align-items: center; }
+  .topic-icon { font-size: 2rem; background: #fff; width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 3px 8px rgba(0,0,0,0.08); }
+  .topic-info h3 { font-family: 'Noto Sans KR', sans-serif; font-size: 1.02rem; font-weight: 700; margin-bottom: 3px; color: #3a2418; }
+  .topic-info p { font-size: 0.85rem; color: #6b5646; }
+
+  /* ── 규칙 카드 ── */
+  .rule-grid { display:grid; grid-template-columns: 1fr; gap: 12px; margin: 14px 0; }
+  .rule-card { background:#fff6ee; border-radius:16px; padding:16px 16px 14px 20px; position:relative; display:flex; align-items:flex-start; gap:14px; }
+  .rule-num { flex-shrink:0; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Jua', sans-serif; font-size:0.95rem; color:#fff; }
+  .rule-card p { font-size: 0.95rem; margin-top: 2px; }
+
+  /* ── 기획서 작성기 CTA (중간) ── */
+  .mid-cta {
+    text-align: center; background: linear-gradient(135deg, #ef4444 0%, #f0a500 100%);
+    border-radius: 20px; padding: 26px 22px; color: #fff; margin-top: 16px;
+    box-shadow: 0 10px 24px rgba(239,68,68,0.3);
+  }
+  .mid-cta .emoji-mid { font-size: 2.2rem; }
+  .mid-cta p { color: #fff; font-weight: 700; margin: 8px 0 14px; }
+  .btn-huge {
+    display: inline-flex; align-items: center; gap: 10px; background: #fff; color: #ef4444; text-decoration: none;
+    font-family: 'Jua', sans-serif; font-size: 1.1rem; padding: 14px 30px; border-radius: 50px;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.2); transition: transform 0.15s;
+  }
+  .btn-huge:hover { transform: translateY(-4px) scale(1.04); }
+
+  /* ── 흐름도 ── */
+  .flow { display:flex; flex-direction:column; gap:8px; margin-top:16px; }
+  .flow-step { display:flex; align-items:center; gap:14px; background:#fff6ee; border-radius:14px; padding:14px 18px; }
+  .flow-step .fnum { width:30px; height:30px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; color:#fff; font-family:'Jua', sans-serif; }
+  .flow-step p { font-size: 0.95rem; }
+  .flow-arrow { text-align:center; color:#d99a7d; font-size:1.2rem; }
+
+  /* ── 완성작 CTA ── */
+  .final-cta { text-align: center; background: linear-gradient(135deg, #ef4444 0%, #f0684a 55%, #f0a500 100%); border-radius: 26px; padding: 40px 26px; color: #fff; box-shadow: 0 14px 34px rgba(239,68,68,0.35); }
+  .final-cta .emoji-big { font-size: 3rem; animation: bounce 1s infinite alternate; }
+  @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-12px); } }
+  .final-cta h2 { color: #fff; font-size: 1.6rem; margin: 10px 0 6px; }
+  .final-cta p { color: rgba(255,255,255,0.9); margin-bottom: 18px; font-weight: 500; }
+
+  footer { text-align: center; padding: 30px 20px 50px; color: #a98872; font-size: 0.85rem; }
+
+  @media (max-width: 560px) {
+    .section { padding: 24px 18px; }
+    header { padding: 44px 18px 36px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="confetti-bg" id="confetti"></div>
+
+<header>
+  <div class="badge">🏆 경기공유학교 2026</div>
+  <h1>가족과 함께하는<br>AI 바이브코딩! 🧑‍🚀✨</h1>
+  <p>유한대학교 · Day07 · AI 이상형 월드컵 토너먼트 만들기 🏆⚔️</p>
+  <div class="top-nav">
+    <a href="#goal">오늘의 목표</a>
+    <a href="#rules">설계 규칙</a>
+    <a href="#topics">추천 주제</a>
+    <a href="#paper">예시 게임</a>
+    <a href="#steps">만드는 순서</a>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- 오늘의 목표 -->
+  <section class="section c-red" id="goal">
+    <div class="section-title"><div class="section-icon icon-red">🎯</div><h2>오늘 만들어볼 것은?</h2></div>
+    <ul class="fun-list">
+      <li><span class="dot">⚔️</span><span class="txt"><strong>1:1 대결을 통해 최후의 1인을 가리는 이상형 월드컵 토너먼트 게임</strong>을 만들어볼 거예요!</span></li>
+      <li><span class="dot">🍗</span><span class="txt">음식, 애니메이션, 스포츠, 여행지 등 내가 원하는 주제와 후보들을 직접 선정하고 배치해요.</span></li>
+      <li><span class="dot">🏆</span><span class="txt">16강, 8강, 4강 라운드를 거쳐 VS 카드 대결과 승자 세레머니, 최종 대진표까지 완성해요.</span></li>
+    </ul>
+  </section>
+
+  <!-- 설계 규칙 -->
+  <section class="section c-orange" id="rules">
+    <div class="section-title"><div class="section-icon icon-orange">📋</div><h2>월드컵 토너먼트 특화 설계 규칙</h2></div>
+    <div class="rule-grid">
+      <div class="rule-card"><div class="rule-num" style="background:#ef4444">1</div><p><strong>시각적 대립구도(VS 연출):</strong> 1대1 대결 화면에서 두 후보 카드 간의 흥미진진한 타격감 연출을 넣어요.</p></div>
+      <div class="rule-card"><div class="rule-num" style="background:#f0a500">2</div><p><strong>라운드 흐름 관리:</strong> 16강 → 8강 → 4강 → 결승전으로 이어지는 대진표와 진행 상황을 보여줘요.</p></div>
+      <div class="rule-card"><div class="rule-num" style="background:#FFD93D">3</div><p><strong>결과 및 세레머니:</strong> 최후의 우승자가 정해지면 트로피 세레머니와 함께 전체 대진표를 시각화해요.</p></div>
+    </div>
+  </section>
+
+  <!-- 추천 주제 -->
+  <section class="section c-gold" id="topics">
+    <div class="section-title"><div class="section-icon icon-gold">💡</div><h2>인기 토너먼트 주제 아이디어</h2></div>
+    <p>무엇을 만들지 고민되시나요? 가족들이 좋아하는 인기 키워드예요.</p>
+    <div class="topics">
+      <div class="topic-card">
+        <div class="topic-icon">🍗</div>
+        <div class="topic-info"><h3>K-푸드 대표 야식 16강</h3><p>치킨 vs 피자, 떡볶이 vs 족발! 가슴 떨리는 야식 최강자전</p></div>
+      </div>
+      <div class="topic-card">
+        <div class="topic-icon">🎬</div>
+        <div class="topic-info"><h3>추억의 애니 캐릭터 월드컵</h3><p>짱구, 도라에몽, 코난, 원피스 등 최애 캐릭터들의 라이벌전</p></div>
+      </div>
+      <div class="topic-card">
+        <div class="topic-icon">✈️</div>
+        <div class="topic-info"><h3>버킷리스트 세계 여행지</h3><p>파리, 하와이, 도쿄, 발리 등 가족과 함께 떠나고 싶은 꿈의 도시</p></div>
+      </div>
+      <div class="topic-card">
+        <div class="topic-icon">🍰</div>
+        <div class="topic-info"><h3>달콤한 최애 디저트 16강</h3><p>마카롱, 크로플, 빙수, 소금빵! 당충전 디저트 왕좌의 게임</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 예시 게임 -->
+  <section class="section c-blue" id="paper">
+    <div class="section-title"><div class="section-icon icon-blue">🎮</div><h2>먼저 완성된 월드컵을 플레이해볼까요?</h2></div>
+    <p>버튼을 누르면 오늘 만들어볼 것과 같은 형태의 완성작을 직접 플레이해볼 수 있어요.</p>
+    <div class="mid-cta">
+      <div class="emoji-mid">🏆</div>
+      <p>K-푸드 대표 야식 월드컵 16강</p>
+      <a class="btn-huge" href="worldcup_game.html" target="_blank" rel="noopener">
+        🚀 야식 월드컵 플레이하기
+      </a>
+    </div>
+  </section>
+
+  <!-- 만드는 순서 -->
+  <section class="section c-pink" id="steps">
+    <div class="section-title"><div class="section-icon icon-pink">🛠️</div><h2>이렇게 만들어요!</h2></div>
+    <div class="flow">
+      <div class="flow-step"><div class="fnum" style="background:#ef4444">1</div><p>토너먼트로 만들 <strong>주제와 후보(8~16개)</strong>를 정해요.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="fnum" style="background:#f0a500">2</div><p>기획서 작성기에 <strong>예시대로(또는 자유롭게) 기획서</strong>를 작성해요.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="fnum" style="background:#FFD93D">3</div><p>완성되면 <strong>마크다운 파일을 다운로드</strong>해요.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="fnum" style="background:#4D96FF">4</div><p>Antigravity IDE를 열고 <strong>"마크다운 파일을 읽고 html 단일 페이지로 개발해줘."</strong>라고 요청해요.</p></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="fnum" style="background:#FF6FA5">5</div><p>완성되면 <strong>html 파일을 열어서</strong> 가족과 함께 대결을 즐겨요.</p></div>
+    </div>
+  </section>
+
+  <!-- 완성작 CTA -->
+  <div class="final-cta">
+    <div class="emoji-big">🏆⚔️</div>
+    <h2 class="jua">나만의 월드컵 완성하기</h2>
+    <p>기획서를 완성했다면, 이제 나만의 이상형 월드컵을 직접 만들어봐요!</p>
+    <a class="btn-huge" href="worldcup_paper.html" target="_blank" rel="noopener">
+      🚀 기획서 작성기로 이동하기
+    </a>
+  </div>
+
+</div>
+
+<footer>
+  🏆 경기공유학교 2026 · 가족과 함께하는 AI 바이브코딩 (유한대학교) · Day07 ⚔️
+</footer>
+
+<script>
+  // 배경 컨페티
+  const shapes = ['🏆','⚔️','🥇','✨','⭐','💫','🎉','🔥','☁️','🎯'];
+  const bg = document.getElementById('confetti');
+  for (let i = 0; i < 24; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.fontSize = (1 + Math.random() * 1.6) + 'rem';
+    el.style.animationDuration = (10 + Math.random() * 14) + 's';
+    el.style.animationDelay = (Math.random() * 14) + 's';
+    bg.appendChild(el);
+  }
+</script>
+
+</body>
+</html>
