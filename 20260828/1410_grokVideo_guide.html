@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grok으로 만드는 캐릭터 숏폼 영상</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a2129;
+    --ink-soft: #333c46;
+    --muted: #5c6875;
+    --paper: #f1f4f7;
+    --raised: #ffffff;
+    --line: #d8dee5;
+    --accent: #2e6da4;
+    --accent-strong: #1a3a5c;
+    --accent-soft: #dce8f2;
+    --warm: #d68c00;
+    --warm-soft: #f7ecd6;
+    --code-bg: #e7ecf1;
+    --shadow: rgba(26, 33, 41, 0.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #e7ebef;
+      --ink-soft: #c7d0da;
+      --muted: #93a0ab;
+      --paper: #10151b;
+      --raised: #181f27;
+      --line: #29323c;
+      --accent: #6fa8dc;
+      --accent-strong: #9cc4ea;
+      --accent-soft: #1c2a38;
+      --warm: #e8ab4a;
+      --warm-soft: #2c2313;
+      --code-bg: #1e2731;
+      --shadow: rgba(0, 0, 0, 0.45);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #e7ebef;
+    --ink-soft: #c7d0da;
+    --muted: #93a0ab;
+    --paper: #10151b;
+    --raised: #181f27;
+    --line: #29323c;
+    --accent: #6fa8dc;
+    --accent-strong: #9cc4ea;
+    --accent-soft: #1c2a38;
+    --warm: #e8ab4a;
+    --warm-soft: #2c2313;
+    --code-bg: #1e2731;
+    --shadow: rgba(0, 0, 0, 0.45);
+  }
+
+  * { box-sizing: border-box; }
+  html { background: var(--paper); }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    line-height: 1.75;
+    font-size: 16.5px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: 'IBM Plex Mono', 'D2Coding', ui-monospace, monospace; }
+
+  a { color: var(--accent-strong); }
+  a:hover { color: var(--warm); }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    padding: 5.2rem 1.5rem 3.6rem;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
+    background:
+      radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--accent) 20%, transparent) 1px, transparent 1.6px)
+      0 0 / 26px 26px;
+  }
+  .hero-inner { position: relative; max-width: 800px; margin: 0 auto; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 0.6em;
+    font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent-strong); margin: 0 0 1.3rem;
+  }
+  .hero-eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--warm); flex: none; }
+  h1.hero-title {
+    font-size: clamp(2rem, 5vw, 3rem); line-height: 1.22; font-weight: 700;
+    margin: 0 0 1rem; text-wrap: balance; letter-spacing: -0.01em;
+  }
+  h1.hero-title em { font-style: normal; color: var(--accent-strong); }
+  .hero-sub { color: var(--ink-soft); font-size: 1.05rem; max-width: 640px; margin: 0 0 1.2rem; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 0.5em 1.1em; color: var(--muted); font-size: 0.96rem; }
+
+  /* ---------- Page ---------- */
+  .page { max-width: 800px; margin: 0 auto; padding: 3.4rem 1.5rem 6rem; display: flex; flex-direction: column; gap: 3.4rem; }
+  section { scroll-margin-top: 2rem; }
+
+  .section-head { display: flex; align-items: baseline; gap: 0.9rem; margin-bottom: 1.4rem; padding-bottom: 0.9rem; border-bottom: 1px solid var(--line); }
+  .section-num { font-size: 0.85rem; color: var(--warm); letter-spacing: 0.06em; flex: none; }
+  .section-head h2 { font-size: clamp(1.35rem, 3vw, 1.65rem); margin: 0; font-weight: 700; letter-spacing: -0.01em; }
+
+  p { margin: 0.9em 0; color: var(--ink-soft); }
+  strong { color: var(--ink); font-weight: 600; }
+
+  ul.plain, ol.plain { margin: 0.8em 0; padding-left: 1.3em; color: var(--ink-soft); }
+  ul.plain li, ol.plain li { margin: 0.45em 0; }
+
+  /* ---------- Checklist ---------- */
+  .check-list { list-style: none; margin: 1.2rem 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+  .check-list li {
+    display: flex; align-items: flex-start; gap: 0.7rem;
+    background: var(--raised); border: 1px solid var(--line); border-radius: 9px;
+    padding: 0.7rem 0.95rem; font-size: 0.94rem; color: var(--ink-soft);
+  }
+  .check-list li::before {
+    content: "\2713"; flex: none; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent-strong); font-size: 0.72rem;
+    display: flex; align-items: center; justify-content: center; font-weight: 700; margin-top: 0.1em;
+  }
+
+  .lead-callout {
+    background: linear-gradient(180deg, var(--accent-soft), var(--raised) 70%);
+    border: 1px solid var(--line); border-left: 3px solid var(--accent-strong);
+    border-radius: 10px; padding: 1.3rem 1.5rem; margin: 0 0 1.6rem;
+  }
+  .lead-callout p { margin: 0; color: var(--ink); font-size: 1.02rem; }
+  .lead-callout p + p { margin-top: 0.6em; }
+
+  /* ---------- Flow ---------- */
+  .flow { display: flex; flex-direction: column; gap: 0; margin: 1.4rem 0; }
+  .flow-step { display: flex; align-items: flex-start; gap: 1rem; background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 0.9rem 1.1rem; }
+  .flow-step.mark { border-color: color-mix(in srgb, var(--warm) 45%, var(--line)); background: linear-gradient(180deg, var(--warm-soft), var(--raised) 70%); }
+  .flow-num {
+    flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-strong); color: #fff;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .flow-step.mark .flow-num { background: var(--warm); }
+  .flow-step p { margin: 0; font-size: 0.96rem; color: var(--ink-soft); }
+  .flow-step p strong { color: var(--ink); }
+  .flow-arrow { text-align: center; color: var(--muted); font-size: 1.1rem; padding: 4px 0; }
+
+  /* ---------- Role cards ---------- */
+  .role-grid { display: grid; grid-template-columns: 1fr; gap: 0.85rem; margin: 1.4rem 0; }
+  .role-card { background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.2rem; box-shadow: 0 1px 2px var(--shadow); }
+  .role-card .role-title { display: flex; align-items: center; gap: 0.6rem; font-weight: 700; color: var(--ink); margin-bottom: 0.35rem; font-size: 0.98rem; }
+  .role-card p { margin: 0; font-size: 0.92rem; color: var(--ink-soft); }
+
+  /* ---------- Prompt box ---------- */
+  .prompt-box {
+    background: var(--code-bg); border: 1px solid var(--line); border-radius: 9px;
+    padding: 1.1rem 1.3rem; margin: 1.2rem 0; font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.87rem; color: var(--ink-soft); white-space: pre-wrap; line-height: 1.65;
+  }
+  .prompt-box .tag { display: block; font-family: 'IBM Plex Sans KR', sans-serif; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--warm); margin-bottom: 0.55rem; font-weight: 600; }
+
+  /* ---------- Table ---------- */
+  .table-wrap { overflow-x: auto; margin: 1.5rem 0; border: 1px solid var(--line); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 0.9rem; }
+  th, td { border-bottom: 1px solid var(--line); padding: 0.7em 0.85em; text-align: left; vertical-align: top; }
+  th { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--accent-soft); }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+  td:nth-child(1) { color: var(--ink); font-weight: 600; white-space: nowrap; }
+
+  /* ---------- Callout ---------- */
+  .callout { position: relative; background: var(--raised); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 8px; padding: 1.1rem 1.3rem; margin: 1.5rem 0; }
+  .callout .label { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-strong); display: block; margin-bottom: 0.5rem; }
+  .callout p { margin: 0; color: var(--ink); font-size: 0.98rem; }
+  .callout.warm { border-left-color: var(--warm); background: linear-gradient(180deg, var(--warm-soft), var(--raised) 65%); }
+  .callout.warm .label { color: var(--warm); }
+
+  /* ---------- Download / CTA ---------- */
+  .dl-callout { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
+  .dl-callout p { margin: 0.2rem 0 0; }
+  .dl-btn {
+    flex: none; display: inline-flex; align-items: center; gap: 0.5em;
+    background: var(--accent-strong); color: #fff; text-decoration: none;
+    font-size: 0.9rem; font-weight: 600; padding: 0.65rem 1.2rem; border-radius: 999px;
+    box-shadow: 0 4px 12px var(--shadow); transition: transform 0.15s, background 0.15s;
+  }
+  .dl-btn:hover { background: var(--warm); color: #fff; transform: translateY(-2px); }
+
+  /* ---------- Rule grid (do / don't) ---------- */
+  .rule-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.4rem 0; }
+  @media (max-width: 620px) { .rule-grid { grid-template-columns: 1fr; } }
+  .rule-card { background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 1.1rem 1.25rem; }
+  .rule-card .tag { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: 0.5rem; }
+  .rule-card.do { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+  .rule-card.do .tag { color: var(--accent-strong); }
+  .rule-card.dont .tag { color: var(--warm); }
+  .rule-card ul { margin: 0; padding-left: 1.1em; font-size: 0.9rem; color: var(--ink-soft); }
+  .rule-card li { margin: 0.4em 0; }
+
+  /* ---------- Character sheet example ---------- */
+  .sheet { background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 1.3rem 1.5rem; margin: 1.4rem 0; }
+  .sheet dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 0.55rem 1.1rem; }
+  .sheet dt { font-family: 'IBM Plex Mono', monospace; font-size: 0.74rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent-strong); padding-top: 0.15em; }
+  .sheet dd { margin: 0; font-size: 0.94rem; color: var(--ink-soft); }
+  @media (max-width: 560px) { .sheet dl { grid-template-columns: 1fr; gap: 0.15rem 0; } .sheet dd { margin-bottom: 0.6rem; } }
+
+  /* ---------- Narration script ---------- */
+  .script-box { background: var(--raised); border: 1px solid var(--line); border-left: 3px solid var(--accent-strong); border-radius: 10px; padding: 1.4rem 1.6rem; margin: 1.4rem 0; }
+  .script-box p { margin: 0.9em 0; color: var(--ink); font-size: 0.98rem; }
+  .script-box p:first-child { margin-top: 0; }
+  .script-note { font-size: 0.84rem; color: var(--muted); margin-top: 0.8em; }
+
+  hr.rule { border: none; border-top: 1px solid var(--line); margin: 0; }
+
+  footer { max-width: 800px; margin: 0 auto; padding: 0 1.5rem 4rem; display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 0.85rem; font-family: 'IBM Plex Mono', monospace; flex-wrap: wrap; gap: 0.5rem; }
+
+  .ref-list { list-style: none; margin: 1rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+  .ref-list li { font-size: 0.9rem; }
+  .ref-list a { text-decoration: none; }
+  .ref-list a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <span class="hero-eyebrow mono">SNS 콘텐츠 제작 수업 · 마지막 시간</span>
+    <h1 class="hero-title">Grok으로 만드는 <em>캐릭터 숏폼</em> 영상</h1>
+    <p class="hero-sub">캐릭터가 등장하는 45~60초 스토리 숏폼을 만듭니다. 기획·대본·프롬프트는 ChatGPT, 이미지·영상 생성은 Grok, 자막·완성은 Canva — <strong>「AI 동화책 만들기」·「과학 숏폼」과 완전히 같은 방식</strong>에, 오늘은 <strong>캐릭터 시트</strong> 한 단계를 더합니다.</p>
+    <div class="hero-meta mono">
+      <span>한국폴리텍대학교</span>
+      <span>2026.08.28</span>
+      <span>예시 · 늦깎이 개발자 "도윤"</span>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- 01 -->
+  <section>
+    <div class="section-head"><span class="section-num mono">01</span><h2>오늘 만드는 것 &amp; 핵심 원칙</h2></div>
+
+    <div class="lead-callout">
+      <p><strong>동화책 만들기</strong>에서는 ChatGPT로 이야기와 프롬프트를 만들고, Reve로 그림을 그리고, Canva로 글을 올려 완성했습니다. <strong>과학 숏폼</strong>도 도구 이름만 바꿔 똑같이 했습니다.</p>
+      <p>오늘도 워크플로우는 그대로입니다. 다만 <strong>비주얼 생성 도구가 Grok</strong>으로 바뀌고, "이야기책 페이지" 대신 <strong>"캐릭터가 나오는 45~60초 스토리 영상"</strong>을 만듭니다. 캐릭터가 장면마다 흔들리지 않도록 <strong>캐릭터 시트</strong>를 먼저 정리하는 것이 오늘의 새 단계입니다.</p>
+    </div>
+
+    <div class="rule-grid">
+      <div class="rule-card do">
+        <span class="tag">지난 시간까지</span>
+        <ul>
+          <li>ChatGPT &rarr; 이야기 &middot; 대본 &middot; 장면별 프롬프트</li>
+          <li>Reve &rarr; 장면별 이미지 생성</li>
+          <li>Canva &rarr; 자막 &middot; 나레이션 &middot; BGM으로 완성</li>
+        </ul>
+      </div>
+      <div class="rule-card do" style="border-color: color-mix(in srgb, var(--warm) 40%, var(--line));">
+        <span class="tag" style="color: var(--warm);">오늘 (Grok)</span>
+        <ul>
+          <li>ChatGPT &rarr; 대본 &middot; <strong>캐릭터 시트</strong> &middot; 장면별 프롬프트</li>
+          <li>Grok &rarr; 캐릭터 기준 이미지 &rarr; 장면별 영상 클립</li>
+          <li>Canva &rarr; 자막 &middot; 나레이션 &middot; BGM으로 완성</li>
+        </ul>
+      </div>
+    </div>
+
+    <p><strong>오늘의 체크리스트</strong></p>
+    <ul class="check-list">
+      <li>주제 &middot; 대본 &middot; 캐릭터 &middot; 장면 구성은 모두 ChatGPT 프로젝트에서 만든다</li>
+      <li>캐릭터는 <strong>한 문단짜리 고정 묘사(캐릭터 시트)</strong>로 정리하고, 모든 장면 프롬프트에 그대로 붙여넣는다</li>
+      <li>Grok에서는 프롬프트를 새로 쓰지 않고, ChatGPT에서 완성한 프롬프트를 붙여넣어 생성만 한다</li>
+      <li>Grok 클립 안에는 자막 &middot; 텍스트를 넣지 않는다 (자막은 Canva에서)</li>
+      <li>클립은 9:16 세로, 6초 내외로 만들고 카메라 움직임은 프롬프트당 한 가지만 지정한다</li>
+      <li>Canva에서 클립을 이어 붙이고 자막 &middot; 나레이션(TTS) &middot; BGM을 넣어 완성한다</li>
+      <li>영상 첫 3~4초는 시선을 붙잡는 훅으로 따로 설계한다</li>
+    </ul>
+  </section>
+
+  <hr class="rule">
+
+  <!-- 02 -->
+  <section>
+    <div class="section-head"><span class="section-num mono">02</span><h2>전체 제작 흐름</h2></div>
+    <div class="flow">
+      <div class="flow-step"><div class="flow-num">1</div><p>ChatGPT 기획 프로젝트를 만듭니다. (역할별 채팅창 분리)</p></div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-step"><div class="flow-num">2</div><p><strong>영상 주제와 컨셉</strong>을 정합니다. — 캐릭터 한 명이 겪는 짧은 이야기가 좋습니다. (도전 &middot; 실수 &middot; 반전 &middot; 성장 등)</p></div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-step"><div class="flow-num">3</div><p><strong>45~60초 내레이션 &middot; 대사 대본</strong>을 정리합니다. — 훅 &rarr; 전개 &rarr; 마무리 한 줄.</p></div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-step mark"><div class="flow-num">4</div><p><strong>캐릭터 시트를 작성합니다.</strong> — 아래 <strong>캐릭터 시트 메이커</strong>로 정리하고 <code>.md</code>로 저장해, ChatGPT 캐릭터 창에 붙여넣습니다.</p></div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-step"><div class="flow-num">5</div><p><strong>장면별 스토리보드</strong>를 정리합니다. — 8컷 내외, 컷마다 화면 구성 &middot; 카메라 &middot; 분위기.</p></div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-step"><div class="flow-num">6</div><p>ChatGPT에서 <strong>장면별 Grok 프롬프트</strong>를 만듭니다. — 매 프롬프트에 캐릭터 시트 묘사를 그대로 포함.</p></div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-step"><div class="flow-num">7</div><p>Grok에서 <strong>캐릭터 기준 이미지 1장</strong>을 만들어 확정합니다. (정면 &middot; 전신 &middot; 중립 배경)</p></div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-step"><div class="flow-num">8</div><p>Grok에서 장면별로 <strong>이미지 &rarr; 영상(6초 내외 클립)</strong>을 생성합니다.</p></div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-step"><div class="flow-num">9</div><p>Canva에서 클립을 이어 붙이고 <strong>자막 &middot; 나레이션 &middot; BGM</strong>을 입혀 최종 숏폼을 완성합니다.</p></div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- 03 -->
+  <section>
+    <div class="section-head"><span class="section-num mono">03</span><h2>ChatGPT 프로젝트 운영</h2></div>
+    <p>프로젝트 1개 안에 역할별 채팅창을 나누어 씁니다. 지난 시간과 이름만 조금 다를 뿐 구조는 같고, <strong>캐릭터 창</strong>이 중심이 됩니다.</p>
+
+    <div class="role-grid">
+      <div class="role-card"><div class="role-title">🎬 주제 &middot; 대본 창</div><p>영상의 주제, 메시지, 45~60초 내레이션/대사 전체 대본을 정리합니다.</p></div>
+      <div class="role-card"><div class="role-title">👤 캐릭터 창</div><p>캐릭터 시트(외형 &middot; 성격 &middot; 말투 &middot; 비주얼 키워드)를 붙여넣고, 캐릭터 기준 이미지용 프롬프트를 만듭니다.</p></div>
+      <div class="role-card"><div class="role-title">🎞️ 스토리보드 창</div><p>시간대별 화면 구성, 첫 3~4초 훅, 장면 전환, 카메라 움직임을 정리합니다.</p></div>
+      <div class="role-card"><div class="role-title">🧩 프롬프트 제작 창</div><p>위 설정을 종합해 장면별 최종 Grok 프롬프트를 작성합니다. (캐릭터 묘사 포함)</p></div>
+      <div class="role-card"><div class="role-title">✅ 검수 창 (선택)</div><p>생성된 클립의 캐릭터 일관성, 톤, 카메라 움직임을 확인합니다.</p></div>
+    </div>
+
+    <div class="callout">
+      <span class="label">각 채팅창은 작은 기준 문서</span>
+      <p>프롬프트 제작 창에서는 다른 창에서 합의한 설정을 다시 설명하지 않고, 그 내용을 바탕으로 최종 프롬프트만 만듭니다. 동화책 &middot; 과학 숏폼 때와 동일합니다.</p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- 04 -->
+  <section id="character">
+    <div class="section-head"><span class="section-num mono">04</span><h2>캐릭터 시트 만들기 <span style="color:var(--warm)">(오늘의 새 단계)</span></h2></div>
+
+    <p>Grok은 장면을 만들 때마다 캐릭터를 <strong>매번 새로 그립니다.</strong> 그래서 아무 설정 없이 "20대 남자"라고만 하면 장면마다 머리색 &middot; 얼굴 &middot; 옷이 조금씩 바뀝니다. 해결책은 간단합니다.</p>
+
+    <div class="callout warm">
+      <span class="label">핵심</span>
+      <p>캐릭터를 <strong>한 문단으로 고정해 묘사</strong>하고(＝캐릭터 시트), 그 문장을 <strong>모든 장면 프롬프트에 그대로 붙여넣습니다.</strong> 먼저 캐릭터 기준 이미지 1장을 확정한 뒤, 그 이미지를 각 장면 영상의 시작 프레임으로 씁니다.</p>
+    </div>
+
+    <p><strong>캐릭터 시트에 꼭 들어가야 하는 것</strong></p>
+    <ul class="plain">
+      <li><strong>외형</strong> — 헤어(길이 &middot; 색), 눈동자 색, 체형, 의상, 특징적 소품 (영상 생성에 가장 크게 영향)</li>
+      <li><strong>성격 &middot; 말투</strong> — 대사와 나레이션 톤을 정할 때 참고</li>
+      <li><strong>비주얼 레퍼런스 키워드</strong> — 프롬프트에 바로 넣을 영어 키워드 (예: <span class="mono">cinematic lighting, warm color palette, 35mm</span>)</li>
+    </ul>
+
+    <div class="callout dl-callout">
+      <div>
+        <span class="label">실습 도구</span>
+        <p>항목을 채우고 마크다운으로 저장 &rarr; ChatGPT 캐릭터 창에 붙여넣기</p>
+      </div>
+      <a class="dl-btn" href="character-sheet-maker.html" target="_blank" rel="noopener">🗂 캐릭터 시트 메이커 열기 &nearr;</a>
+    </div>
+
+    <p><strong>ChatGPT 캐릭터 창 요청 예시</strong></p>
+    <div class="prompt-box"><span class="tag">요청 예시</span>아래는 이번 영상의 캐릭터 시트야. 이걸 기준으로,
+장면마다 그대로 붙여 쓸 수 있는 "캐릭터 고정 묘사" 3~4문장을 영어로 정리해줘.
+그리고 캐릭터 기준 이미지(정면, 전신, 중립 회색 배경, 9:16)용 Grok 프롬프트도 하나 만들어줘.
+
+[여기에 캐릭터 시트 .md 내용 붙여넣기]</div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- 05 -->
+  <section>
+    <div class="section-head"><span class="section-num mono">05</span><h2>Grok — 캐릭터 이미지 &amp; 장면 클립</h2></div>
+    <p>Grok(웹 <span class="mono">grok.com</span> 또는 앱)의 이미지/영상 생성 기능을 씁니다. 프롬프트는 새로 쓰지 않고, ChatGPT에서 완성한 것을 붙여넣습니다. 순서는 <strong>① 캐릭터 기준 이미지 확정 &rarr; ② 장면별 이미지 &rarr; ③ 이미지를 영상으로</strong> 입니다.</p>
+
+    <div class="rule-grid">
+      <div class="rule-card do">
+        <span class="tag">이렇게 만든다</span>
+        <ul>
+          <li>캐릭터 기준 이미지부터 확정 (정면 &middot; 전신 &middot; 중립 배경)</li>
+          <li>장면 이미지 프롬프트에 캐릭터 고정 묘사를 <strong>매번 그대로</strong> 포함</li>
+          <li>마음에 드는 이미지를 고른 뒤 "영상으로 만들기(image to video)"로 6초 내외 클립 생성</li>
+          <li>9:16 세로로 통일, 카메라 움직임은 클립당 하나만 (예: slow push-in, pan left)</li>
+          <li>조명 &middot; 색감 &middot; 그림체 키워드를 전 장면 동일하게 유지</li>
+        </ul>
+      </div>
+      <div class="rule-card dont">
+        <span class="tag">하지 않는다</span>
+        <ul>
+          <li>장면마다 캐릭터를 새 문장으로 대충 묘사</li>
+          <li>클립 안에 자막 &middot; 대사 텍스트를 생성 (자막은 Canva)</li>
+          <li>한 클립에 카메라 움직임 여러 개 지정</li>
+          <li>성인/과격 모드 사용 — 수업에서는 표준 모드만</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout warm">
+      <span class="label">사용량 절약</span>
+      <p>Grok 무료 사용량은 제한이 있습니다. 프롬프트를 ChatGPT에서 <strong>8컷 모두 미리 정리</strong>한 뒤, Grok에서는 확정된 프롬프트만 순서대로 생성하세요. 재생성은 정말 필요한 컷만.</p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- 06 -->
+  <section>
+    <div class="section-head"><span class="section-num mono">06</span><h2>Canva — 자막 &middot; 나레이션 &middot; BGM으로 완성</h2></div>
+    <p>Grok으로 만든 클립을 이어 붙이고 소리와 글자를 올려 최종 숏폼을 완성합니다.</p>
+
+    <p><strong>진행 순서 — Grok 클립 8개로 영상 만들기</strong></p>
+    <div class="flow">
+      <div class="flow-step"><div class="flow-num">1</div><p><strong>새 영상 프로젝트</strong> — Canva에서 "Instagram Reel" 또는 "YouTube Shorts" 템플릿 선택 (세로 1080&times;1920px). 빈 캔버스로 시작해도 됩니다.</p></div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-step"><div class="flow-num">2</div><p><strong>클립 8개 업로드</strong> — "업로드 항목(Uploads)"에 장면1~8 클립을 올리고 타임라인에 순서대로 배치합니다.</p></div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-step"><div class="flow-num">3</div><p><strong>클립 길이 다듬기</strong> — 각 클립을 필요한 구간만 남기고 트림. 전환은 컷 또는 페이드만. 전체 45~60초에 맞춥니다.</p></div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-step"><div class="flow-num">4</div><p><strong>나레이션</strong> — "오디오 &rarr; 텍스트 음성 변환(Text to Speech)"에 대본을 붙여넣고 캐릭터 톤에 맞는 보이스 선택. 직접 녹음도 가능합니다.</p></div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-step"><div class="flow-num">5</div><p><strong>자막</strong> — "자막(Captions)"으로 나레이션 기준 자동 자막 생성 후, 클립에서 인물/중요 요소와 겹치지 않게 위치 조정.</p></div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-step"><div class="flow-num">6</div><p><strong>타이틀 &middot; 마무리 문구</strong> — 첫 컷 제목, 마지막 컷 메시지는 "텍스트" 도구로 직접 추가.</p></div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-step"><div class="flow-num">7</div><p><strong>BGM &middot; 효과음</strong> — "오디오"에서 분위기에 맞는 배경음 검색 후 볼륨 -15dB 정도로 낮춰 나레이션이 잘 들리게.</p></div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-step"><div class="flow-num">8</div><p><strong>최종 확인 후 내보내기</strong> — 자막 타이밍 &middot; 전환 &middot; 소리 밸런스 확인 후 "공유 &rarr; 다운로드 &rarr; MP4, 1080p 이상, 9:16".</p></div>
+    </div>
+
+    <p><strong>항목별 세부 가이드</strong></p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>항목</th><th>진행 방법</th></tr></thead>
+        <tbody>
+          <tr><td>템플릿</td><td>"Instagram Reel" / "YouTube Shorts" 검색 &rarr; 세로 1080&times;1920px 캔버스</td></tr>
+          <tr><td>자막</td><td>자동 자막(Captions) 생성 후 타이밍 미세 조정. 폰트는 고딕 계열(Pretendard, Noto Sans KR), 강조만 볼드</td></tr>
+          <tr><td>나레이션</td><td>텍스트 음성 변환으로 캐릭터 톤에 맞는 보이스, 또는 직접 녹음(마이크와 30cm, 문장 사이 짧게 쉬기)</td></tr>
+          <tr><td>BGM &amp; 효과음</td><td>분위기 키워드로 검색(예: "calm", "hopeful", "lo-fi"). BGM은 -15dB 정도로 낮게</td></tr>
+          <tr><td>전환 &middot; 타이밍</td><td>컷 또는 페이드만. 각 클립 최소 3초 이상 유지해 자막 읽을 시간 확보</td></tr>
+          <tr><td>색상</td><td>포인트 컬러 1개 + 총 2~3색 이내로 제한</td></tr>
+          <tr><td>내보내기</td><td>MP4, 1080p 이상, 9:16. 하단 UI에 가려지는 안전 영역 고려해 텍스트는 화면 중앙~상단 배치</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- 07 -->
+  <section>
+    <div class="section-head"><span class="section-num mono">07</span><h2>실전 예시 — 늦깎이 개발자 "도윤"</h2></div>
+    <p>"처음으로 내 손으로 만든 걸 세상에 내보내는 순간"을 주제로 위 흐름을 그대로 적용한 예시입니다. 세로형 숏폼, 약 50초, 따뜻하고 담담한 톤.</p>
+
+    <p><strong>캐릭터 시트 (요약본)</strong></p>
+    <div class="sheet">
+      <dl>
+        <dt>이름</dt><dd>도윤</dd>
+        <dt>나이 / 역할</dt><dd>20대 후반, 늦깎이 개발 입문자 (주인공 겸 내레이터)</dd>
+        <dt>외형</dt><dd>짧은 검은 곱슬머리, 갈색 눈, 마른 체형. 헐렁한 회색 후드티, 손목에 낡은 시계. 항상 텀블러를 들고 다님</dd>
+        <dt>성격 &middot; 말투</dt><dd>느리고 조용하지만 끈질김. 혼잣말이 많고, 문장을 짧게 끊어 말함</dd>
+        <dt>비주얼 키워드</dt><dd><span class="mono">cinematic lighting, warm desk lamp glow, night, 35mm, shallow depth of field, muted color palette</span></dd>
+      </dl>
+    </div>
+
+    <p><strong>내레이션 전체 대본</strong></p>
+    <div class="script-box">
+      <p>새벽 두 시. 화면에는 빨간 에러 메시지만 스무 줄.</p>
+      <p>두 달 전만 해도 나는 코드가 뭔지도 몰랐다.</p>
+      <p>한 줄 고치고 저장, 새로고침. 또 에러. 또 한 줄.</p>
+      <p>그렇게 며칠을 반복하다 보니, 어느새 에러가 하나로 줄었다.</p>
+      <p>마지막 한 줄을 고치고, 배포 버튼을 눌렀다.</p>
+      <p>주소창에 내 링크를 치자, 내가 만든 화면이 떴다.</p>
+      <p>대단한 건 아니다. 버튼 세 개짜리 작은 웹. 그런데 이건, 내가 만든 거다.</p>
+      <p>시작이 늦었다고 생각했는데. 그냥, 오늘 시작한 거였다.</p>
+      <p class="script-note">글자수 기준 약 50초 분량. 35초로 줄이려면 3~4번째 문단을 한 문장으로 합칩니다.</p>
+    </div>
+
+    <p><strong>장면별 스토리보드</strong></p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>시간</th><th>내레이션 요약</th><th>화면 &middot; 카메라</th><th>Grok 프롬프트 방향</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>0-5초</td><td>새벽 두 시, 에러 메시지 스무 줄</td><td>모니터 앞 도윤의 뒷모습, 얼굴에 화면 빛. slow push-in</td><td>캐릭터 고정 묘사 + "back view, monitor glow, red error text reflected on face, night"</td></tr>
+          <tr><td>2</td><td>5-12초</td><td>두 달 전엔 코드가 뭔지도 몰랐다</td><td>낮의 같은 책상, 텅 빈 화면 앞에서 머뭇거림. 고정 샷</td><td>고정 묘사 + "daytime, empty code editor, hesitant expression, static shot"</td></tr>
+          <tr><td>3</td><td>12-20초</td><td>한 줄 고치고 저장, 또 에러</td><td>키보드 위 손 클로즈업 &rarr; 화면의 에러. 짧은 컷 반복 느낌</td><td>고정 묘사 + "close-up hands typing, then screen with error, repetitive rhythm"</td></tr>
+          <tr><td>4</td><td>20-28초</td><td>며칠 반복하니 에러가 하나로 줄었다</td><td>책상 위 컵 쌓임, 창밖이 밝아졌다 어두워짐(시간 경과). pan across desk</td><td>고정 묘사 + "time passing, stacked cups, window light shifting, gentle pan"</td></tr>
+          <tr><td>5</td><td>28-35초</td><td>마지막 한 줄, 배포 버튼</td><td>마우스 커서가 "Deploy" 버튼 위에서 멈춤. 손가락 클릭. 극단적 클로즈업</td><td>고정 묘사 + "extreme close-up cursor on deploy button, finger clicks, tension"</td></tr>
+          <tr><td>6</td><td>35-43초</td><td>주소창에 링크를 치자 화면이 떴다</td><td>브라우저에 완성된 웹 페이지 등장. 도윤 얼굴에 옅은 미소. slow zoom out</td><td>고정 묘사 + "browser showing finished simple web page, faint smile, slow zoom out"</td></tr>
+          <tr><td>7</td><td>43-49초</td><td>대단한 건 아니지만, 내가 만든 것</td><td>의자에 기대 화면을 바라보는 도윤 전신. 따뜻한 조명. 고정 샷</td><td>고정 묘사 + "full body leaning back in chair, warm lamp light, calm"</td></tr>
+          <tr><td>8</td><td>49-50초</td><td>늦은 게 아니라, 오늘 시작한 것</td><td>화면 어두워지며 텍스트 자리(Canva에서 문구). 페이드아웃</td><td>고정 묘사 + "screen dimming, empty space for caption, fade out"</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p><strong>장면 프롬프트 작성 예시 (프롬프트 제작 창)</strong></p>
+    <div class="prompt-box"><span class="tag">요청 예시</span>캐릭터 시트와 스토리보드를 바탕으로 5번째 장면용 Grok 프롬프트를 만들어줘.
+조건:
+- 맨 앞에 캐릭터 고정 묘사 3문장을 그대로 넣을 것
+- 9:16 세로
+- 클립 안에 텍스트/자막 생성 금지
+- 카메라 움직임은 하나만: extreme close-up, slight tension
+- 톤: cinematic, warm desk lamp, night, muted colors
+- 6초 클립 기준</div>
+
+    <div class="callout warm">
+      <span class="label">참고 자료</span>
+      <ul class="ref-list">
+        <li><a href="https://grok.com" target="_blank" rel="noopener">Grok — grok.com (이미지 &middot; 영상 생성)</a></li>
+        <li><a href="https://www.canva.com/ko_kr/learn/how-to-make-a-video/" target="_blank" rel="noopener">Canva로 동영상 만들기 — 공식 가이드</a></li>
+        <li><a href="../20260821/1410_scienceVideo_guide.html" target="_blank" rel="noopener">지난 시간 자료 — 과학 숏폼 영상 만들기 (2026.08.21)</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- 08 -->
+  <section>
+    <div class="section-head"><span class="section-num mono">08</span><h2>내 캐릭터로 바꿔서 실습하기</h2></div>
+    <p>"도윤" 대신 각자 만들고 싶은 캐릭터와 이야기를 골라 같은 순서로 만듭니다.</p>
+    <ol class="plain">
+      <li>캐릭터 한 명이 겪는 <strong>짧은 이야기</strong> 하나를 고른다 (첫 출근, 오래된 취미의 복귀, 작은 용기, 이별과 정리 등)</li>
+      <li>ChatGPT <strong>주제 &middot; 대본 창</strong>에서 45~60초 내레이션 대본을 만든다</li>
+      <li><a href="character-sheet-maker.html" target="_blank" rel="noopener">캐릭터 시트 메이커</a>로 캐릭터를 정리하고 <code>.md</code>로 저장 &rarr; <strong>캐릭터 창</strong>에 붙여넣는다</li>
+      <li><strong>스토리보드 창</strong>에서 8컷 내외로 쪼갠다 (훅 &rarr; 전개 &rarr; 마무리)</li>
+      <li><strong>프롬프트 제작 창</strong>에서 캐릭터 고정 묘사를 포함한 장면별 Grok 프롬프트를 만든다</li>
+      <li>Grok에서 캐릭터 기준 이미지 &rarr; 장면 클립을 생성하고, Canva에서 자막 &middot; 나레이션 &middot; BGM을 입혀 완성한다</li>
+    </ol>
+    <div class="callout">
+      <span class="label">기억할 것</span>
+      <p>도구는 계속 바뀝니다. Reve였다가, 오늘은 Grok이고, 다음엔 또 다른 게 나올 겁니다. 그래도 원칙은 하나입니다 — <strong>기획과 프롬프트는 대화형 AI, 비주얼은 생성 도구, 완성은 Canva. 그리고 캐릭터는 한 문단으로 고정한다.</strong></p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- 09 -->
+  <section>
+    <div class="section-head"><span class="section-num mono">09</span><h2>마지막 시간을 마치며</h2></div>
+    <div class="lead-callout">
+      <p>120시간을 함께 걸어왔습니다. 스마트 메모에서 시작해, 문서와 폼과 자동화를 지나, 바이브 코딩으로 직접 웹을 만들고, 오늘은 AI로 영상까지 만들었습니다.</p>
+      <p>배운 도구는 언젠가 낡습니다. 하지만 <strong>"필요한 걸 정의하고, 역할을 나누고, 조금씩 고쳐 완성한다"</strong>는 방식은 남습니다. 그게 이 수업에서 진짜 가져가실 것입니다.</p>
+      <p>도윤의 마지막 대사처럼 — 시작이 늦은 게 아니라, 오늘 시작한 것입니다. 수고하셨습니다.</p>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <span>Grok 캐릭터 숏폼 영상 만들기 · SNS 콘텐츠 제작 수업 (마지막 시간)</span>
+  <span>한국폴리텍대학교 · 2026.08.28</span>
+</footer>
+
+</body>
+</html>

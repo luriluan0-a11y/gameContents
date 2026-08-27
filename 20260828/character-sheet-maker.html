@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>캐릭터 시트 작성기</title>
+<style>
+  :root{
+    --stage: #14141a;
+    --stage-edge: #0b0b0e;
+    --card: #f2ecdd;
+    --card-shadow: #0006;
+    --ink: #1c1a15;
+    --ink-soft: #55503f;
+    --amber: #d98a2b;
+    --amber-deep: #a9660f;
+    --teal: #2f5d5a;
+    --line: #c9bfa0;
+    --hole: #0b0b0e;
+    --paper-2: #ece3cd;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #23232c 0%, var(--stage) 55%, var(--stage-edge) 100%);
+    color: var(--ink);
+    font-family: 'Courier New', Courier, monospace;
+    display:flex;
+    justify-content:center;
+    padding: 40px 16px 80px;
+  }
+
+  .dossier{
+    width:100%;
+    max-width: 760px;
+    position:relative;
+  }
+
+  .tab{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    background: var(--amber);
+    color: var(--stage-edge);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight:700;
+    letter-spacing: 0.14em;
+    font-size: 12px;
+    padding: 8px 18px 10px;
+    border-radius: 6px 6px 0 0;
+    margin-left: 28px;
+    box-shadow: 0 -2px 0 var(--amber-deep) inset;
+  }
+  .tab .dot{
+    width:6px;height:6px;border-radius:50%;
+    background: var(--stage-edge);
+    display:inline-block;
+  }
+
+  .card{
+    position:relative;
+    background: var(--card);
+    background-image:
+      repeating-linear-gradient(#f2ecdd 0 27px, #e4dcc3 28px 29px);
+    background-position: 0 92px;
+    border-radius: 2px 10px 10px 10px;
+    box-shadow: 0 30px 60px var(--card-shadow), 0 2px 0 #00000022;
+    padding: 30px 34px 34px 58px;
+  }
+
+  .holes{
+    position:absolute;
+    left:18px; top:70px; bottom:34px;
+    width:12px;
+    display:flex; flex-direction:column; justify-content:space-between;
+  }
+  .holes span{
+    width:12px; height:12px; border-radius:50%;
+    background: var(--hole);
+    box-shadow: inset 0 2px 3px #000a, 0 1px 0 #ffffff22;
+  }
+
+  header.head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    border-bottom: 3px solid var(--ink);
+    padding-bottom: 12px;
+    margin-bottom: 22px;
+  }
+  header.head h1{
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 26px;
+    letter-spacing: 0.06em;
+    margin: 0 0 4px;
+  }
+  header.head .sub{
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+  }
+  .file-no{
+    font-family: Georgia, serif;
+    font-size: 12px;
+    color: var(--ink-soft);
+    text-align:right;
+    white-space:nowrap;
+  }
+
+  .row{ display:flex; gap:16px; margin-bottom: 16px; }
+  .row .field{ flex:1; }
+
+  .field{ margin-bottom: 16px; }
+  .field label{
+    display:block;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight:700;
+    font-size: 12.5px;
+    letter-spacing: 0.03em;
+    color: var(--teal);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .field .hint{
+    font-size: 11px;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin: -3px 0 6px;
+  }
+  input[type=text], textarea{
+    width:100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1.5px dashed var(--line);
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14.5px;
+    color: var(--ink);
+    padding: 4px 2px 6px;
+    resize: vertical;
+    line-height: 1.55;
+  }
+  input[type=text]:focus, textarea:focus{
+    outline:none;
+    border-bottom: 1.5px solid var(--amber-deep);
+  }
+  textarea{ min-height: 64px; }
+  ::placeholder{ color:#8b8468; opacity:0.8; }
+
+  .divider{
+    text-align:center;
+    color: var(--line);
+    letter-spacing: 0.4em;
+    font-size: 10px;
+    margin: 22px 0 18px;
+  }
+
+  .actions{
+    margin-top: 26px;
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .stamp{
+    font-family: Georgia, serif;
+    font-weight:700;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    color: #b23b2f;
+    border: 2px solid #b23b2f;
+    border-radius: 4px;
+    padding: 6px 12px;
+    transform: rotate(-4deg);
+    opacity: 0.85;
+    transition: all .25s ease;
+    user-select:none;
+  }
+  .stamp.ready{
+    color: var(--teal);
+    border-color: var(--teal);
+    transform: rotate(-2deg) scale(1.03);
+  }
+
+  button.download{
+    background: var(--stage-edge);
+    color: var(--paper-2);
+    border: none;
+    font-family: 'Courier New', monospace;
+    font-weight:700;
+    letter-spacing: 0.08em;
+    font-size: 13.5px;
+    padding: 13px 22px;
+    border-radius: 3px;
+    cursor:pointer;
+    box-shadow: 0 4px 0 #000, 0 6px 12px #0006;
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  button.download:hover{ transform: translateY(1px); box-shadow: 0 3px 0 #000, 0 5px 10px #0006; }
+  button.download:active{ transform: translateY(4px); box-shadow: 0 0 0 #000; }
+
+  .footnote{
+    text-align:center;
+    color:#8a8577;
+    font-size:11px;
+    margin-top: 18px;
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 560px){
+    .row{ flex-direction:column; gap:0; }
+    .card{ padding: 26px 20px 28px 44px; }
+    header.head{ flex-direction:column; align-items:flex-start; gap:6px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="dossier">
+  <div class="tab"><span class="dot"></span>CHARACTER FILE</div>
+  <div class="card">
+    <div class="holes"><span></span><span></span><span></span><span></span></div>
+
+    <header class="head">
+      <div>
+        <h1>캐릭터 시트</h1>
+        <div class="sub">영상 제작용 · 캐릭터 설정 정리</div>
+      </div>
+      <div class="file-no" id="fileNo">FILE NO. ??</div>
+    </header>
+
+    <div class="row">
+      <div class="field">
+        <label for="name">이름</label>
+        <input type="text" id="name" placeholder="예) 도윤, 루나, 케이 ...">
+      </div>
+      <div class="field">
+        <label for="ageRace">나이 / 종족</label>
+        <input type="text" id="ageRace" placeholder="예) 20대 초반 인간, 300살 요정 ...">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="role">역할</label>
+        <input type="text" id="role" placeholder="예) 주인공, 조력자, 빌런, 내레이터 ...">
+      </div>
+      <div class="field">
+        <label for="voiceTag">목소리 톤 (한 줄 요약)</label>
+        <input type="text" id="voiceTag" placeholder="예) 낮고 차분한 저음, 발랄한 하이톤 ...">
+      </div>
+    </div>
+
+    <div class="divider">✂ — — — — — — — — — — — — — — — ✂</div>
+
+    <div class="field">
+      <label for="appearance">외형 묘사</label>
+      <div class="hint">헤어/눈동자 색, 체형, 의상, 특징적 소품 등 — 영상 캐릭터 생성 시 참고할 디테일</div>
+      <textarea id="appearance" placeholder="예) 짧은 은발, 회색 눈, 검은 트렌치코트, 왼쪽 뺨에 흉터 ..."></textarea>
+    </div>
+
+    <div class="field">
+      <label for="personality">성격</label>
+      <textarea id="personality" placeholder="예) 겉으론 무뚝뚝하지만 속정이 깊음, 완벽주의 성향 ..."></textarea>
+    </div>
+
+    <div class="field">
+      <label for="speech">말투 & 화법</label>
+      <div class="hint">대사를 쓸 때 그대로 참고할 어투/말버릇</div>
+      <textarea id="speech" placeholder="예) 존댓말을 쓰지만 문장을 짧게 끊음, 말끝에 '...뭐' 를 자주 붙임 ..."></textarea>
+    </div>
+
+    <div class="field">
+      <label for="backstory">배경 이야기</label>
+      <textarea id="backstory" placeholder="예) 어린 시절 마을이 불타 없어진 후 복수를 다짐하고 검술을 익힘 ..."></textarea>
+    </div>
+
+    <div class="field">
+      <label for="goal">목표 & 동기</label>
+      <textarea id="goal" placeholder="예) 잃어버린 여동생을 찾는 것이 유일한 목표 ..."></textarea>
+    </div>
+
+    <div class="field">
+      <label for="quirks">특징 & 버릇</label>
+      <textarea id="quirks" placeholder="예) 긴장하면 손가락을 튕김, 단 음식을 못 먹음 ..."></textarea>
+    </div>
+
+    <div class="field">
+      <label for="relations">관계</label>
+      <textarea id="relations" placeholder="예) 스승과는 애증 관계, 라이벌 캐릭터와는 앙숙 ..."></textarea>
+    </div>
+
+    <div class="field">
+      <label for="visualRef">비주얼 레퍼런스 메모</label>
+      <div class="hint">AI 이미지/영상 생성 프롬프트에 바로 쓸 수 있는 키워드 위주로</div>
+      <textarea id="visualRef" placeholder="예) cinematic lighting, 90s anime style, cool color palette ..."></textarea>
+    </div>
+
+    <div class="field">
+      <label for="notes">기타 메모</label>
+      <textarea id="notes" placeholder="그 외 자유롭게 적어두고 싶은 내용"></textarea>
+    </div>
+
+    <div class="actions">
+      <div class="stamp" id="stamp">DRAFT</div>
+      <button class="download" id="downloadBtn">⇩ 마크다운으로 다운로드</button>
+    </div>
+  </div>
+  <div class="footnote">작성한 내용은 저장되지 않으니, 다운로드 후 보관해 주세요.</div>
+</div>
+
+<script>
+  const fields = ['name','ageRace','role','voiceTag','appearance','personality','speech','backstory','goal','quirks','relations','visualRef','notes'];
+  const el = id => document.getElementById(id);
+
+  function randomFileNo(){
+    return 'FILE NO. ' + String(Math.floor(Math.random()*900)+100);
+  }
+  el('fileNo').textContent = randomFileNo();
+
+  function updateStamp(){
+    const filled = fields.filter(id => el(id).value.trim().length > 0).length;
+    const stamp = el('stamp');
+    if(filled >= 5){
+      stamp.textContent = 'READY';
+      stamp.classList.add('ready');
+    } else {
+      stamp.textContent = 'DRAFT';
+      stamp.classList.remove('ready');
+    }
+  }
+  fields.forEach(id => el(id).addEventListener('input', updateStamp));
+
+  function buildMarkdown(){
+    const v = id => el(id).value.trim();
+    const name = v('name') || '이름 미정';
+    const line = (label, value) => value ? `**${label}:** ${value}  \n` : `**${label}:** _(미작성)_  \n`;
+    const section = (title, value) => `## ${title}\n\n${value ? value : '_(미작성)_'}\n\n`;
+
+    let md = `# ${name}\n\n`;
+    md += line('나이 / 종족', v('ageRace'));
+    md += line('역할', v('role'));
+    md += line('목소리 톤', v('voiceTag'));
+    md += `\n---\n\n`;
+    md += section('외형 묘사', v('appearance'));
+    md += section('성격', v('personality'));
+    md += section('말투 & 화법', v('speech'));
+    md += section('배경 이야기', v('backstory'));
+    md += section('목표 & 동기', v('goal'));
+    md += section('특징 & 버릇', v('quirks'));
+    md += section('관계', v('relations'));
+    md += section('비주얼 레퍼런스 메모', v('visualRef'));
+    md += section('기타 메모', v('notes'));
+    return md;
+  }
+
+  function slugify(name){
+    const cleaned = name.trim().replace(/[\\/:*?"<>|]/g, '').replace(/\s+/g, '_');
+    return cleaned.length ? cleaned : '캐릭터시트';
+  }
+
+  el('downloadBtn').addEventListener('click', () => {
+    const md = buildMarkdown();
+    const filename = `캐릭터시트_${slugify(el('name').value)}.md`;
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+</script>
+
+</body>
+</html>
