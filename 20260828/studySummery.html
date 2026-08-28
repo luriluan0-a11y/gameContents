@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 수업에서 배운 내용 총정리</title>
+    <meta name="description" content="웹 개발 기초, AI 프롬프트 엔지니어링, Windows 생산성까지 수업에서 배운 핵심 내용 총정리">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0D1117;
+            --surface: #161B22;
+            --surface2: #21262D;
+            --border: #30363D;
+            --text: #E6EDF3;
+            --text-muted: #8B949E;
+            --primary: #58A6FF;
+            --green: #3FB950;
+            --orange: #F78166;
+            --purple: #BC8CFF;
+            --yellow: #E3B341;
+            --cyan: #39D353;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            min-height: 100vh;
+        }
+
+        /* ── Header ── */
+        .site-header {
+            background: linear-gradient(135deg, #0D1117 0%, #161B22 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 60px 20px 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .site-header::before {
+            content: '';
+            position: absolute;
+            top: -60px; left: -60px; right: -60px; bottom: -60px;
+            background: radial-gradient(ellipse at 30% 50%, rgba(88,166,255,0.07) 0%, transparent 60%),
+                        radial-gradient(ellipse at 70% 50%, rgba(188,140,255,0.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .header-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--purple));
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 5px 16px;
+            border-radius: 20px;
+            margin-bottom: 18px;
+            letter-spacing: 0.05em;
+        }
+
+        .site-header h1 {
+            font-size: 2.4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.3;
+            margin-bottom: 14px;
+        }
+
+        .site-header .subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+            font-weight: 300;
+        }
+
+        /* ── Container ── */
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 52px 24px 80px;
+        }
+
+        /* ── Section Cards ── */
+        .section-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 36px 38px;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .section-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(88,166,255,0.4);
+        }
+
+        .section-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
+            border-radius: 16px 0 0 16px;
+        }
+
+        .card-web::before   { background: linear-gradient(to bottom, #58A6FF, #39D353); }
+        .card-ai::before    { background: linear-gradient(to bottom, #BC8CFF, #F78166); }
+        .card-pc::before    { background: linear-gradient(to bottom, #E3B341, #F78166); }
+        .card-media::before { background: linear-gradient(to bottom, #FF7B54, #FFB26B); }
+
+        .section-card h2 {
+            font-size: 1.45rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-web h2   { color: var(--primary); }
+        .card-ai h2    { color: var(--purple); }
+        .card-pc h2    { color: var(--yellow); }
+        .card-media h2 { color: #FFB26B; }
+
+        /* ── Sub-section ── */
+        .sub-section {
+            margin-bottom: 28px;
+        }
+
+        .sub-section:last-child { margin-bottom: 0; }
+
+        .sub-section h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sub-section p {
+            color: #C9D1D9;
+            margin-bottom: 10px;
+            font-size: 0.97rem;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        ul li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 10px;
+            color: #C9D1D9;
+            font-size: 0.97rem;
+        }
+
+        ul li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        ul li strong {
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        /* ── Code ── */
+        code {
+            font-family: 'Fira Code', monospace;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            color: var(--orange);
+        }
+
+        /* ── Shortcut Chips ── */
+        .shortcut-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .shortcut-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+        }
+
+        .shortcut-desc { color: var(--text); }
+
+        .key-combo { display: flex; gap: 5px; align-items: center; flex-shrink: 0; margin-left: 10px; }
+
+        kbd {
+            background: #30363D;
+            border: 1px solid #484F58;
+            border-bottom-width: 2px;
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+            color: var(--yellow);
+            white-space: nowrap;
+        }
+
+        /* ── Divider ── */
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 24px 0;
+        }
+
+        /* ── Media Section ── */
+        .media-section {
+            background: linear-gradient(135deg, #1A1A2E, #16213E);
+            border: 1px solid rgba(255,123,84,0.3);
+            border-radius: 16px;
+            padding: 40px 38px;
+            margin-bottom: 28px;
+        }
+
+        .media-section h2 {
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: #FFB26B;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .media-desc {
+            color: rgba(255,255,255,0.55);
+            font-size: 0.93rem;
+            margin-bottom: 32px;
+        }
+
+        .media-block { margin-bottom: 36px; }
+        .media-block:last-child { margin-bottom: 0; }
+
+        .media-block h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #FFD9B7;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        audio {
+            width: 100%;
+            border-radius: 30px;
+            outline: none;
+            filter: invert(1) hue-rotate(180deg);
+        }
+
+        video {
+            width: 100%;
+            border-radius: 14px;
+            display: block;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        }
+
+        /* ── Footer ── */
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 600px) {
+            .site-header h1 { font-size: 1.8rem; }
+            .container { padding: 32px 16px 60px; }
+            .section-card, .media-section { padding: 24px 20px; }
+            .shortcut-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 헤더 -->
+    <div class="site-header">
+        <div class="header-badge">📅 2026년 8월 28일 수업</div>
+        <h1>📚 수업에서 배운 내용 총정리</h1>
+        <p class="subtitle">옵시디언 study 폴더에 기록된 수업 자료와 학습 내용을 종합적으로 요약한 문서입니다.</p>
+    </div>
+
+    <div class="container">
+
+        <!-- 1. 웹 개발 기초 -->
+        <div class="section-card card-web">
+            <h2>🌐 1. 웹 개발 기초</h2>
+
+            <div class="sub-section">
+                <h3>인라인 스타일 (Inline Style)</h3>
+                <ul>
+                    <li><strong>개념:</strong> HTML 태그 안에 직접 <code>style="..."</code> 속성을 넣어 디자인을 적용하는 방식입니다. (마치 글자에 직접 스티커를 붙이는 것과 같습니다.)</li>
+                    <li><strong>장점:</strong> 딱 하나의 요소를 빠르고 직관적으로 변경할 때 매우 편리합니다.</li>
+                    <li><strong>단점:</strong> 스타일이 많아지면 코드가 복잡해지고 일괄 수정이 어려워집니다.</li>
+                    <li><strong>예시:</strong> <code>&lt;p style="color: red;"&gt;안녕하세요&lt;/p&gt;</code></li>
+                </ul>
+            </div>
+
+            <hr class="divider">
+
+            <div class="sub-section">
+                <h3>파닉스 단어 학습 앱 (웹 애플리케이션 구조)</h3>
+                <ul>
+                    <li>단어 학습(플립 카드)과 퀴즈 기능이 결합된 싱글 페이지 애플리케이션(SPA)의 구조를 배웠습니다.</li>
+                    <li><strong>TTS 음성 재생:</strong> <code>window.speechSynthesis</code> (Web Speech API)를 활용하여 단어를 직접 발음해주는 기능 구현.</li>
+                    <li><strong>상태 관리:</strong> 학습 진행도, 점수 계산 등의 상태(State)를 JavaScript 변수로 관리하는 로직을 배웠습니다.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 2. AI 및 프롬프트 엔지니어링 -->
+        <div class="section-card card-ai">
+            <h2>🤖 2. AI 및 프롬프트 엔지니어링</h2>
+
+            <div class="sub-section">
+                <h3>프롬프트 토큰 효율성</h3>
+                <ul>
+                    <li><strong>현상:</strong> AI에게 존댓말이나 장황한 인삿말을 사용하면 한국어 처리 특성상 토큰 소모량이 2~3배 이상 증가합니다.</li>
+                    <li><strong>해결책:</strong> 불필요한 서술어를 줄이고 <strong>개조식(Bullet points)</strong>이나 <strong>명사형/반말</strong> 위주의 간결한 핵심 요구사항으로 프롬프트를 작성합니다.</li>
+                    <li>AI는 감정이 없으므로 <strong>명확한 맥락 전달</strong>이 가장 중요합니다.</li>
+                </ul>
+            </div>
+
+            <hr class="divider">
+
+            <div class="sub-section">
+                <h3>옵시디언 &amp; 마크다운의 AI 호환성</h3>
+                <ul>
+                    <li><strong>마크다운(Markdown):</strong> 불필요한 태그와 스타일 노이즈가 없는 순수 텍스트(Plain Text)라 LLM이 가장 빠르고 정확하게 읽어낼 수 있는 데이터 구조입니다.</li>
+                    <li><strong>옵시디언(Obsidian):</strong> 백링크(<code>[[문서]]</code>)와 태그(<code>#태그</code>)로 문서를 연결하여 AI에게 풍부한 맥락(Context)을 제공합니다. RAG(검색 증강 생성)에 최적화된 환경입니다.</li>
+                    <li><strong>데이터 소유권:</strong> 클라우드 종속 없이 내 컴퓨터 로컬에 완전 소유 가능합니다.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 3. PC 활용 및 생산성 -->
+        <div class="section-card card-pc">
+            <h2>🚀 3. PC 활용 및 생산성</h2>
+
+            <div class="sub-section">
+                <h3>Windows 필수 단축키</h3>
+                <p>작업 속도와 생산성을 2배로 높여주는 핵심 단축키 모음입니다.</p>
+                <div class="shortcut-grid">
+                    <div class="shortcut-item">
+                        <span class="shortcut-desc">클립보드 기록 열기</span>
+                        <div class="key-combo"><kbd>Win</kbd>+<kbd>V</kbd></div>
+                    </div>
+                    <div class="shortcut-item">
+                        <span class="shortcut-desc">화면 캡처 (영역 지정)</span>
+                        <div class="key-combo"><kbd>Win</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd></div>
+                    </div>
+                    <div class="shortcut-item">
+                        <span class="shortcut-desc">창 좌/우 화면 분할</span>
+                        <div class="key-combo"><kbd>Win</kbd>+<kbd>←/→</kbd></div>
+                    </div>
+                    <div class="shortcut-item">
+                        <span class="shortcut-desc">파일 탐색기 열기</span>
+                        <div class="key-combo"><kbd>Win</kbd>+<kbd>E</kbd></div>
+                    </div>
+                    <div class="shortcut-item">
+                        <span class="shortcut-desc">바탕화면 바로 가기</span>
+                        <div class="key-combo"><kbd>Win</kbd>+<kbd>D</kbd></div>
+                    </div>
+                    <div class="shortcut-item">
+                        <span class="shortcut-desc">실행 취소</span>
+                        <div class="key-combo"><kbd>Ctrl</kbd>+<kbd>Z</kbd></div>
+                    </div>
+                    <div class="shortcut-item">
+                        <span class="shortcut-desc">복사 / 붙여넣기</span>
+                        <div class="key-combo"><kbd>Ctrl</kbd>+<kbd>C/V</kbd></div>
+                    </div>
+                    <div class="shortcut-item">
+                        <span class="shortcut-desc">이모지 / 특수문자 창</span>
+                        <div class="key-combo"><kbd>Win</kbd>+<kbd>.</kbd></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🎬 특별 부록: 동영상 & 음악 -->
+        <div class="media-section">
+            <h2>🎬 특별 부록: 수업 결과물</h2>
+            <p class="media-desc">수업에서 배운 내용을 바탕으로 직접 제작한 동영상과 노래입니다. 아래에서 감상해 보세요!</p>
+
+            <div class="media-block">
+                <h3>🎵 직접 만든 노래 (20260828_song.mp3)</h3>
+                <audio controls src="20280828_song.mp3">
+                    브라우저가 오디오 재생을 지원하지 않습니다.
+                </audio>
+            </div>
+
+            <div class="media-block">
+                <h3>📹 직접 만든 영상 (20280828_v.mp4)</h3>
+                <video controls src="20280828_v.mp4">
+                    브라우저가 비디오 재생을 지원하지 않습니다.
+                </video>
+            </div>
+        </div>
+
+    </div><!-- /container -->
+
+    <footer>
+        <p>📚 수업에서 배운 내용 총정리 • 2026년 8월 28일 • 웹 개발 · AI · 생산성</p>
+    </footer>
+
+</body>
+</html>
