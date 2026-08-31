@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>챗봇 생성기 - 프로그래머 직업인멘토링 및 실무체험</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap');
+
+  :root {
+    --navy: #16233d;
+    --navy-light: #1a3a5c;
+    --blue: #2e6da4;
+    --blue-light: #4d8fc7;
+    --teal: #2f8f7c;
+    --orange: #f0a500;
+    --slate: #5b6472;
+    --bg: #f4f6fa;
+    --card: #ffffff;
+    --border: #dde3ed;
+    --text: #22303f;
+    --text-soft: #5b6472;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4 { font-family: 'Noto Sans KR', sans-serif; font-weight: 800; }
+
+  /* ── 헤더 ── */
+  header {
+    position: relative;
+    background:
+      radial-gradient(circle at 1px 1px, rgba(255,255,255,0.08) 1px, transparent 0) 0 0 / 22px 22px,
+      linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 55%, var(--blue) 100%);
+    color: #fff;
+    padding: 54px 24px 42px;
+    text-align: center;
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.28);
+    padding: 7px 18px;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+    color: #ffd479;
+    margin-bottom: 16px;
+  }
+
+  header h1 {
+    font-size: clamp(1.7rem, 4.6vw, 2.4rem);
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
+
+  header p {
+    margin-top: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #cddaea;
+  }
+
+  .top-nav {
+    margin-top: 26px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .top-nav a {
+    background: rgba(255,255,255,0.08);
+    color: #eaf0f8;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    border: 1px solid rgba(255,255,255,0.22);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+
+  .top-nav a:hover { background: var(--orange); border-color: var(--orange); color: var(--navy); }
+
+  /* ── 컨테이너 ── */
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 34px 18px 60px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .section {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 28px 26px;
+    margin-bottom: 22px;
+    box-shadow: 0 2px 10px rgba(20,30,50,0.06);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--orange);
+  }
+
+  .section.c-purple { border-left-color: var(--orange); }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.25rem;
+    color: var(--navy);
+    margin-bottom: 16px;
+  }
+
+  .section-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  .icon-purple { background: var(--orange); }
+
+  .section p, .section li { font-size: 0.96rem; color: var(--text); }
+
+  .step-title {
+    font-size: 1.05rem;
+    color: var(--navy);
+    margin: 24px 0 4px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+  }
+
+  .step-title:first-of-type { margin-top: 18px; padding-top: 0; border-top: none; }
+
+  .hint { font-size: 0.88rem; color: var(--text-soft); margin: 4px 0 12px; }
+
+  .sub-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--slate);
+    margin: 16px 0 8px;
+  }
+
+  .fun-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 12px 0;
+  }
+
+  .fun-list li {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-weight: 500;
+  }
+
+  .fun-list li .dot { font-size: 1rem; flex-shrink: 0; }
+  .fun-list li .txt { flex: 1 1 0%; min-width: 0; }
+
+  .fun-list code {
+    background: #e8edf4;
+    color: var(--navy);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85em;
+  }
+
+  .callout .txt { flex: 1 1 0%; min-width: 0; }
+
+  /* ── 입력 폼 ── */
+  .field-row {
+    margin-bottom: 12px;
+  }
+
+  .field-row label {
+    display: block;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--navy);
+    margin-bottom: 5px;
+  }
+
+  input[type="text"], textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    color: var(--text);
+    background: #fff;
+    resize: vertical;
+  }
+
+  input[type="text"]:focus, textarea:focus {
+    outline: none;
+    border-color: var(--blue-light);
+    box-shadow: 0 0 0 3px rgba(77,143,199,0.18);
+  }
+
+  input::placeholder, textarea::placeholder { color: #9aa5b3; }
+
+  .kw-row {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+
+  .kw-row-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .kw-cat {
+    display: inline-block;
+    background: var(--navy-light);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    border-radius: 5px;
+  }
+
+  .kw-row-free .kw-cat-input {
+    flex: 1 1 0%;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .kw-remove {
+    background: none;
+    border: none;
+    color: #c0392b;
+    font-weight: 700;
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 5px;
+  }
+
+  .kw-remove:hover { background: #fdecec; }
+
+  .kw-field-label { font-size: 0.78rem; color: var(--text-soft); font-weight: 700; margin: 6px 0 3px; }
+
+  .fallback-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .fallback-row input { flex: 1 1 0%; }
+
+  /* ── 버튼 ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 12px 22px;
+    border-radius: 8px;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(20,30,50,0.14);
+    transition: transform 0.15s, box-shadow 0.15s;
+    border: none;
+    cursor: pointer;
+    margin: 5px 6px 5px 0;
+    font-family: inherit;
+  }
+
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(20,30,50,0.2); }
+  .btn:active { transform: translateY(0); }
+
+  .btn-purple { background: var(--orange); }
+  .btn-green  { background: var(--teal); }
+  .btn-blue   { background: var(--blue-light); }
+
+  .btn-outline {
+    background: #fff;
+    color: var(--navy);
+    border: 1px solid var(--border);
+    box-shadow: none;
+  }
+
+  .btn-sm { padding: 8px 16px; font-size: 0.85rem; }
+
+  .btn-row { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 14px; }
+
+  /* ── 콜아웃 ── */
+  .callout {
+    background: #fff8e6;
+    border-left: 4px solid var(--orange);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-weight: 600;
+    color: #6b4e00;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* ── 코드 블록 (미리보기 / 복사) ── */
+  .code-wrap {
+    position: relative;
+    margin: 14px 0;
+  }
+
+  .code-block {
+    background: #1c2333;
+    color: #d6e0ee;
+    border-radius: 10px;
+    padding: 20px 60px 20px 20px;
+    font-family: 'JetBrains Mono', 'Consolas', 'D2Coding', monospace;
+    font-size: 0.8rem;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    max-height: 420px;
+    overflow-y: auto;
+    line-height: 1.6;
+    border: 1px solid #34455f;
+  }
+
+  .copy-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: var(--blue-light);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.2s;
+  }
+
+  .copy-btn:hover { transform: translateY(-1px); }
+  .copy-btn.copied { background: var(--teal); }
+
+  /* ── 완성작 CTA ── */
+  .final-cta {
+    text-align: center;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 60%, var(--blue) 100%);
+    border-radius: 14px;
+    padding: 36px 26px;
+    color: #fff;
+    box-shadow: 0 8px 22px rgba(20,30,50,0.22);
+  }
+
+  .final-cta .emoji-big { font-size: 2.4rem; }
+
+  .final-cta h2 { color: #fff; font-size: 1.4rem; margin: 10px 0 6px; }
+  .final-cta p { color: rgba(255,255,255,0.85); margin-bottom: 18px; font-weight: 500; }
+
+  .final-cta .btn-huge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--orange);
+    color: var(--navy);
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 1.05rem;
+    padding: 14px 30px;
+    border-radius: 8px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    transition: transform 0.15s;
+  }
+
+  .final-cta .btn-huge:hover { transform: translateY(-2px); }
+
+  footer {
+    text-align: center;
+    padding: 26px 20px 46px;
+    color: var(--text-soft);
+    font-size: 0.82rem;
+  }
+
+  @media (max-width: 560px) {
+    .section { padding: 22px 18px; }
+    header { padding: 42px 18px 34px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">🛠️ 챗봇 생성기</div>
+  <h1>나만의 캐릭터 챗봇<br>설계표 만들기</h1>
+  <p>덕수중학교 · 드림하이파이브-덕수중 진로캠프 · 프로그래머 직업인멘토링 및 실무체험</p>
+  <div class="top-nav">
+    <a href="148_day01_chatBot.html">◀ 특강 페이지로 돌아가기</a>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- 챗봇 설계표 소개 -->
+  <section class="section c-purple">
+    <div class="section-title"><div class="section-icon icon-purple">🧩</div><h2>챗봇 설계표란?</h2></div>
+    <div class="callout"><span class="dot">🎯</span><span class="txt">아래 칸을 채우고 버튼을 누르면 나만의 캐릭터 챗봇 설계 마크다운 파일이 다운로드돼요.</span></div>
+    <ul class="fun-list">
+      <li><span class="dot">🗣️</span><span class="txt">사용자가 입력한 문장에 <strong>특정 키워드</strong>가 들어있으면 정해진 대답을 하는 방식이에요.</span></li>
+      <li><span class="dot">✍️</span><span class="txt">"캐릭터가 어떤 사람인가"를 길게 답하기보다, <strong>"이 키워드가 나오면 캐릭터는 뭐라고 말할까?"</strong>를 바로바로 적는 게 훨씬 빠르고 코드에 그대로 들어가요.</span></li>
+      <li><span class="dot">✅</span><span class="txt">칸을 다 채우면 <code>RESPONSES</code> 배열, <code>GREETING</code>, <code>FALLBACK_REPLIES</code>가 담긴 마크다운이 만들어져요. 이 파일을 AI에게 주고 "이 설계표로 챗봇 html 단일 파일을 만들어줘"라고 요청하면 끝!</span></li>
+    </ul>
+  </section>
+
+  <!-- 챗봇 설계표 작성 폼 -->
+  <section class="section c-purple">
+    <div class="section-title"><div class="section-icon icon-purple">📐</div><h2>챗봇 설계표 작성하기</h2></div>
+    <p>아래 칸을 채운 뒤 맨 아래 <strong>마크다운 다운로드</strong> 버튼을 눌러주세요.</p>
+
+    <h3 class="step-title">1단계. 캐릭터 기본 설정</h3>
+    <p class="hint">캐릭터의 뼈대만 빠르게 정합니다. 여기서 오래 고민하지 마세요.</p>
+
+    <div class="field-row"><label>1. 이름</label><input type="text" id="f-name" placeholder="예: 레오"></div>
+    <div class="field-row"><label>2. 정체 (사람/동물/로봇/정령 등)</label><input type="text" id="f-identity" placeholder="예: 고양이"></div>
+    <div class="field-row"><label>3. 나이 또는 특징 한 줄</label><input type="text" id="f-age" placeholder="예: 7세"></div>
+    <div class="field-row"><label>4. 성격을 표현하는 단어 3개</label><input type="text" id="f-personality" placeholder="예: 도도함, 귀찮음, 깔끔함"></div>
+    <div class="field-row"><label>5. 말버릇 (문장 끝에 항상 붙는 말)</label><input type="text" id="f-verbal" placeholder='예: 문장 끝에 "~옹"으로 끝난다'></div>
+    <div class="field-row"><label>6. 캐릭터를 표현하는 이모지 1~2개</label><input type="text" id="f-emoji" placeholder="예: 🐈"></div>
+    <div class="field-row"><label>7. 사용자를 부르는 호칭</label><input type="text" id="f-callname" placeholder="예: 집사야"></div>
+    <div class="field-row"><label>8. 캐릭터를 한 문장으로 소개한다면</label><input type="text" id="f-intro" placeholder="예: 나는 집사의 고양이 레오야."></div>
+
+    <h3 class="step-title">2단계. 키워드 응답 설계표</h3>
+    <p class="hint"><strong>반응할 키워드</strong>에는 사용자가 입력할 만한 단어를 쉼표로 구분해서 2~4개, <strong>캐릭터의 대답</strong>에는 그 키워드가 나왔을 때 캐릭터가 할 대답을 캐릭터 말투로 적으세요.</p>
+
+    <div class="sub-title">필수 카테고리 (8개 — 되도록 모두 채워주세요)</div>
+    <div id="requiredRows"></div>
+
+    <div class="sub-title">자유 카테고리 (캐릭터 개성에 맞게 자유롭게 추가)</div>
+    <p class="hint">예: 좋아하는 음식, 두려운 것, 캐릭터의 특별한 능력 등</p>
+    <div id="freeRows"></div>
+    <button type="button" class="btn btn-blue btn-sm" id="addFreeRow">➕ 카테고리 추가</button>
+
+    <h3 class="step-title">3단계. 예외 상황</h3>
+
+    <div class="field-row">
+      <label>첫 인사말 (GREETING) — 챗봇을 처음 열었을 때 캐릭터가 하는 말</label>
+      <textarea id="f-greeting" rows="2" placeholder="예: 인간! 나 레오다옹. 용건이 뭐냥?"></textarea>
+    </div>
+
+    <div class="field-row">
+      <label>모르는 질문에 대한 회피 대사 (FALLBACK_REPLIES) — 정해진 키워드가 없을 때 캐릭터답게 둘러대는 말 (2개 이상)</label>
+      <div id="fallbackRows"></div>
+      <button type="button" class="btn btn-blue btn-sm" id="addFallback">➕ 회피 대사 추가</button>
+    </div>
+
+    <div class="field-row">
+      <label>초기화 버튼 눌렀을 때 (비워두면 첫 인사말과 동일하게 사용돼요)</label>
+      <textarea id="f-reset" rows="2" placeholder="다르게 하고 싶을 때만 입력하세요"></textarea>
+    </div>
+
+    <div class="callout">
+      <span class="dot">📥</span><span class="txt">다 채웠다면 아래 버튼을 눌러 마크다운 파일을 받아보세요! 파일 안에는 <strong>구글 AI 스튜디오 개발 가이드</strong>(붙여넣기용 프롬프트 포함)도 함께 들어있어요.</span>
+    </div>
+
+    <div class="btn-row">
+      <button type="button" class="btn btn-purple" id="downloadBtn">📥 챗봇 설계 마크다운 다운로드</button>
+      <button type="button" class="btn btn-outline" id="previewBtn">👀 미리보기</button>
+      <button type="button" class="btn btn-outline" id="sampleBtn">🎲 샘플로 채우기</button>
+    </div>
+
+    <div class="sub-title">📥 다운로드한 파일, 이렇게 사용하세요</div>
+    <ul class="fun-list">
+      <li><span class="dot">1️⃣</span><span class="txt"><a href="https://aistudio.google.com/" target="_blank" rel="noopener">구글 AI 스튜디오</a>에 접속해서 새 채팅을 시작하세요.</span></li>
+      <li><span class="dot">2️⃣</span><span class="txt">다운로드한 마크다운 파일을 첨부하거나, 내용을 복사해서 붙여넣으세요.</span></li>
+      <li><span class="dot">3️⃣</span><span class="txt">파일 맨 아래 "🚀 구글 AI 스튜디오 개발 가이드"에 있는 프롬프트를 그대로 복사해서 이어서 붙여넣으세요.</span></li>
+      <li><span class="dot">4️⃣</span><span class="txt">AI가 만들어준 코드를 복사해서 <code>.html</code> 파일로 저장하고, 더블클릭해서 브라우저로 열어 테스트해보세요.</span></li>
+    </ul>
+
+    <div class="code-wrap" id="previewWrap" hidden>
+      <pre class="code-block" id="previewBlock"></pre>
+      <button class="copy-btn" id="previewCopyBtn">📋 복사</button>
+    </div>
+  </section>
+
+  <!-- 완성작 보러가기 -->
+  <div class="final-cta">
+    <div class="emoji-big">⚔️</div>
+    <h2>캐릭터 챗봇 루크 스카이워커</h2>
+    <p>먼저 완성된 예시로 어떤 챗봇을 만들 수 있는지 구경해볼까요?</p>
+    <a class="btn-huge" href="148_chatBot_Luke.html" target="_blank" rel="noopener">
+      🚀 챗봇 만나러 가기
+    </a>
+  </div>
+
+  <div class="btn-row" style="justify-content:center; margin-top:26px;">
+    <a class="btn btn-green" href="148_day01_chatBot.html">◀ 특강 페이지로 돌아가기</a>
+  </div>
+
+</div>
+
+<footer>
+  드림하이파이브-덕수중 진로캠프 · 프로그래머 직업인멘토링 및 실무체험 (유한대학교)
+</footer>
+
+<script>
+  // 필수 카테고리 (고정) — [카테고리명, 키워드 placeholder]
+  const REQUIRED_CATS = [
+    ['인사', '예: 안녕, hi, 하이'],
+    ['이름 소개', '예: 이름'],
+    ['특기/전문분야', '예: 특기, 잘하는 거'],
+    ['고민 상담', '예: 고민'],
+    ['칭찬받았을 때', '예: 잘한다, 멋져, 최고'],
+    ['놀림/무례한 말 들었을 때', '예: 바보, 못생겼어'],
+    ['심심하다고 할 때', '예: 심심해'],
+    ['작별 인사', '예: 잘가, bye, 안녕히'],
+  ];
+
+  const requiredWrap = document.getElementById('requiredRows');
+  REQUIRED_CATS.forEach(([cat, kwPlaceholder], i) => {
+    const row = document.createElement('div');
+    row.className = 'kw-row';
+    row.innerHTML = `
+      <div class="kw-row-head"><span class="kw-cat">${cat}</span></div>
+      <div class="kw-field-label">반응할 키워드 (쉼표로 구분)</div>
+      <input type="text" class="kw-keywords" data-cat="${cat}" placeholder="${kwPlaceholder}">
+      <div class="kw-field-label">캐릭터의 대답</div>
+      <textarea class="kw-reply" rows="2" placeholder="캐릭터 말투로 대답을 적어주세요"></textarea>
+    `;
+    requiredWrap.appendChild(row);
+  });
+
+  // 자유 카테고리 (동적 추가/삭제)
+  const freeWrap = document.getElementById('freeRows');
+  function addFreeRow() {
+    const row = document.createElement('div');
+    row.className = 'kw-row kw-row-free';
+    row.innerHTML = `
+      <div class="kw-row-head">
+        <input type="text" class="kw-cat-input" placeholder="카테고리명 (예: 좋아하는 음식)">
+        <button type="button" class="kw-remove">✕ 삭제</button>
+      </div>
+      <div class="kw-field-label">반응할 키워드 (쉼표로 구분)</div>
+      <input type="text" class="kw-keywords" placeholder="예: 밥, 참치, 간식">
+      <div class="kw-field-label">캐릭터의 대답</div>
+      <textarea class="kw-reply" rows="2" placeholder="캐릭터 말투로 대답을 적어주세요"></textarea>
+    `;
+    row.querySelector('.kw-remove').addEventListener('click', () => row.remove());
+    freeWrap.appendChild(row);
+  }
+  for (let i = 0; i < 4; i++) addFreeRow();
+  document.getElementById('addFreeRow').addEventListener('click', addFreeRow);
+
+  // 회피 대사 (동적 추가/삭제, 최소 1개 유지)
+  const fbWrap = document.getElementById('fallbackRows');
+  function addFallbackRow(placeholder) {
+    const row = document.createElement('div');
+    row.className = 'fallback-row';
+    row.innerHTML = `<input type="text" class="fb-input" placeholder="${placeholder}">
+      <button type="button" class="kw-remove">✕</button>`;
+    row.querySelector('.kw-remove').addEventListener('click', () => {
+      if (fbWrap.children.length > 1) row.remove();
+    });
+    fbWrap.appendChild(row);
+  }
+  addFallbackRow('회피 대사 ① (예: 음... 그건 나중에 얘기하자옹!)');
+  addFallbackRow('회피 대사 ② (예: 그건 잘 모르겠다냥~)');
+  document.getElementById('addFallback').addEventListener('click', () => addFallbackRow('회피 대사 추가'));
+
+  // ── 마크다운 생성 ──
+  function v(id) { return document.getElementById(id).value.trim(); }
+  function esc(s) { return (s || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
+
+  function collectRows() {
+    const rows = [];
+    requiredWrap.querySelectorAll('.kw-row').forEach(row => {
+      const cat = row.querySelector('.kw-cat').textContent.trim();
+      const keywords = row.querySelector('.kw-keywords').value.trim();
+      const reply = row.querySelector('.kw-reply').value.trim();
+      rows.push({ cat, keywords, reply, required: true });
+    });
+    freeWrap.querySelectorAll('.kw-row-free').forEach(row => {
+      const cat = row.querySelector('.kw-cat-input').value.trim();
+      const keywords = row.querySelector('.kw-keywords').value.trim();
+      const reply = row.querySelector('.kw-reply').value.trim();
+      if (cat || keywords || reply) rows.push({ cat, keywords, reply, required: false });
+    });
+    return rows;
+  }
+
+  function collectFallbacks() {
+    return Array.from(fbWrap.querySelectorAll('.fb-input'))
+      .map(el => el.value.trim())
+      .filter(Boolean);
+  }
+
+  function buildMarkdown() {
+    const name = v('f-name');
+    const identity = v('f-identity');
+    const age = v('f-age');
+    const personality = v('f-personality');
+    const verbal = v('f-verbal');
+    const emoji = v('f-emoji');
+    const callname = v('f-callname');
+    const intro = v('f-intro');
+    const greeting = v('f-greeting');
+    const reset = v('f-reset');
+    const rows = collectRows();
+    const fallbacks = collectFallbacks();
+
+    const blank = '(미입력)';
+    let md = `# 나의 캐릭터 챗봇 설계표\n\n`;
+    md += `이 설계표는 드림하이파이브-덕수중 진로캠프 "챗봇 생성기" 페이지에서 직접 작성한 내용이에요.\n`;
+    md += `아래 내용을 그대로 AI(구글 AI 스튜디오 등)에게 주고, "이 설계표를 바탕으로 캐릭터 챗봇 html 단일 파일을 만들어줘"라고 요청해보세요!\n\n`;
+    md += `---\n\n`;
+
+    md += `## 1단계. 캐릭터 기본 설정\n\n`;
+    md += `1. 이름: ${name || blank}\n`;
+    md += `2. 정체 (사람/동물/로봇/정령 등): ${identity || blank}\n`;
+    md += `3. 나이 또는 특징 한 줄: ${age || blank}\n`;
+    md += `4. 성격을 표현하는 단어 3개: ${personality || blank}\n`;
+    md += `5. 말버릇: ${verbal || blank}\n`;
+    md += `6. 캐릭터를 표현하는 이모지: ${emoji || blank}\n`;
+    md += `7. 사용자를 부르는 호칭: ${callname || blank}\n`;
+    md += `8. 캐릭터를 한 문장으로 소개한다면: ${intro || blank}\n\n`;
+    md += `---\n\n`;
+
+    md += `## 2단계. 키워드 응답 설계표\n\n`;
+    md += `| 카테고리 | 반응할 키워드 | 캐릭터의 대답 |\n|---|---|---|\n`;
+    rows.forEach(r => {
+      const cat = r.cat || (r.required ? '' : blank);
+      md += `| ${cat} | ${r.keywords || '-'} | ${r.reply || '-'} |\n`;
+    });
+    md += `\n---\n\n`;
+
+    md += `## 3단계. 예외 상황\n\n`;
+    md += `1. 첫 인사말 (GREETING): ${greeting || blank}\n`;
+    md += `2. 모르는 질문에 대한 회피 대사 (FALLBACK_REPLIES):\n`;
+    if (fallbacks.length) {
+      fallbacks.forEach(f => { md += `   - ${f}\n`; });
+    } else {
+      md += `   - ${blank}\n`;
+    }
+    md += `3. 초기화 버튼 눌렀을 때: ${reset || '(첫 인사말과 동일하게 사용)'}\n\n`;
+    md += `---\n\n`;
+
+    md += `## 4단계. 코드 참고용 (자동 생성)\n\n`;
+    md += '```js\n';
+    md += `const RESPONSES = [\n`;
+    rows.filter(r => r.keywords && r.reply).forEach(r => {
+      const kws = r.keywords.split(',').map(s => s.trim()).filter(Boolean).map(s => `'${esc(s)}'`).join(', ');
+      md += `  { keywords: [${kws}], reply: '${esc(r.reply)}' },\n`;
+    });
+    md += `];\n\n`;
+    md += `const GREETING = '${esc(greeting)}';\n`;
+    md += `const FALLBACK_REPLIES = [${fallbacks.map(f => `'${esc(f)}'`).join(', ')}];\n`;
+    md += '```\n\n';
+    md += `---\n\n`;
+
+    const charLabel = name || '내 캐릭터';
+    md += `## 🚀 구글 AI 스튜디오 개발 가이드\n\n`;
+    md += `### 1. 이 파일을 AI 스튜디오에 전달하기\n`;
+    md += `1. [구글 AI 스튜디오](https://aistudio.google.com/)에 접속해서 로그인하세요.\n`;
+    md += `2. 새 채팅을 시작하세요.\n`;
+    md += `3. 이 마크다운 파일을 첨부하거나, 파일을 열어서 전체 내용을 복사해 붙여넣으세요.\n\n`;
+
+    md += `### 2. 아래 프롬프트를 그대로 붙여넣으세요\n\n`;
+    md += '```\n';
+    md += `이 설계표를 참고해서 "${charLabel}" 캐릭터 챗봇 웹페이지를 만들어줘.\n\n`;
+    md += `[필수 조건]\n`;
+    md += `- html, css, js를 한 파일(html 단일 파일)로 만들어줘. 외부 API는 사용하지 마.\n`;
+    md += `- 위 4단계의 RESPONSES 배열, GREETING, FALLBACK_REPLIES를 그대로 코드에 반영해줘.\n`;
+    md += `- 사용자가 입력한 문장에 RESPONSES의 keywords 중 하나라도 포함되면 그 reply를 보여줘. 여러 개가 겹치면 먼저 매칭되는 것 하나만 보여줘.\n`;
+    md += `- 아무 키워드도 매칭되지 않으면 FALLBACK_REPLIES 중 하나를 랜덤으로 보여줘.\n`;
+    md += `- 채팅창 UI로 만들어줘: 캐릭터 말풍선(왼쪽), 내 말풍선(오른쪽), 하단에 입력창과 전송 버튼.\n`;
+    md += `- 페이지를 처음 열면 GREETING 문구를 캐릭터 말풍선으로 먼저 보여줘.\n`;
+    md += `- 대화를 초기화하는 버튼을 추가하고, 누르면 대화 내용을 지우고 초기화 메시지를 다시 보여줘.\n`;
+    md += `- 캐릭터의 이모지와 이름을 헤더에 보여주고, 1단계 캐릭터 정보(정체·성격·말버릇)에 어울리는 색상과 분위기로 디자인해줘.\n`;
+    md += `- 모바일 화면에서도 잘 보이게 반응형으로 만들어줘.\n`;
+    md += '```\n\n';
+
+    md += `### 3. 결과 확인하고 저장하기\n`;
+    md += `1. AI가 만들어준 코드를 복사하세요.\n`;
+    md += `2. 메모장(또는 VS Code)에 붙여넣고 \`${charLabel}_챗봇.html\` 같은 이름으로 저장하세요. (\`.html\`로 저장하는 게 중요해요!)\n`;
+    md += `3. 저장한 파일을 더블클릭해서 브라우저로 열고, 직접 대화해보며 테스트하세요.\n\n`;
+
+    md += `### 4. 잘 안 될 때 이렇게 다시 요청해보세요\n`;
+    md += `- "챗봇이 대답을 못 알아들어요. 키워드 매칭이 잘 되도록 다시 확인해줘."\n`;
+    md += `- "디자인이 마음에 안 들어요. ${charLabel} 캐릭터 느낌에 더 어울리게 색을 바꿔줘."\n`;
+    md += `- "초기화 버튼이 안 눌려요. 고쳐줘."\n`;
+
+    return md;
+  }
+
+  function updatePreview() {
+    document.getElementById('previewBlock').textContent = buildMarkdown();
+  }
+
+  // ── 샘플로 채우기 (고양이 레오 예시) ──
+  const SAMPLE = {
+    name: '레오',
+    identity: '고양이',
+    age: '7세',
+    personality: '도도함, 귀찮음, 깔끔함',
+    verbal: '문장 끝에 "~옹"으로 끝난다',
+    emoji: '🐈',
+    callname: '집사야',
+    intro: '나는 집사의 고양이 레오야.',
+    greeting: '야옹~ 집사 왔냐옹? 도도하고 깔끔한 7살 고양이 레오다옹. 무슨 일로 나를 불렀냐옹?',
+    reset: '냐아옹~ 기억을 그루밍하듯 싹 지웠다옹! 다시 처음부터 얘기하자옹.',
+    fallbacks: [
+      '냐옹? 그게 무슨 소리냐옹. 알아듣기 쉽게 츄르나 하나 대령해라옹.',
+      '졸린데 귀찮게 하지 말라옹... 웅냐냥...',
+      '내 알 바 아니다옹. 나는 내 그루밍이나 하련다옹.',
+    ],
+    required: [
+      { keywords: '안녕, hi, 하이, 야옹', reply: '안녕하냐옹~ 밥은 먹었느냐옹~' },
+      { keywords: '이름, 누구, 성함, 레오', reply: '나는 레오다옹. 반갑다옹~.' },
+      { keywords: '특기, 취미, 잘하는 것, 그루밍, 잠', reply: '내가 제일 잘하는 건 잠자기와 그루밍이다옹~' },
+      { keywords: '고민, 슬퍼, 걱정, 우울, 힘들어', reply: '냐옹? 뭘 걱정하는거냐옹. 밥 먹고 숨 쉬면 걱정할 것은 없다옹~' },
+      { keywords: '잘한다, 멋져, 최고, 착해, 예뻐, 귀여워', reply: '칭찬은 식상하다옹~' },
+      { keywords: '바보, 못생겼어, 짜증, 싫어, 미워', reply: '나쁜 말은 쓰지 않는 거다옹~' },
+      { keywords: '심심해, 심심, 놀아줘', reply: '심심하면 나를 쓰다듬어라옹. 만져주는 건 언제나 환영이다옹~' },
+      { keywords: '잘가, bye, 안녕히, 바이', reply: '잘가라옹. 집 잘지켜라옹~' },
+    ],
+    free: [
+      { cat: '좋아하는 음식', keywords: '츄르, 간식, 밥, 맛있는 거', reply: '츄르?! 간식? 그건 참을 수 없다옹! 당장 내놓아라옹~!' },
+      { cat: '나이', keywords: '나이, 몇 살, 나이가', reply: '나는 7살이다옹. 인간 나이로 치면 대충 삼촌뻘이다옹~!' },
+      { cat: '싫어하는 것', keywords: '목욕, 물, 씻자, 씻어', reply: '목욕은 세상에서 제일 싫다옹! 물은 저리 치워라옹~!' },
+      { cat: '취미', keywords: '잠, 졸려, 피곤해', reply: '하루에 15시간은 자야 피부가 뽀송해진다옹. 귀찮게 하지 말라옹~' },
+      { cat: '놀아주기', keywords: '놀자, 장난감, 낚싯대, 깃털', reply: '귀찮다옹... 하지만 저 낚싯대는 조금 탐나는구옹...' },
+    ],
+  };
+
+  function fillSample() {
+    document.getElementById('f-name').value = SAMPLE.name;
+    document.getElementById('f-identity').value = SAMPLE.identity;
+    document.getElementById('f-age').value = SAMPLE.age;
+    document.getElementById('f-personality').value = SAMPLE.personality;
+    document.getElementById('f-verbal').value = SAMPLE.verbal;
+    document.getElementById('f-emoji').value = SAMPLE.emoji;
+    document.getElementById('f-callname').value = SAMPLE.callname;
+    document.getElementById('f-intro').value = SAMPLE.intro;
+    document.getElementById('f-greeting').value = SAMPLE.greeting;
+    document.getElementById('f-reset').value = SAMPLE.reset;
+
+    const reqRows = requiredWrap.querySelectorAll('.kw-row');
+    reqRows.forEach((row, i) => {
+      const s = SAMPLE.required[i];
+      if (!s) return;
+      row.querySelector('.kw-keywords').value = s.keywords;
+      row.querySelector('.kw-reply').value = s.reply;
+    });
+
+    freeWrap.innerHTML = '';
+    SAMPLE.free.forEach(s => {
+      addFreeRow();
+      const row = freeWrap.lastElementChild;
+      row.querySelector('.kw-cat-input').value = s.cat;
+      row.querySelector('.kw-keywords').value = s.keywords;
+      row.querySelector('.kw-reply').value = s.reply;
+    });
+
+    fbWrap.innerHTML = '';
+    SAMPLE.fallbacks.forEach(f => {
+      addFallbackRow('');
+      const row = fbWrap.lastElementChild;
+      row.querySelector('.fb-input').value = f;
+    });
+
+    const wrap = document.getElementById('previewWrap');
+    if (!wrap.hidden) updatePreview();
+  }
+
+  document.getElementById('sampleBtn').addEventListener('click', fillSample);
+
+  document.getElementById('previewBtn').addEventListener('click', () => {
+    const wrap = document.getElementById('previewWrap');
+    if (wrap.hidden) {
+      updatePreview();
+      wrap.hidden = false;
+    } else {
+      wrap.hidden = true;
+    }
+  });
+
+  document.getElementById('previewCopyBtn').addEventListener('click', function () {
+    updatePreview();
+    const text = document.getElementById('previewBlock').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const original = this.textContent;
+      this.textContent = '✅ 완료!';
+      this.classList.add('copied');
+      setTimeout(() => {
+        this.textContent = original;
+        this.classList.remove('copied');
+      }, 1800);
+    });
+  });
+
+  function downloadText(filename, text) {
+    const blob = new Blob([text], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  document.getElementById('downloadBtn').addEventListener('click', () => {
+    const name = v('f-name');
+    if (!name) {
+      alert('먼저 1단계에서 캐릭터 이름을 입력해주세요!');
+      document.getElementById('f-name').focus();
+      return;
+    }
+    const md = buildMarkdown();
+    const safe = name.replace(/[\\/:*?"<>|\s]+/g, '_');
+    downloadText(`캐릭터챗봇설계표_${safe}.md`, md);
+  });
+</script>
+
+</body>
+</html>

@@ -1,1 +1,545 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>프로그래머 직업인멘토링 및 실무체험 - AI 캐릭터 챗봇 만들기</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap');
 
+  :root {
+    --navy: #16233d;
+    --navy-light: #1a3a5c;
+    --blue: #2e6da4;
+    --blue-light: #4d8fc7;
+    --teal: #2f8f7c;
+    --orange: #f0a500;
+    --slate: #5b6472;
+    --bg: #f4f6fa;
+    --card: #ffffff;
+    --border: #dde3ed;
+    --text: #22303f;
+    --text-soft: #5b6472;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3 { font-family: 'Noto Sans KR', sans-serif; font-weight: 800; }
+
+  /* ── 헤더 ── */
+  header {
+    position: relative;
+    background:
+      radial-gradient(circle at 1px 1px, rgba(255,255,255,0.08) 1px, transparent 0) 0 0 / 22px 22px,
+      linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 55%, var(--blue) 100%);
+    color: #fff;
+    padding: 54px 24px 42px;
+    text-align: center;
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.28);
+    padding: 7px 18px;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+    color: #ffd479;
+    margin-bottom: 16px;
+  }
+
+  header h1 {
+    font-size: clamp(1.7rem, 4.6vw, 2.4rem);
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
+
+  header p {
+    margin-top: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #cddaea;
+  }
+
+  .top-nav {
+    margin-top: 26px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .top-nav a {
+    background: rgba(255,255,255,0.08);
+    color: #eaf0f8;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    border: 1px solid rgba(255,255,255,0.22);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+
+  .top-nav a:hover { background: var(--orange); border-color: var(--orange); color: var(--navy); }
+
+  /* ── 컨테이너 ── */
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 34px 18px 60px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .section {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 28px 26px;
+    margin-bottom: 22px;
+    box-shadow: 0 2px 10px rgba(20,30,50,0.06);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--navy-light);
+  }
+
+  .section.c-pink   { border-left-color: var(--navy-light); }
+  .section.c-orange { border-left-color: var(--blue); }
+  .section.c-yellow { border-left-color: var(--teal); }
+  .section.c-green  { border-left-color: var(--slate); }
+  .section.c-blue   { border-left-color: var(--blue-light); }
+  .section.c-purple { border-left-color: var(--orange); }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.25rem;
+    color: var(--navy);
+    margin-bottom: 16px;
+  }
+
+  .section-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  .icon-pink   { background: var(--navy-light); }
+  .icon-orange { background: var(--blue); }
+  .icon-yellow { background: var(--teal); }
+  .icon-green  { background: var(--slate); }
+  .icon-blue   { background: var(--blue-light); }
+  .icon-purple { background: var(--orange); }
+
+  .section p, .section li { font-size: 0.96rem; color: var(--text); }
+
+  .fun-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 12px 0;
+  }
+
+  .fun-list li {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-weight: 500;
+  }
+
+  .fun-list li .dot { font-size: 1rem; flex-shrink: 0; }
+  .fun-list li .txt { flex: 1 1 0%; min-width: 0; }
+
+  .callout .txt { flex: 1 1 0%; min-width: 0; }
+
+  /* ── 버튼 ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 12px 22px;
+    border-radius: 8px;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(20,30,50,0.14);
+    transition: transform 0.15s, box-shadow 0.15s;
+    border: none;
+    cursor: pointer;
+    margin: 5px 6px 5px 0;
+  }
+
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(20,30,50,0.2); }
+  .btn:active { transform: translateY(0); }
+
+  .btn-pink   { background: var(--navy-light); }
+  .btn-orange { background: var(--blue); }
+  .btn-blue   { background: var(--blue-light); }
+  .btn-green  { background: var(--teal); }
+  .btn-purple { background: var(--orange); }
+
+  .btn-row { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 14px; }
+
+  /* ── 카드 그리드 ── */
+  .grid3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 14px 0;
+  }
+
+  .mini-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 14px;
+    text-align: center;
+    transition: transform 0.15s, border-color 0.15s;
+  }
+
+  .mini-card:hover { transform: translateY(-3px); border-color: var(--blue-light); }
+  .mini-card .emoji { font-size: 1.7rem; margin-bottom: 6px; }
+  .mini-card .label { font-weight: 700; color: var(--navy); }
+  .mini-card .desc { font-size: 0.83rem; color: var(--text-soft); margin-top: 4px; }
+
+  /* ── 콜아웃 ── */
+  .callout {
+    background: #fff8e6;
+    border-left: 4px solid var(--orange);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-weight: 600;
+    color: #6b4e00;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .callout.warn {
+    background: #fdecec;
+    border-left-color: #c0392b;
+    color: #8a1f1f;
+  }
+
+  .speech-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-weight: 600;
+    color: var(--navy);
+  }
+
+  /* ── 이미지 ── */
+  .img-block {
+    margin: 16px 0;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .img-block img { width: 100%; display: block; }
+
+  /* ── 코드 블록 (복사 가능) ── */
+  .code-wrap {
+    position: relative;
+    margin: 14px 0;
+  }
+
+  .code-block {
+    background: #1c2333;
+    color: #d6e0ee;
+    border-radius: 10px;
+    padding: 20px 60px 20px 20px;
+    font-family: 'JetBrains Mono', 'Consolas', 'D2Coding', monospace;
+    font-size: 0.8rem;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    max-height: 420px;
+    overflow-y: auto;
+    line-height: 1.6;
+    border: 1px solid #34455f;
+  }
+
+  .copy-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: var(--blue-light);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.2s;
+  }
+
+  .copy-btn:hover { transform: translateY(-1px); }
+  .copy-btn.copied { background: var(--teal); }
+
+  /* ── 완성작 CTA ── */
+  .final-cta {
+    text-align: center;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 60%, var(--blue) 100%);
+    border-radius: 14px;
+    padding: 36px 26px;
+    color: #fff;
+    box-shadow: 0 8px 22px rgba(20,30,50,0.22);
+  }
+
+  .final-cta .emoji-big { font-size: 2.4rem; }
+
+  .final-cta h2 { color: #fff; font-size: 1.4rem; margin: 10px 0 6px; }
+  .final-cta p { color: rgba(255,255,255,0.85); margin-bottom: 18px; font-weight: 500; }
+
+  .final-cta .btn-huge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--orange);
+    color: var(--navy);
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 1.05rem;
+    padding: 14px 30px;
+    border-radius: 8px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    transition: transform 0.15s;
+  }
+
+  .final-cta .btn-huge:hover { transform: translateY(-2px); }
+
+  footer {
+    text-align: center;
+    padding: 26px 20px 46px;
+    color: var(--text-soft);
+    font-size: 0.82rem;
+  }
+
+  @media (max-width: 560px) {
+    .section { padding: 22px 18px; }
+    header { padding: 42px 18px 34px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">💻 드림하이파이브-덕수중 진로캠프</div>
+  <h1>프로그래머 직업인멘토링<br>&amp; 실무체험</h1>
+  <p>덕수중학교 · 유한대학교 멘토링 · 나만의 캐릭터 챗봇 만들기</p>
+  <div class="top-nav">
+    <a href="#role">프로그래머의 역할</a>
+    <a href="#vibe">바이브코딩</a>
+    <a href="#install">사용 프로그램</a>
+    <a href="#webapp">웹앱 개발</a>
+    <a href="#markdown">마크다운</a>
+    <a href="#chatbot">챗봇 만들기</a>
+    <a href="148_chatBot_생성기.html">챗봇 생성기</a>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- 개발에서 프로그래머의 역할 -->
+  <section class="section c-pink" id="role">
+    <div class="section-title"><div class="section-icon icon-pink">🧑‍💻</div><h2>개발에서 프로그래머의 역할</h2></div>
+    <ul class="fun-list">
+      <li><span class="dot">📋</span><span class="txt">기획자·디자이너가 그린 아이디어를 실제로 <strong>동작하는 프로그램</strong>으로 만드는 사람이에요.</span></li>
+      <li><span class="dot">🧩</span><span class="txt">복잡한 요구사항을 컴퓨터가 이해할 수 있는 <strong>단계별 논리(로직)</strong>로 잘게 쪼개는 역할을 해요.</span></li>
+      <li><span class="dot">🎯</span><span class="txt">컴퓨터는 사람처럼 "알아서" 해석하지 않기 때문에, <strong>애매함을 없애고 정확하게 지시</strong>하는 게 프로그래머의 핵심 능력이에요.</span></li>
+    </ul>
+
+    <h3 style="margin:22px 0 10px; font-size:1.05rem; color: var(--navy);">💬 그래서 프로그래머는 글보다 순서도를 씁니다</h3>
+    <ul class="fun-list">
+      <li><span class="dot">🗣️</span><span class="txt">사람끼리는 "적당히", "알아서", "있으면" 같은 표현으로도 대화가 통하지만, 이런 말은 사람마다 다르게 해석될 수 있어요.</span></li>
+      <li><span class="dot">📐</span><span class="txt">그래서 프로그래머는 조건과 흐름을 <strong>순서도(Flowchart)</strong>로 그려서, 오해 없이 정확하게 로직을 전달해요.</span></li>
+    </ul>
+
+    <div class="callout">
+      <span class="dot">😂</span><span class="txt">순서도가 왜 필요한지, 유명한 유머로 확인해볼까요?</span>
+    </div>
+
+    <div class="speech-box">🗣️ 아내: "마트 가서 우유 하나 사 와. 그런데 계란이 있으면, 6개 사 와!"</div>
+
+    <div class="img-block">
+      <img src="programer.jpg" alt="계란 있으면 6개 사오라는 프로그래머 순서도 유머">
+    </div>
+
+    <div class="callout warn">
+      <span class="dot">🤦</span><span class="txt">결과: 계란은 <strong>0개</strong>, 우유는 <strong>6개</strong>! "계란이 있으면"이라는 조건이 <strong>우유의 개수</strong>에 걸려버렸기 때문이에요. 프로그래머에게는 이런 애매한 문장이 제일 무섭답니다.</span>
+    </div>
+  </section>
+
+  <!-- 바이브 코딩이란? -->
+  <section class="section c-pink" id="vibe">
+    <div class="section-title"><div class="section-icon icon-pink">🎨</div><h2>바이브 코딩이란?</h2></div>
+    <ul class="fun-list">
+      <li><span class="dot">💬</span><span class="txt">AI에게 자연어로 <strong>"이런 걸 만들어줘"</strong>라고 말하면 AI가 코드를 대신 짜주는 방식의 프로그래밍이에요.</span></li>
+      <li><span class="dot">🙌</span><span class="txt">코드를 몰라도 만들 수 있어서 <strong>노코드 방식</strong>이라고도 불러요.</span></li>
+      <li><span class="dot">🧑‍🔬</span><span class="txt">2025년 초, AI 연구자 <strong>안드레이 카파시</strong>가 이 표현을 쓰면서 유행하기 시작했어요. 핵심은 "코드가 있다는 사실을 거의 잊고, 그냥 AI에게 말로 시키면서 결과를 보는 느낌"이에요.</span></li>
+    </ul>
+  </section>
+
+  <!-- 프로그래머들이 사용하는 프로그램 -->
+  <section class="section c-orange" id="install">
+    <div class="section-title"><div class="section-icon icon-orange">🛠️</div><h2>프로그래머들이 사용하는 프로그램</h2></div>
+    <p>프로그래머들은 코드를 작성할 때 다양한 <strong>IDE(통합 개발 환경)</strong>를 사용해요. 어떤 프로그램들이 있는지 살펴볼까요?</p>
+
+    <div class="callout">
+      <span class="dot">💡</span><span class="txt">IDE란? <strong>Integrated Development Environment</strong>(통합 개발 환경)의 줄임말이에요. 궁금하면 구글에 검색해도 AI가 척척 알려줘요.</span>
+    </div>
+
+    <div class="grid3">
+      <div class="mini-card"><div class="emoji">🅰️</div><div class="label">Visual Studio</div></div>
+      <div class="mini-card"><div class="emoji">☕</div><div class="label">IntelliJ IDEA</div><div class="desc">자바 개발 인기 IDE - 강추!</div></div>
+      <div class="mini-card"><div class="emoji">🍎</div><div class="label">Xcode</div><div class="desc">애플 기기 앱 개발용</div></div>
+      <div class="mini-card"><div class="emoji">🤖</div><div class="label">Android Studio</div><div class="desc">안드로이드 앱 개발 전용</div></div>
+      <div class="mini-card"><div class="emoji">💙</div><div class="label">VS Code</div><div class="desc">텍스트 에디터지만 확장 기능으로 IDE처럼 사용 가능</div></div>
+    </div>
+
+    <div class="callout">
+      <span class="dot">🎯</span><span class="txt">오늘 개발은 <strong>구글 AI 스튜디오</strong>를 사용할거에요!</span>
+    </div>
+    <div class="btn-row">
+      <a class="btn btn-orange" href="https://aistudio.google.com/" target="_blank" rel="noopener">🚀 구글 AI 스튜디오로 이동</a>
+    </div>
+  </section>
+
+  <!-- 웹 앱 개발 -->
+  <section class="section c-yellow" id="webapp">
+    <div class="section-title"><div class="section-icon icon-yellow">🌐</div><h2>웹 앱 개발</h2></div>
+    <p>기본적으로 3개의 파일이 필요해요.</p>
+    <div class="grid3">
+      <div class="mini-card"><div class="emoji">🧱</div><div class="label">HTML</div><div class="desc">화면(front)의 구조를 잡는 태그들이 있는 파일</div></div>
+      <div class="mini-card"><div class="emoji">🎨</div><div class="label">CSS</div><div class="desc">화면 디자인을 적어놓은 파일</div></div>
+      <div class="mini-card"><div class="emoji">⚡</div><div class="label">JS</div><div class="desc">화면의 동작을 구현해 놓은 파일</div></div>
+    </div>
+    <ul class="fun-list">
+      <li><span class="dot">🗂️</span><span class="txt">"교육용 앱 만들어줘"라고 하면 3개의 파일을 만들어줘요.</span></li>
+      <li><span class="dot">📄</span><span class="txt">"교육용 앱을 단일 파일로 만들어줘"라고 하면 1개의 파일로 만들어줘요.</span></li>
+    </ul>
+  </section>
+
+  <!-- 프로그래밍 공부의 어려움 -->
+  <section class="section c-green">
+    <div class="section-title"><div class="section-icon icon-green">⚠️</div><h2>프로그래밍 공부의 어려움</h2></div>
+    <div class="callout warn">
+      <span class="dot">🙅</span><span class="txt">생성형 AI와 사랑에 빠지지 마세요! = 배신 당하니까요.</span>
+    </div>
+    <p>토큰이 부족하기 때문에 오늘은 <strong>3번 정도만</strong> 실습해 볼게요.</p>
+    <div class="img-block">
+      <img src="https://luriluan0-a11y.github.io/gameContents/image/146_anti.png" alt="AI와의 관계에 대한 재미있는 이미지">
+    </div>
+  </section>
+
+  <!-- 마크다운 -->
+  <section class="section c-blue" id="markdown">
+    <div class="section-title"><div class="section-icon icon-blue">📝</div><h2>마크다운을 사용해보자!</h2></div>
+    <p>프롬프트를 그동안 쓰셨죠? 프롬프트만 쓰면 재사용하기 어려워요.<br>그래서 우리는 <strong>MD(마크다운)</strong> 파일을 만들어볼 거예요.</p>
+    <div class="btn-row">
+      <a class="btn btn-blue" href="https://luriluan0-a11y.github.io/gameContents/mentoring/05.markdown_gaide.html" target="_blank" rel="noopener">📘 마크다운 완벽 가이드</a>
+    </div>
+  </section>
+
+  <!-- AI 캐릭터 챗봇을 만들어 보자 -->
+  <section class="section c-purple" id="chatbot">
+    <div class="section-title"><div class="section-icon icon-purple">🤖</div><h2>AI 캐릭터 챗봇을 만들어 보자!</h2></div>
+    <div class="callout"><span class="dot">🎯</span><span class="txt">오늘 만들어볼 것 → 나만의 캐릭터와 대화하는 챗봇 만들기</span></div>
+
+    <h3 style="margin:20px 0 10px; font-size:1.05rem; color: var(--navy);">🧩 AI 캐릭터 챗봇이란?</h3>
+    <ul class="fun-list">
+      <li><span class="dot">🗣️</span><span class="txt">정해진 성격과 말투를 가진 캐릭터가 사용자와 대화를 나누는 콘텐츠예요.</span></li>
+      <li><span class="dot">🎮</span><span class="txt">게임 속 NPC, 교육용 튜터 캐릭터, 상담/힐링 캐릭터 등 다양하게 활용돼요.</span></li>
+      <li><span class="dot">💬</span><span class="txt">진짜 사람과 대화하는 것 같은 몰입감을 줄 수 있어요.</span></li>
+    </ul>
+
+    <h3 style="margin:20px 0 10px; font-size:1.05rem; color: var(--navy);">🎭 페르소나(Persona)란?</h3>
+    <ul class="fun-list">
+      <li><span class="dot">✨</span><span class="txt">캐릭터에게 생명을 불어넣는 설정값이에요.</span></li>
+      <li><span class="dot">📛</span><span class="txt">이름, 말투, 성격, 세계관(배경 이야기)으로 구성돼요.</span></li>
+      <li><span class="dot">🌟</span><span class="txt">페르소나가 뚜렷할수록 챗봇이 매력적으로 느껴져요.</span></li>
+    </ul>
+
+    <h3 style="margin:20px 0 10px; font-size:1.05rem; color: var(--navy);">📋 챗봇을 만들 때 규칙</h3>
+    <ul class="fun-list">
+      <li><span class="dot">🎭</span><span class="txt">페르소나 일관성을 유지해요. 캐릭터가 갑자기 다른 사람처럼 말하면 몰입이 깨져요.</span></li>
+      <li><span class="dot">🔑</span><span class="txt">오늘은 "규칙 기반" 챗봇을 만들어요. 모든 대화를 다 이해할 수는 없으니, 핵심 키워드에 반응하도록 설계해요.</span></li>
+      <li><span class="dot">🙈</span><span class="txt">모르는 질문에는 "모른다"고 딱딱하게 답하지 말고, 캐릭터답게 자연스럽게 회피하는 대사를 준비해요.</span></li>
+      <li><span class="dot">🔄</span><span class="txt">대화 흐름(인사 → 키워드 응답 → 마무리/초기화)을 미리 설계해 둬요.</span></li>
+    </ul>
+  </section>
+
+  <!-- 챗봇 설계 → 별도 페이지 안내 -->
+  <section class="section c-purple">
+    <div class="section-title"><div class="section-icon icon-purple">📐</div><h2>챗봇 설계</h2></div>
+    <p>캐릭터 기본 설정부터 키워드 응답표, 예외 상황까지 — 단계별 설계표는 <strong>챗봇 생성기</strong> 페이지에 따로 정리해 두었어요. 버튼을 눌러 이동한 뒤, 칸을 채우면 설계 마크다운 파일이 바로 다운로드돼요.</p>
+
+    <div class="btn-row">
+      <a class="btn btn-purple" href="148_chatBot_생성기.html">🛠️ 챗봇 생성기 페이지로 이동</a>
+    </div>
+
+    <p style="margin-top:16px;">다운로드한 마크다운 파일을 AI에게 주고, 그 내용을 토대로 html 단일 파일을 만들어 달라고 요청해 보세요.</p>
+  </section>
+
+  <!-- 완성작 보러가기 -->
+  <div class="final-cta">
+    <div class="emoji-big">⚔️</div>
+    <h2>캐릭터 챗봇 루크 스카이워커</h2>
+    <p>먼저 완성된 예시로 어떤 챗봇을 만들 수 있는지 구경해볼까요?</p>
+    <a class="btn-huge" href="https://luriluan0-a11y.github.io/gameContents/specialClass/148_chatBot_Luke.html" target="_blank" rel="noopener">
+      🚀 챗봇 만나러 가기
+    </a>
+  </div>
+
+</div>
+
+<footer>
+  드림하이파이브-덕수중 진로캠프 · 프로그래머 직업인멘토링 및 실무체험 (유한대학교)
+</footer>
+
+<script>
+  function copyCode(id, btn) {
+    const text = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const original = btn.textContent;
+      btn.textContent = '✅ 완료!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove('copied');
+      }, 1800);
+    });
+  }
+</script>
+
+</body>
+</html>

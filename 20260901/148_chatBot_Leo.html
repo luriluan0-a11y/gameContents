@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>레오와 대화하기 - AI 캐릭터 챗봇</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;800;900&family=Nanum+Gothic:wght@400;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nanum Gothic', 'Noto Sans KR', 'Outfit', sans-serif;
+    background: radial-gradient(circle at 50% 30%, #291b12 0%, #0d0906 80%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── 배경 파티클 (따뜻한 조명 & 발자국) ── */
+  .particles-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .particle {
+    position: absolute;
+    color: rgba(242, 166, 90, 0.15);
+    pointer-events: none;
+    animation: floatUp ease-in-out infinite;
+  }
+
+  @keyframes floatUp {
+    0% {
+      transform: translateY(110vh) translateX(0) rotate(0deg);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.5;
+    }
+    90% {
+      opacity: 0.5;
+    }
+    100% {
+      transform: translateY(-10vh) translateX(40px) rotate(360deg);
+      opacity: 0;
+    }
+  }
+
+  /* ── 앱 메인 프레임 ── */
+  .app {
+    width: 420px;
+    max-width: 100%;
+    height: 700px;
+    max-height: 92vh;
+    background: rgba(30, 21, 16, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 30px;
+    border: 1px solid rgba(242, 166, 90, 0.25);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 30px rgba(212, 111, 28, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── 헤더 영역 ── */
+  .header {
+    background: linear-gradient(135deg, #25160f 0%, #3e2518 100%);
+    padding: 26px 20px 22px;
+    text-align: center;
+    color: #fff;
+    position: relative;
+    border-bottom: 1px solid rgba(242, 166, 90, 0.25);
+  }
+
+  .avatar-container {
+    position: relative;
+    display: inline-block;
+    margin: 0 auto;
+    cursor: pointer;
+  }
+
+  .avatar {
+    font-size: 3.6rem;
+    line-height: 1;
+    filter: drop-shadow(0 0 16px rgba(242, 166, 90, 0.7));
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .avatar-container:hover .avatar {
+    transform: scale(1.15) rotate(8deg);
+  }
+
+  .status-badge {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    background-color: #2ec4b6;
+    border: 2px solid #25160f;
+    border-radius: 50%;
+    animation: pulse-green 2s infinite;
+  }
+
+  @keyframes pulse-green {
+    0% { box-shadow: 0 0 0 0 rgba(46, 196, 182, 0.7); }
+    70% { box-shadow: 0 0 0 8px rgba(46, 196, 182, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(46, 196, 182, 0); }
+  }
+
+  .char-name {
+    font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 900;
+    margin-top: 8px;
+    letter-spacing: 0.02em;
+    color: #fbeee6;
+    text-shadow: 0 0 12px rgba(242, 166, 90, 0.4);
+  }
+
+  .char-desc {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #cca485;
+    margin-top: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  .reset-btn {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    background: rgba(242, 166, 90, 0.15);
+    border: 1px solid rgba(242, 166, 90, 0.35);
+    color: #fbeee6;
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 8px 14px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
+    outline: none;
+  }
+
+  .reset-btn:hover {
+    background: rgba(242, 166, 90, 0.28);
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(242, 166, 90, 0.2);
+  }
+
+  /* ── 채팅창 영역 ── */
+  .chat {
+    flex: 1;
+    overflow-y: auto;
+    padding: 22px 18px;
+    background: #150d09;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .bubble-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .bubble-row.bot { justify-content: flex-start; }
+  .bubble-row.user { justify-content: flex-end; }
+
+  .bubble-avatar {
+    font-size: 1.6rem;
+    flex-shrink: 0;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    user-select: none;
+  }
+
+  .bubble {
+    max-width: 76%;
+    padding: 12px 16px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.5;
+    word-break: break-word;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    animation: pop 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+  }
+
+  @keyframes pop {
+    from { opacity: 0; transform: translateY(12px) scale(0.95); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .bubble-row.bot .bubble {
+    background: #251b15;
+    color: #fbeee6;
+    border: 1px solid rgba(242, 166, 90, 0.25);
+    border-top-left-radius: 4px;
+  }
+
+  .bubble-row.user .bubble {
+    background: linear-gradient(135deg, #f2a65a 0%, #d46f1c 100%);
+    color: #fff;
+    border-top-right-radius: 4px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+
+  /* ── 타이핑 인디케이터 ── */
+  .typing-dots {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    height: 18px;
+    padding: 2px 4px;
+  }
+
+  .typing-dots span {
+    width: 6px;
+    height: 6px;
+    background-color: #fbeee6;
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+  }
+
+  .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+  .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+  @keyframes bounce {
+    0%, 80%, 100% { transform: scale(0.3); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+
+  /* ── 입력 영역 ── */
+  .input-row {
+    display: flex;
+    gap: 10px;
+    padding: 16px 18px;
+    background: #1e1510;
+    border-top: 1px solid rgba(242, 166, 90, 0.2);
+  }
+
+  .input-row input {
+    flex: 1;
+    border: 2px solid #36251b;
+    background: #110905;
+    color: #fbeee6;
+    border-radius: 50px;
+    padding: 14px 20px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .input-row input::placeholder { color: #8a7363; }
+  .input-row input:focus {
+    border-color: #f2a65a;
+    box-shadow: 0 0 12px rgba(242, 166, 90, 0.25);
+  }
+
+  .send-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #f2a65a 0%, #d46f1c 100%);
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 12px rgba(212, 111, 28, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: none;
+  }
+
+  .send-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 16px rgba(212, 111, 28, 0.45);
+  }
+
+  .send-btn:active {
+    transform: scale(0.95);
+  }
+
+  /* 스크롤바 커스텀 */
+  .chat::-webkit-scrollbar { width: 6px; }
+  .chat::-webkit-scrollbar-thumb { background: #3c2a1f; border-radius: 10px; }
+  .chat::-webkit-scrollbar-track { background: transparent; }
+</style>
+</head>
+<body>
+
+<div class="particles-bg" id="particles"></div>
+
+<div class="app">
+  <div class="header">
+    <button class="reset-btn" onclick="resetChat(true)">🔄 초기화</button>
+    <div class="avatar-container">
+      <div class="avatar">🐈</div>
+      <div class="status-badge"></div>
+    </div>
+    <div class="char-name">레오</div>
+    <div class="char-desc">도도하고 깔끔한 7세 고양이</div>
+  </div>
+
+  <div class="chat" id="chat"></div>
+
+  <div class="input-row">
+    <input type="text" id="userInput" placeholder="레오에게 집사로서 말을 건네보세요..." onkeydown="if(event.key==='Enter') sendMessage()" autocomplete="off">
+    <button class="send-btn" onclick="sendMessage()">➤</button>
+  </div>
+</div>
+
+<script>
+  // ── 캐릭터 설정 데이터 (캐릭터 챗봇 만들기.md 기준) ──
+  const CHARACTER_NAME = '레오';
+  const GREETING = '야옹~ 집사 왔냐옹? 도도하고 깔끔한 7살 고양이 레오다옹. 무슨 일로 나를 불렀냐옹?';
+  const RESET_MESSAGE = '냐아옹~ 기억을 그루밍하듯 싹 지웠다옹! 다시 처음부터 얘기하자옹.';
+  
+  const FALLBACK_REPLIES = [
+    '냐옹? 그게 무슨 소리냐옹. 알아듣기 쉽게 츄르나 하나 대령해라옹.',
+    '졸린데 귀찮게 하지 말라옹... 웅냐냥...',
+    '내 알 바 아니다옹. 나는 내 그루밍이나 하련다옹.'
+  ];
+  
+  const REPEAT_PREFIX = '아까도 물어봤던 말이다옹! 귀찮지만 한 번 더 답해준다옹: ';
+  
+  const RUDE_WORDS = ['바보', '못생겼어', '짜증', '싫어', '미워'];
+  const RUDE_REPLY = '나쁜 말은 쓰지 않는 거다옹~';
+
+  const RESPONSES = [
+    { keywords: ['안녕', 'hi', '하이', '야옹'], reply: '안녕하냐옹~ 밥은 먹었느냐옹~' },
+    { keywords: ['이름', '누구', '성함', '레오'], reply: '나는 레오다옹. 반갑다옹~.' },
+    { keywords: ['특기', '취미', '잘하는 것', '그루밍', '잠'], reply: '내가 제일 잘하는 건 잠자기와 그루밍이다옹~' },
+    { keywords: ['고민', '슬퍼', '걱정', '우울', '힘들어'], reply: '냐옹? 뭘 걱정하는거냐옹. 밥 먹고 숨 쉬면 걱정할 것은 없다옹~' },
+    { keywords: ['잘한다', '멋져', '최고', '착해', '예뻐', '귀여워'], reply: '칭찬은 식상하다옹~' },
+    { keywords: ['바보', '못생겼어', '짜증', '싫어', '미워'], reply: '나쁜 말은 쓰지 않는 거다옹~' },
+    { keywords: ['심심해', '심심', '놀아줘'], reply: '심심하면 나를 쓰다듬어라옹. 만져주는 건 언제나 환영이다옹~' },
+    { keywords: ['잘가', 'bye', '안녕히', '바이'], reply: '잘가라옹. 집 잘지켜라옹~' },
+    // 자유 카테고리
+    { keywords: ['츄르', '간식', '밥', '맛있는 거'], reply: '츄르?! 간식? 그건 참을 수 없다옹! 당장 내놓아라옹~!' },
+    { keywords: ['나이', '몇 살', '나이가'], reply: '나는 7살이다옹. 인간 나이로 치면 대충 삼촌뻘이다옹~!' },
+    { keywords: ['목욕', '물', '씻자', '씻어'], reply: '목욕은 세상에서 제일 싫다옹! 물은 저리 치워라옹~!' },
+    { keywords: ['잠', '졸려', '피곤해'], reply: '하루에 15시간은 자야 피부가 뽀송해진다옹. 귀찮게 하지 말라옹~' },
+    { keywords: ['놀자', '장난감', '낚싯대', '깃털'], reply: '귀찮다옹... 하지만 저 낚싯대는 조금 탐나는구옹...' }
+  ];
+
+  // ── 챗봇 기능 로직 ──
+  const chatEl = document.getElementById('chat');
+  const inputEl = document.getElementById('userInput');
+  let lastMatchedIndex = -1;
+  let isTyping = false;
+
+  // 타이핑 인디케이터 엘리먼트 생성
+  let typingIndicatorEl = null;
+  function createTypingIndicator() {
+    typingIndicatorEl = document.createElement('div');
+    typingIndicatorEl.className = 'bubble-row bot';
+    typingIndicatorEl.id = 'typingIndicator';
+    typingIndicatorEl.style.display = 'none';
+
+    const avatar = document.createElement('div');
+    avatar.className = 'bubble-avatar';
+    avatar.textContent = '🐱';
+    typingIndicatorEl.appendChild(avatar);
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    
+    const dots = document.createElement('div');
+    dots.className = 'typing-dots';
+    for (let i = 0; i < 3; i++) {
+      const span = document.createElement('span');
+      dots.appendChild(span);
+    }
+    
+    bubble.appendChild(dots);
+    typingIndicatorEl.appendChild(bubble);
+    chatEl.appendChild(typingIndicatorEl);
+  }
+
+  function addBubble(text, from) {
+    const row = document.createElement('div');
+    row.className = 'bubble-row ' + from;
+
+    if (from === 'bot') {
+      const avatar = document.createElement('div');
+      avatar.className = 'bubble-avatar';
+      avatar.textContent = '🐱';
+      row.appendChild(avatar);
+    }
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = text;
+    row.appendChild(bubble);
+
+    // 타이핑 인디케이터보다 항상 위에 위치하도록 삽입
+    if (typingIndicatorEl && chatEl.contains(typingIndicatorEl)) {
+      chatEl.insertBefore(row, typingIndicatorEl);
+    } else {
+      chatEl.appendChild(row);
+    }
+    
+    chatEl.scrollTop = chatEl.scrollHeight;
+  }
+
+  function findReply(message) {
+    const lower = message.toLowerCase();
+
+    // 비속어/부정적 키워드 필터링
+    if (RUDE_WORDS.some(w => lower.includes(w))) {
+      return RUDE_REPLY;
+    }
+
+    // 키워드 데이터베이스 매칭
+    for (let i = 0; i < RESPONSES.length; i++) {
+      const item = RESPONSES[i];
+      if (item.keywords.some(k => lower.includes(k.toLowerCase()))) {
+        const isRepeat = i === lastMatchedIndex;
+        lastMatchedIndex = i;
+        return isRepeat ? REPEAT_PREFIX + item.reply : item.reply;
+      }
+    }
+
+    // 매칭되지 않을 시 임의의 fallback 응답
+    lastMatchedIndex = -1;
+    return FALLBACK_REPLIES[Math.floor(Math.random() * FALLBACK_REPLIES.length)];
+  }
+
+  function sendMessage() {
+    if (isTyping) return;
+    
+    const text = inputEl.value.trim();
+    if (!text) return;
+
+    addBubble(text, 'user');
+    inputEl.value = '';
+
+    // 타이핑 중 상태 활성화 및 인디케이터 노출
+    isTyping = true;
+    typingIndicatorEl.style.display = 'flex';
+    chatEl.scrollTop = chatEl.scrollHeight;
+
+    // 0.6초 ~ 1.2초 사이의 무작위 딜레이 후 답변 출력 (생동감 구현)
+    const delay = 600 + Math.random() * 600;
+    setTimeout(() => {
+      typingIndicatorEl.style.display = 'none';
+      addBubble(findReply(text), 'bot');
+      isTyping = false;
+    }, delay);
+  }
+
+  function resetChat(showResetMessage = false) {
+    chatEl.innerHTML = '';
+    createTypingIndicator();
+    lastMatchedIndex = -1;
+    
+    isTyping = true;
+    typingIndicatorEl.style.display = 'flex';
+    
+    setTimeout(() => {
+      typingIndicatorEl.style.display = 'none';
+      const startText = showResetMessage ? RESET_MESSAGE : GREETING;
+      addBubble(startText, 'bot');
+      isTyping = false;
+    }, 700);
+  }
+
+  // ── 배경 파티클 생성 ──
+  function initParticles() {
+    const particlesContainer = document.getElementById('particles');
+    const particleTypes = ['🐾', '✨', '•'];
+    
+    for (let i = 0; i < 40; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const type = particleTypes[Math.floor(Math.random() * particleTypes.length)];
+      
+      if (type === '•') {
+        p.style.width = (4 + Math.random() * 8) + 'px';
+        p.style.height = p.style.width;
+        p.style.borderRadius = '50%';
+        p.style.backgroundColor = 'rgba(242, 166, 90, 0.25)';
+      } else {
+        p.textContent = type;
+        p.style.fontSize = (12 + Math.random() * 12) + 'px';
+      }
+      
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.top = Math.random() * 100 + 'vh';
+      p.style.animationDuration = (8 + Math.random() * 12) + 's';
+      p.style.animationDelay = (Math.random() * 6) + 's';
+      
+      particlesContainer.appendChild(p);
+    }
+  }
+
+  // 초기화 실행
+  initParticles();
+  resetChat(false);
+</script>
+</body>
+</html>
