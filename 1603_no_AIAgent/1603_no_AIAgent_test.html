@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1603_AI 에이전트 없이 텔레그램 실패 알림 만들기</title>
+<style>
+  :root {
+    --paper:#F3F4EF; --surface:#FFFFFF; --ink:#1E2A33; --ink-soft:#5C6B72;
+    --line:#DADFD6; --accent:#2E6DA4; --accent-ink:#1A3A5C; --code-bg:#EEF1EC; --pre-bg:#1E2A33; --pre-ink:#E9EAE4;
+    --mono: ui-monospace,"SF Mono","Cascadia Mono",Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:#14181B; --surface:#1B2126; --ink:#E9EAE4; --ink-soft:#9BA6A8;
+      --line:#2C343A; --accent:#7FB0DD; --accent-ink:#A9CCEB; --code-bg:#242C32; --pre-bg:#0F1316; --pre-ink:#E9EAE4;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:#14181B; --surface:#1B2126; --ink:#E9EAE4; --ink-soft:#9BA6A8;
+    --line:#2C343A; --accent:#7FB0DD; --accent-ink:#A9CCEB; --code-bg:#242C32; --pre-bg:#0F1316; --pre-ink:#E9EAE4;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin:0; background:var(--paper); color:var(--ink); }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif; line-height:1.8; -webkit-font-smoothing:antialiased; }
+  .page { max-width:820px; margin:0 auto; padding:3.5rem 16px 5rem; }
+  header { border-bottom:2px solid var(--accent); padding-bottom:1.25rem; margin-bottom:1.75rem; }
+  .eyebrow { font-family:var(--mono); font-size:.75rem; color:var(--ink-soft); letter-spacing:.06em; }
+  h1 { font-size:clamp(1.5rem,4.5vw,2.1rem); line-height:1.35; margin:.4rem 0 .3rem; color:var(--accent-ink); }
+  .meta { color:var(--ink-soft); font-size:.9rem; margin:0; }
+  nav { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:1rem 1.25rem; margin-bottom:2rem; }
+  nav strong { font-size:.85rem; color:var(--ink-soft); }
+  nav ol { margin:.5rem 0 0; padding-left:1.25rem; columns:2; column-gap:2rem; font-size:.92rem; }
+  nav li { break-inside:avoid; padding:.1rem 0; }
+  a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+  h2 { font-size:1.3rem; margin:2.6rem 0 .8rem; padding-top:.4rem; border-top:1px solid var(--line); color:var(--accent-ink); scroll-margin-top:1rem; }
+  h3 { font-size:1.05rem; margin:1.6rem 0 .5rem; }
+  p, li { font-size:1rem; }
+  li { margin:.25rem 0; }
+  blockquote { margin:1rem 0; padding:.6rem 1rem; border-left:3px solid var(--accent); background:var(--surface); color:var(--ink-soft); border-radius:0 4px 4px 0; }
+  code { font-family:var(--mono); font-size:.88em; background:var(--code-bg); padding:.1em .35em; border-radius:3px; overflow-wrap:anywhere; }
+  pre { background:var(--pre-bg); color:var(--pre-ink); padding:1rem 1.1rem; border-radius:4px; overflow-x:auto; margin:1rem 0; line-height:1.55; }
+  pre code { background:none; padding:0; font-size:.84rem; color:inherit; overflow-wrap:normal; }
+  strong { color:var(--accent-ink); }
+  figure { margin:1.25rem 0; }
+  figure img { display:block; max-width:100%; height:auto; border:1px solid var(--line); border-radius:4px; }
+  figcaption { margin-top:.5rem; font-size:.85rem; color:var(--ink-soft); }
+  @media (max-width:640px) { nav ol { columns:1; } .page { padding-top:2rem; } }
+  @media print { body { background:#fff; color:#000; } nav { display:none; } pre { white-space:pre-wrap; } }
+</style>
+</head>
+<body>
+<div class="page">
+<header>
+  <div class="eyebrow">1603</div>
+  <h1>AI 에이전트 없이 텔레그램 실패 알림 만들기</h1>
+  <p class="meta">작성일: 2026-09-19 · 9/21 문의 내용 반영</p>
+</header>
+<nav><strong>목차</strong><ol><li><a href="#배경">배경</a></li><li><a href="#확인-방법-3단계-일반-원칙">확인 방법 3단계 (일반 원칙)</a></li><li><a href="#왜-AI-에이전트-없이도-되는가">왜 AI 에이전트 없이도 되는가</a></li><li><a href="#알림-전용-봇-만들기">알림 전용 봇 만들기</a></li><li><a href="#chat-id-확인하기">chat_id 확인하기</a></li><li><a href="#테스트-메시지-보내기">테스트 메시지 보내기</a></li><li><a href="#실제-자동화에-통합한-예시-환율-메모">실제 자동화에 통합한 예시: 환율 메모</a></li><li><a href="#확장-환율-하락-시-구매-검토-알림">확장: 환율 하락 시 &quot;구매 검토&quot; 알림</a></li><li><a href="#9-21-문의-21일-환율-안내가-안-왔다-점검과-개선-2026-09-21">9/21 문의: &quot;21일 환율 안내가 안 왔다&quot; 점검과 개선 (2026-09-21)</a></li><li><a href="#다른-자동화에-재사용하기">다른 자동화에 재사용하기</a></li><li><a href="#참고-관련-자동화-문서">참고: 관련 자동화 문서</a></li></ol></nav>
+<main>
+<h2 id="배경">배경</h2>
+<p>업무 자동화(예: 환율 메모, 뉴스 스크랩 등)를 AI 에이전트(Hermes/OpenClaw) 없이도 만들 수 있는지 검토하다가, "자동화가 실제로 실행됐는지 어떻게 확인하나"라는 질문에서 출발했다.</p>
+<p>결론: 자동화 자체는 물론이고, 실패 시 알림을 받는 것도 AI 에이전트 없이 순수 스크립트 + 텔레그램 봇 API만으로 충분히 가능하다.</p>
+<h2 id="확인-방법-3단계-일반-원칙">확인 방법 3단계 (일반 원칙)</h2>
+<p>자동화가 돌았는지 확인하는 방법은 아래 세 가지로 나뉜다.</p>
+<ol><li><strong>산출물 확인</strong>: 예정된 파일(오늘 날짜 행/파일)이 실제로 생성·갱신됐는지 확인. 가장 직접적이지만 실패 원인은 알 수 없음.</li><li><strong>로그/실행 이력 확인</strong>: 작업 스케줄러(Windows) 또는 cron의 마지막 실행 시각·종료 코드 확인. 실패 원인 파악용.</li><li><strong>완료 알림</strong>: 실패했을 때만 알림을 받도록 설정. 매번 확인할 필요가 없어 가장 편함.</li></ol>
+<p>이 문서는 3번(실패 알림)을 AI 에이전트 없이 구현하는 방법을 다룬다.</p>
+<h2 id="왜-AI-에이전트-없이도-되는가">왜 AI 에이전트 없이도 되는가</h2>
+<p>텔레그램 봇 API는 단순 HTTP 요청이다. Hermes/OpenClaw 같은 에이전트가 텔레그램 메시지를 보내는 것도 결국 이 API를 호출하는 것뿐이라, 스크립트에서 직접 호출하면 에이전트 없이도 동일하게 동작한다.</p>
+<ul><li>장점: 속도·비용·안정성(모델 폐기·응답 실패 등의 문제가 없음)</li><li>한계: "새 기사 요약"처럼 자연어 생성이 필요한 알림은 LLM 호출이 필요함. 반면 "실패했다/성공했다" 같은 정해진 템플릿 알림은 순수 스크립트로 충분함.</li></ul>
+<h2 id="알림-전용-봇-만들기">알림 전용 봇 만들기</h2>
+<p>기존에 쓰던 대화형 에이전트 봇과 알림을 분리하기 위해, 알림 전용 봇을 새로 만들었다.</p>
+<ol><li>텔레그램에서 <code>@BotFather</code> 검색 후 대화 시작</li><li><code>/newbot</code> 입력</li><li>봇 이름(표시 이름) 입력</li><li>봇 username 입력 — <strong>반드시 <code>bot</code>으로 끝나야 함</strong> (예: <code>lukeInfoV_bot</code>)</li><li>생성 완료 시 봇 토큰(<code>숫자:영문숫자조합</code> 형태)을 받음 — 이 토큰은 비밀번호처럼 취급해야 함</li></ol>
+<blockquote>이번에 만든 봇: <code>lukeInfoV_bot</code> (알림 전용, 대화 응답 로직 없음)</blockquote>
+<h2 id="chat-id-확인하기">chat_id 확인하기</h2>
+<p>봇은 사용자가 먼저 메시지를 보내야 응답을 보낼 수 있다.</p>
+<ol><li>텔레그램 앱에서 만든 봇(<code>@lukeInfoV_bot</code>)을 검색해 아무 메시지나 전송 (예: <code>hi</code>)</li><li>PowerShell에서 아래 명령 실행:</li></ol>
+<pre><code data-lang="powershell">Invoke-RestMethod &quot;https://api.telegram.org/bot&lt;TOKEN&gt;/getUpdates&quot;</code></pre>
+<ol><li>결과가 테이블로 나와서 중첩 객체가 안 보이면, 아래처럼 직접 경로를 지정해서 뽑는다:</li></ol>
+<pre><code data-lang="powershell">(Invoke-RestMethod &quot;https://api.telegram.org/bot&lt;TOKEN&gt;/getUpdates&quot;).result | ForEach-Object { $_.message.chat.id }</code></pre>
+<p><strong>주의할 점</strong>: <code>getUpdates</code> 결과에는 봇 자신의 정보(<code>from.id</code>)와 사용자 정보(<code>chat.id</code>)가 섞여 있다. 토큰의 콜론(<code>:</code>) 앞부분 숫자가 봇 자신의 ID이므로, chat_id로 착각해 그 값을 넣으면 "bot can't send messages to the bot" 오류가 난다. 반드시 <code>message.chat.id</code> 경로의 값을 사용해야 한다.</p>
+<h2 id="테스트-메시지-보내기">테스트 메시지 보내기</h2>
+<pre><code data-lang="powershell">Invoke-RestMethod &quot;https://api.telegram.org/bot&lt;TOKEN&gt;/sendMessage?chat_id=&lt;CHAT_ID&gt;&amp;text=테스트 알림입니다&quot;</code></pre>
+<ul><li><code>!</code> 접두사는 Claude Code 대화창 안에서만 쓰는 표기이며, 별도 PowerShell 창에서는 붙이지 않는다.</li><li>Windows Git Bash(<code>curl</code>)로 한글 텍스트를 보내면 <code>"strings must be encoded in UTF-8"</code> 오류가 날 수 있다 (터미널 로케일 문제). Python의 <code>urllib.parse.urlencode</code>로 인코딩하면 한글이 정상적으로 전송된다.</li></ul>
+<h2 id="실제-자동화에-통합한-예시-환율-메모">실제 자동화에 통합한 예시: 환율 메모</h2>
+<p>기존 <code>exchange_rate_to_obsidian.py</code>(환율 메모 자동 갱신 스크립트)에 실패 알림 기능을 추가했다.</p>
+<figure><img src="01.png" alt="옵시디언 환율 메모: 날짜별 미국·일본·홍콩 환율 표" width="335" height="326" loading="lazy"><figcaption>옵시디언 <code>환율 메모</code>에 날짜별로 정리된 미국·일본·홍콩 환율</figcaption></figure>
+<ul><li>봇 토큰·chat_id는 스크립트와 같은 폴더의 <code>notify_bot_config.json</code>에 별도 저장 (옵시디언 볼트 밖 → OneDrive 동기화 대상 아님, 민감정보를 노트에 남기지 않기 위함)</li><li><code>main()</code> 실행 중 예외가 발생하면(API 3회 재시도 실패, 파일 없음 등) <code>notify_failure()</code>가 텔레그램으로 실패 내용을 보내고, 원래 예외도 그대로 발생시켜 cron 로그에도 실패가 정상 기록되게 함</li><li>성공 시에는 알림을 보내지 않음 (실패 시에만 알림 — 매번 성공 알림을 받으면 금방 무시하게 되므로) → <strong>2026-09-21 변경</strong>: 매일 06:30 환율 안내를 한 번 보내도록 바뀜. 아래 "9/21 문의" 섹션 참고</li></ul>
+<pre><code data-lang="python">def notify_failure(error: Exception) -&gt; None:
+    &quot;&quot;&quot;실패 시 텔레그램 알림. 알림 자체가 실패해도 원래 에러를 가리지 않도록 예외를 삼킨다.&quot;&quot;&quot;
+    if not NOTIFY_CONFIG.exists():
+        return
+    try:
+        config = json.loads(NOTIFY_CONFIG.read_text(encoding=&quot;utf-8&quot;))
+        url = f&quot;https://api.telegram.org/bot{config[&#x27;bot_token&#x27;]}/sendMessage&quot;
+        data = urllib.parse.urlencode(
+            {&quot;chat_id&quot;: config[&quot;chat_id&quot;], &quot;text&quot;: f&quot;[환율 메모 자동화 실패]\n{error}&quot;}
+        ).encode(&quot;utf-8&quot;)
+        urllib.request.urlopen(urllib.request.Request(url, data=data), timeout=10)
+    except Exception:
+        pass
+
+
+if __name__ == &quot;__main__&quot;:
+    try:
+        main()
+    except Exception as exc:
+        notify_failure(exc)
+        raise</code></pre>
+<h2 id="확장-환율-하락-시-구매-검토-알림">확장: 환율 하락 시 "구매 검토" 알림</h2>
+<p>실패 알림뿐 아니라, <strong>성공 경로에서도 조건부 알림</strong>을 붙일 수 있다. 환율이 떨어지면 구매를 검토해야 하므로, 오늘 값을 저장하기 직전에 직전 기록과 비교해 하락 여부를 판단하도록 확장했다.</p>
+<figure><img src="02.png" alt="텔레그램 알림 봇 메시지: 실패 테스트 알림, 환율 하락 알림, 9/21 테스트 알림" width="443" height="279" loading="lazy"><figcaption>텔레그램으로 도착한 알림 (실패 시뮬레이션, 환율 하락 알림, 9/21 테스트 알림)</figcaption></figure>
+<ul><li>비교 대상: 세 통화(미국·일본·홍콩) 모두</li><li>비교 기준: 전날(직전 기록) 대비 하락 여부 (목표 환율 같은 고정 기준이 아님)</li><li>같은 날 재실행돼도 오늘 행과 비교하지 않도록, 오늘 날짜와 같은 행은 건너뛰고 그 이전 행을 "직전 기록"으로 삼음</li><li>하나라도 하락하면 <code>[환율 하락 알림 — 구매 검토]</code> 메시지를 하락 폭과 함께 발송, 하락이 없으면 알림 없음 (→ 9/21에 "하락이 없어도 매일 안내"로 변경, 아래 섹션 참고)</li></ul>
+<pre><code data-lang="python">def find_drops(previous, rates):
+    drops = {}
+    for currency in rates:
+        prev_value = parse_rate(previous[currency])
+        new_value = parse_rate(rates[currency])
+        if new_value &lt; prev_value:
+            drops[currency] = (prev_value, new_value)
+    return drops
+
+
+def notify_drops(drops):
+    lines = [
+        f&quot;{CURRENCY_LABELS[c]}: {prev:,.2f} → {new:,.2f} (▼{prev - new:,.2f})&quot;
+        for c, (prev, new) in drops.items()
+    ]
+    notify_telegram(&quot;[환율 하락 알림 — 구매 검토]\n&quot; + &quot;\n&quot;.join(lines))</code></pre>
+<p>이 패턴(실패 시 알림 + 성공 경로에서 조건 충족 시 알림)은 임계값이 있는 다른 자동화(예: 특정 논문 카테고리 신규 등록, 특정 키워드 뉴스 등장)에도 그대로 적용할 수 있다.</p>
+<h2 id="9-21-문의-21일-환율-안내가-안-왔다-점검과-개선-2026-09-21">9/21 문의: "21일 환율 안내가 안 왔다" 점검과 개선 (2026-09-21)</h2>
+<h3 id="증상">증상</h3>
+<p>옵시디언 환율 메모 정리와 텔레그램 구매 안내를 요청해 두었는데, 9/21에는 진행이 안 된 것처럼 보였다.</p>
+<h3 id="점검-순서-위-확인-방법-3단계-를-실제로-적용">점검 순서 (위 "확인 방법 3단계"를 실제로 적용)</h3>
+<ol><li><strong>산출물</strong>: <code>5. Memo/환율 메모.md</code>에 9/21 행이 06:30:31에 정상 추가돼 있었다 (미국 1,390.00 / 일본 886.00 / 홍콩 177.19).</li><li><strong>실행 이력</strong>: Hermes cron 작업 <code>72360a890c52</code>가 <code>last_status: ok</code>, 오류 없음. 작업별 출력 파일(<code>cron/output/&lt;작업ID&gt;/날짜_시각.md</code>)에도 실행 결과가 남아 있었다.</li><li><strong>알림 조건</strong>: 스크립트는 "전일 대비 하락"일 때만 알림을 보낸다. 9/20 → 9/21은 세 통화 모두 소폭 상승이라 알림이 나가지 않은 것이 <strong>설계대로의 동작</strong>이었다.</li></ol>
+<h3 id="알게-된-점">알게 된 점</h3>
+<ul><li>"안 왔다"가 곧 "실패했다"는 아니다. 조건부 알림은 조건 미충족 시에도 조용하므로, <strong>알림이 없는 것과 자동화가 안 돈 것을 구분하려면 산출물과 실행 이력을 봐야 한다.</strong></li><li>하루 한 번(06:30) 기록하는 구조라 낮 시간대 하락은 알림에 잡히지 않는다. 실제로 점검한 밤 시간에는 미국 1,371.70 등 아침보다 약 1.3% 낮았다.</li><li>전일 대비 기준은 "값이 계속 오르는 구간"에서는 알림이 오지 않는다.</li></ul>
+<h3 id="개선-매일-06-30에-한-번-안내">개선: 매일 06:30에 한 번 안내</h3>
+<p>"하락이 없어도 하루 한 번은 받고 싶다"는 요구에 따라, 조건부 알림을 <strong>일일 안내 + 하락 시 제목 강조</strong>로 바꿨다.</p>
+<ul><li>06:30 실행 시 하루 한 번, 세 통화 환율과 직전 기록 대비 등락(▲/▼)을 발송</li><li>하나라도 하락하면 제목 <code>[환율 하락 알림 — 구매 검토]</code>, 아니면 <code>[환율 안내]</code></li><li>하루 중 추가 조회·알림은 하지 않음 (여러 번 조회하는 안은 채택하지 않음)</li><li>실패 알림은 그대로 유지</li><li>수정 전 원본은 <code>exchange_rate_to_obsidian.py.bak</code>으로 백업</li></ul>
+<pre><code data-lang="python">def notify_daily(date_label, rates, previous, drops):
+    title = (
+        f&quot;[환율 하락 알림 — 구매 검토] {date_label}&quot;
+        if drops
+        else f&quot;[환율 안내] {date_label}&quot;
+    )
+    lines = []
+    for currency, value in rates.items():
+        line = f&quot;{CURRENCY_LABELS[currency]}: {parse_rate(value):,.2f}&quot;
+        if previous is not None:
+            diff = parse_rate(value) - parse_rate(previous[currency])
+            if diff &lt; 0:
+                line += f&quot; (▼{-diff:,.2f})&quot;
+            elif diff &gt; 0:
+                line += f&quot; (▲{diff:,.2f})&quot;
+            else:
+                line += &quot; (변동 없음)&quot;
+        lines.append(line)
+    notify_telegram(title + &quot;\n&quot; + &quot;\n&quot;.join(lines))</code></pre>
+<h3 id="테스트와-시행착오">테스트와 시행착오</h3>
+<ul><li>텔레그램 테스트 메시지를 1회 발송해 도착을 확인했다 (사용자 확인 완료). 옵시디언 메모에는 아무것도 기록하지 않는 발송 전용 테스트였다.</li><li>수정 중 파이썬 문자열의 <code>\n</code> 이스케이프가 파일에 실제 줄바꿈으로 저장돼 <code>SyntaxError: unterminated string literal</code>이 발생했다. 반영 후에는 반드시 문법 검사(<code>ast.parse</code>)를 먼저 하고 적용한다.</li><li>Git Bash에서 한글·특수문자를 <code>print</code>하면 <code>cp949</code> 인코딩 오류가 난다. <code>PYTHONIOENCODING=utf-8</code>을 지정해서 확인한다. 스크립트 오류가 아니라 콘솔 문제다.</li><li>알림 함수(<code>notify_telegram</code>)는 예외를 삼키도록 설계돼 있어, 테스트 발송에서는 함수를 직접 호출하지 않고 응답의 <code>ok</code> 값을 확인해야 실제 성공 여부를 알 수 있다.</li></ul>
+<h3 id="후속-확인">후속 확인</h3>
+<ul><li>9/22 06:30 자동 알림이 도착하는지 확인한다. 안 오면 <code>72360a890c52</code>의 실행 기록부터 본다.</li></ul>
+<h2 id="다른-자동화에-재사용하기">다른 자동화에 재사용하기</h2>
+<p><code>lukeInfoV_bot</code>은 대화 기능이 없는 알림 전용 봇이므로, 같은 방식(설정 파일 분리 + 예외 발생 시 알림)을 다른 자동화(교수노조 뉴스 스크랩, 논문 요약 등)에도 그대로 적용할 수 있다. 자동화별로 알림 문구만 바꾸면 된다.</p>
+<h2 id="참고-관련-자동화-문서">참고: 관련 자동화 문서</h2>
+<ul><li>환율 메모 자동화 상세 내용은 <code>AGENTS.md</code>의 "Obsidian 환율 메모 자동 갱신" 섹션 참고</li></ul>
+</main>
+</div>
+</body>
+</html>
