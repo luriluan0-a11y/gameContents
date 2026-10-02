@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AX특강 1차시 — ChatGPT와의 소크라테스 문답으로 나의 지식 체계 세우기</title>
+<style>
+  :root{
+    --navy:#1a3a5c;
+    --ink:#171b21;
+    --blue:#2e6da4;
+    --orange:#f0a500;
+    --orange-hover:#d4920a;
+    --canvas:#ececef;
+    --card:#ffffff;
+    --line:#e4e6eb;
+    --text:#2a2e35;
+    --text-light:#6b7280;
+    --text-faint:#9aa0aa;
+    --field-bg:#f4f5f7;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Pretendard','Malgun Gothic','Apple SD Gothic Neo',sans-serif;
+    color:var(--text);
+    line-height:1.7;
+    background:var(--canvas);
+  }
+  .ico{width:22px;height:22px;stroke:var(--orange);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;}
+
+  /* ── Nav ── */
+  .navwrap{position:sticky;top:0;z-index:100;display:flex;justify-content:center;padding:14px 16px 0;}
+  nav{
+    background:rgba(255,255,255,.88);
+    backdrop-filter:blur(8px);
+    border:1px solid var(--line);
+    border-radius:999px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:8px 10px 8px 20px;
+    max-width:1040px;
+    width:100%;
+    box-shadow:0 4px 18px rgba(20,25,35,.06);
+    overflow-x:auto;
+  }
+  .nav-logo{color:var(--navy);font-weight:800;text-decoration:none;font-size:.86rem;white-space:nowrap;}
+  .nav-links{list-style:none;display:flex;gap:2px;white-space:nowrap;}
+  .nav-links a{
+    color:var(--text-light);
+    text-decoration:none;
+    padding:7px 11px;
+    border-radius:999px;
+    font-size:.78rem;
+    font-weight:600;
+    transition:all .15s;
+  }
+  .nav-links a:hover{background:var(--navy);color:#fff;}
+
+  /* ── Page shell ── */
+  .page{max-width:1040px;margin:0 auto;padding:28px 16px 60px;display:flex;flex-direction:column;gap:18px;}
+  .block{
+    background:var(--card);
+    border-radius:26px;
+    border:1px solid var(--line);
+    box-shadow:0 10px 28px rgba(20,25,35,.05);
+    padding:44px 40px;
+    position:relative;
+    overflow:hidden;
+  }
+  @media(max-width:640px){.block{padding:30px 22px;border-radius:20px;}}
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-size:.72rem;
+    font-weight:700;
+    letter-spacing:.04em;
+    color:var(--navy);
+    background:#eef3f8;
+    padding:6px 14px;
+    border-radius:999px;
+    margin-bottom:18px;
+  }
+
+  h2{font-size:1.28rem;color:var(--ink);margin-bottom:6px;letter-spacing:-.01em;}
+  h2 + .sub{color:var(--text-light);font-size:.88rem;margin-bottom:22px;}
+  h3{font-size:1rem;color:var(--ink);margin:26px 0 10px;}
+  p{color:var(--text-light);font-size:.92rem;margin-bottom:10px;}
+  ul{margin:0 0 14px 20px;color:var(--text-light);font-size:.92rem;}
+  li{margin-bottom:7px;}
+  li::marker{color:var(--orange);}
+  strong{color:var(--text);}
+
+  /* ── Buttons ── */
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;}
+  .btn{
+    display:inline-flex;align-items:center;gap:6px;
+    border-radius:999px;
+    padding:12px 22px;
+    text-decoration:none;
+    font-weight:700;
+    font-size:.84rem;
+    border:none;
+    cursor:pointer;
+    transition:all .15s;
+  }
+  .btn-dark{background:var(--ink);color:#fff;}
+  .btn-dark:hover{background:#000;}
+  .btn-orange{background:var(--orange);color:#fff;}
+  .btn-orange:hover{background:var(--orange-hover);}
+  .btn.small{padding:8px 16px;font-size:.78rem;}
+
+  /* ── Hero ── */
+  .hero-waves{position:absolute;top:0;right:0;width:58%;height:100%;opacity:.9;pointer-events:none;}
+  .hero-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:36px;position:relative;z-index:1;align-items:start;}
+  @media(max-width:780px){.hero-grid{grid-template-columns:1fr;}}
+
+  .dots{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+  .dots .d{display:flex;gap:3px;}
+  .dots .d span{width:7px;height:7px;border-radius:50%;background:var(--line);}
+  .dots .d span.on{background:var(--orange);}
+  .dots .label{font-size:.76rem;color:var(--text-faint);font-weight:600;}
+
+  .hero h1{font-size:2rem;font-weight:800;color:var(--ink);line-height:1.35;letter-spacing:-.02em;margin-bottom:16px;}
+  .hero .lead{font-size:.95rem;color:var(--text-light);max-width:440px;margin-bottom:4px;}
+
+  .meta-card{
+    background:var(--field-bg);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:22px;
+  }
+  .field{margin-bottom:14px;}
+  .field:last-child{margin-bottom:0;}
+  .field label{display:block;font-size:.76rem;font-weight:700;color:var(--ink);margin-bottom:6px;}
+  .field .val{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:9px 12px;
+    font-size:.82rem;
+    color:var(--text-light);
+  }
+
+  /* quote / callout */
+  .quote-row{display:grid;grid-template-columns:1fr;gap:18px;margin-top:28px;padding-top:24px;border-top:1px solid var(--line);position:relative;z-index:1;}
+  .quote{display:flex;gap:14px;align-items:flex-start;}
+  .quote .avatar{
+    width:34px;height:34px;border-radius:50%;
+    background:var(--orange);
+    color:#fff;font-weight:800;font-size:.8rem;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .quote p{font-style:italic;color:var(--text);font-size:.86rem;margin:0;}
+  .quote p strong{color:var(--navy);}
+
+  /* feature grid (icon + title + desc) */
+  .feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:26px;padding-top:26px;border-top:1px solid var(--line);position:relative;z-index:1;}
+  @media(max-width:860px){.feature-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:480px){.feature-grid{grid-template-columns:1fr;}}
+  .feature .ico{margin-bottom:10px;}
+  .feature h4{font-size:.9rem;color:var(--ink);margin-bottom:4px;}
+  .feature p{font-size:.8rem;color:var(--text-light);margin:0;}
+
+  /* ── table ── */
+  table{width:100%;border-collapse:collapse;font-size:.85rem;margin:14px 0;}
+  caption{text-align:left;font-size:.78rem;color:var(--text-faint);margin-bottom:8px;font-weight:600;}
+  th{background:transparent;color:var(--text-faint);font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:8px 12px;text-align:left;border-bottom:2px solid var(--line);}
+  td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text-light);}
+  tr:last-child td{border-bottom:none;}
+
+  /* ── timeline ── */
+  .timeline{position:relative;margin:24px 0 0;padding-left:6px;}
+  .t-item{display:grid;grid-template-columns:92px 22px 1fr;gap:4px 14px;position:relative;}
+  .t-item .t-time{font-weight:800;color:var(--ink);font-size:.78rem;padding-top:2px;white-space:nowrap;}
+  .t-item .t-dotcol{display:flex;flex-direction:column;align-items:center;}
+  .t-item .t-dot{width:10px;height:10px;border-radius:50%;background:var(--orange);margin-top:5px;flex-shrink:0;}
+  .t-item .t-line{width:2px;flex:1;background:var(--line);margin-top:2px;}
+  .t-item:last-child .t-line{display:none;}
+  .t-item .t-body{padding-bottom:22px;}
+  .t-item .t-stage{font-weight:700;color:var(--navy);font-size:.86rem;margin-bottom:2px;}
+  .t-item .t-desc{font-size:.82rem;color:var(--text-light);}
+  .t-item .t-dur{display:inline-block;margin-top:4px;font-size:.72rem;color:var(--text-faint);background:var(--field-bg);padding:2px 9px;border-radius:999px;}
+
+  /* ── prompt box ── */
+  .prompt-wrap{position:relative;margin:16px 0;}
+  .prompt-box{
+    background:var(--ink);
+    color:#dce3ec;
+    border-radius:16px;
+    padding:22px 24px;
+    font-size:.82rem;
+    line-height:1.75;
+    white-space:pre-wrap;
+    word-break:break-word;
+    max-height:420px;
+    overflow-y:auto;
+    font-family:'Consolas','Malgun Gothic',monospace;
+  }
+  .copy-btn{
+    position:absolute;top:14px;right:14px;
+    background:var(--orange);color:#fff;border:none;
+    padding:8px 16px;border-radius:999px;
+    font-size:.78rem;cursor:pointer;font-weight:700;
+    transition:background .15s;
+  }
+  .copy-btn:hover{background:var(--orange-hover);}
+  .copy-btn.copied{background:#3a8a5c;}
+
+  .redirect-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:14px;}
+  @media(max-width:720px){.redirect-grid{grid-template-columns:1fr;}}
+  .redirect-card{
+    background:var(--field-bg);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px 18px;
+    font-size:.84rem;
+    color:var(--text);
+    font-style:italic;
+  }
+
+  /* ── worksheet form fields ── */
+  .ws{background:var(--field-bg);border:1px solid var(--line);border-radius:18px;padding:24px 26px;margin:16px 0;}
+  .ws label{display:block;font-size:.8rem;font-weight:700;color:var(--ink);margin:14px 0 6px;}
+  .ws label:first-child{margin-top:0;}
+  .ws input[type=text], .ws textarea{
+    width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;
+    padding:10px 12px;font-size:.86rem;font-family:inherit;color:var(--text);
+  }
+  .ws textarea{resize:vertical;min-height:44px;}
+  .save-note{font-size:.74rem;color:var(--text-faint);margin-top:10px;}
+
+  .ring-diagram{display:flex;align-items:center;justify-content:center;margin:24px 0;}
+  .ring{border-radius:50%;display:flex;align-items:flex-start;justify-content:center;text-align:center;color:#fff;font-size:.76rem;font-weight:700;padding-top:14px;}
+  .ring-outer{width:250px;height:250px;background:#cfd6e0;color:var(--ink);}
+  .ring-mid{width:172px;height:172px;background:var(--blue);margin-top:-212px;}
+  .ring-inner{width:96px;height:96px;background:var(--orange);margin-top:-134px;padding-top:32px;}
+  .ring-wrap{display:flex;flex-direction:column;align-items:center;}
+
+  .ws-notes{display:grid;grid-template-columns:1fr;gap:12px;margin-top:14px;}
+  @media(min-width:640px){.ws-notes{grid-template-columns:repeat(3,1fr);}}
+  .ws-note{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;font-size:.84rem;}
+  .ws-note .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;}
+  .ws-note textarea{margin-top:8px;border:none;background:var(--field-bg);}
+
+  footer{text-align:center;padding:36px 20px 10px;color:var(--text-faint);font-size:.78rem;}
+  footer a{color:var(--blue);}
+
+  @media print{
+    .navwrap, .copy-btn{display:none;}
+    body{background:#fff;}
+    .block{box-shadow:none;border-radius:0;break-inside:avoid;}
+    .prompt-box{max-height:none;color:#111;background:#f2f2f2;}
+  }
+</style>
+</head>
+<body>
+
+<div class="navwrap">
+<nav>
+  <a class="nav-logo" href="#top">AX특강 1차시</a>
+  <ul class="nav-links">
+    <li><a href="#ax">AX란</a></li>
+    <li><a href="#goal">목표</a></li>
+    <li><a href="#timeline">진행흐름</a></li>
+    <li><a href="#prompt">프롬프트</a></li>
+    <li><a href="#worksheet">활동지</a></li>
+  </ul>
+</nav>
+</div>
+
+<div class="page" id="top">
+
+  <!-- HERO -->
+  <section class="block hero">
+    <svg class="hero-waves" viewBox="0 0 600 420" preserveAspectRatio="none">
+      <path d="M40,360 C200,260 300,110 600,0" stroke="#e8eaef" stroke-width="1.4" fill="none"/>
+      <path d="M70,390 C230,290 330,140 600,40" stroke="#e8eaef" stroke-width="1.4" fill="none"/>
+      <path d="M100,420 C260,320 360,170 600,80" stroke="#e8eaef" stroke-width="1.4" fill="none"/>
+      <path d="M10,320 C170,230 270,90 560,-10" stroke="#eef1f5" stroke-width="1.2" fill="none"/>
+      <path d="M130,420 C280,330 380,190 600,120" stroke="#eef1f5" stroke-width="1.2" fill="none"/>
+    </svg>
+
+    <div class="hero-grid">
+      <div>
+        <div class="dots">
+          <span class="d" id="dots">
+            <span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          </span>
+          <span class="label">1 / 9회차 · 오리엔테이션</span>
+        </div>
+        <h1>ChatGPT와의 소크라테스 문답으로<br>나의 지식 체계 세우기</h1>
+        <p class="lead">정답을 받는 대신 질문을 받습니다. 오늘은 ChatGPT가 여러분에게 묻습니다 — 유한대학교 AX특강 1차시 오리엔테이션.</p>
+        <div class="btn-row">
+          <a class="btn btn-dark" href="#goal">오늘의 목표 보기</a>
+          <a class="btn btn-orange" href="#prompt">ChatGPT 프롬프트 바로가기</a>
+        </div>
+      </div>
+
+      <div class="meta-card">
+        <div class="field"><label>대상</label><div class="val">유한대학교 졸업생</div></div>
+        <div class="field"><label>일정</label><div class="val">2026-10-02 ~ 2026-12-04, 매주 금요일 16:00~20:00 (총 9회차, 10/9 한글날 휴강)</div></div>
+        <div class="field"><label>오늘</label><div class="val">1차시 · 16:00~20:00 (4시간)</div></div>
+        <div class="field"><label>회차</label><div class="val">10/2 → 10/16 → 10/23 → 10/30 → 11/6 → 11/13 → 11/20 → 11/27 → 12/4</div></div>
+      </div>
+    </div>
+
+    <div class="quote-row">
+      <div class="quote">
+        <div class="avatar">!</div>
+        <p><strong>진행 방식 — 사람이 아니라 ChatGPT가 질문자다.</strong> 소크라테스 문답은 학생끼리나 교수자가 묻는 게 아니라, 각자 ChatGPT와 1:1로 대화하며 진행합니다. 교수자의 역할은 프롬프트를 세팅해 주고, 대화가 산으로 갈 때 순회하며 바로잡고, 마지막에 결과물을 모아 전체 토론으로 이어주는 것입니다.</p>
+      </div>
+      <div class="quote">
+        <div class="avatar">1</div>
+        <p>1차시이기 때문에 아직 이 강좌 안에서 "배운 내용"이 없습니다. 오늘의 지식 체계 정리는 <strong>졸업생들이 이미 갖고 있는 AI·디지털 활용 경험을 ChatGPT와의 대화로 끌어내 구조화하는 진단·오리엔테이션 활동</strong>입니다. 결과물이 2차시 이후 커리큘럼 설계의 출발점이 됩니다.</p>
+      </div>
+    </div>
+
+    <div class="feature-grid" id="goal">
+      <div class="feature">
+        <svg class="ico" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <h4>대화 파트너로의 전환</h4>
+        <p>ChatGPT를 답을 주는 도구가 아니라 질문으로 생각을 끌어내는 대화 파트너로 써본다.</p>
+      </div>
+      <div class="feature">
+        <svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.6" y2="16.6"/></svg>
+        <h4>나의 경험 발견</h4>
+        <p>대화를 통해 AI·디지털 도구에 대해 이미 무엇을 알고 있는지 스스로 발견한다.</p>
+      </div>
+      <div class="feature">
+        <svg class="ico" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+        <h4>지식 체계로 정리</h4>
+        <p>이미 아는 것 · 발견한 것 · 더 알고 싶은 것, 세 영역으로 구조화해 정리받는다.</p>
+      </div>
+      <div class="feature">
+        <svg class="ico" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.5 9a8.5 8.5 0 0 1 14-3.4L23 10M1 14l5.5 4.4A8.5 8.5 0 0 0 20.5 15"/></svg>
+        <h4>AX를 직접 체득</h4>
+        <p>AI에게 질문을 시켜 나를 돌아보는 활용법을 오늘 직접 경험한다 — 이것이 AX의 한 사례다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- AX란 무엇인가 -->
+  <section class="block" id="ax">
+    <span class="eyebrow">기초 개념</span>
+    <h2>AX란 무엇인가?</h2>
+    <p class="sub">오늘의 활동을 시작하기 전에, 이 특강의 이름이 뜻하는 것부터 짚고 갑니다.</p>
+    <ul>
+      <li><strong>AX(AI Transformation, AI 전환)</strong>는 조직의 업무·서비스·의사결정 방식을 AI 중심으로 다시 설계하는 것을 말합니다. AI 도구를 하나 더 쓰는 것을 넘어, <strong>업무 방식·조직 문화·구성원의 역량까지 함께 바뀌는 과정</strong>이라는 점에서 단순한 'AI 도입'과는 다릅니다.</li>
+      <li><strong>DX(디지털 전환)</strong>가 종이·오프라인 업무를 디지털로 옮기는 단계였다면, <strong>AX는 그렇게 디지털화된 업무를 AI로 지능화·자동화하는 다음 단계</strong>입니다.</li>
+      <li>분야별로는 기업에서는 고객 응대 AI 에이전트·콘텐츠 생성·코드 자동화로, 교육에서는 AI 튜터·맞춤형 학습으로, 공공에서는 민원 처리 자동화로 나타납니다.</li>
+      <li>같은 약자 AX가 'Agent Experience'(AI 에이전트 사용성 설계) 등 다른 뜻으로도 쓰이니, 맥락에 따라 정확히 구분해서 받아들이는 게 좋습니다.</li>
+    </ul>
+    <div class="btn-row">
+      <a class="btn btn-orange" href="https://sourcegc.vercel.app/portflio/05_AX_guide.html" target="_blank" rel="noopener">AX 가이드 더 보기 →</a>
+    </div>
+  </section>
+
+  <!-- 왜 소크라테스 -->
+  <section class="block">
+    <span class="eyebrow">방법론</span>
+    <h2>왜 소크라테스 문답법 + ChatGPT인가</h2>
+    <ul>
+      <li>소크라테스 문답법은 답을 바로 주지 않고, <strong>질문을 거듭 던져 상대가 스스로 생각을 명료화하고 모순을 발견하게 만드는 대화법</strong>입니다.</li>
+      <li>사람이 이 역할을 하려면 숙련된 진행자가 필요하지만, <strong>ChatGPT에게 역할과 규칙을 프롬프트로 지정하면 각자의 속도에 맞춰 1:1로 질문을 이어갈 수 있습니다.</strong> 모두가 동시에, 각자 다른 깊이로 대화할 수 있다는 게 장점입니다.</li>
+      <li>이것은 AX특강다운 체험입니다. 대부분 ChatGPT를 "질문하면 답해주는 검색엔진"처럼 써왔을 텐데, 오늘은 <strong>역할을 뒤집어 ChatGPT가 나에게 질문하게 만드는 프롬프트 설계</strong>를 경험합니다.</li>
+    </ul>
+    <table>
+      <caption>참고 — 소크라테스 질문 6유형 (ChatGPT가 수행할 역할)</caption>
+      <thead><tr><th>유형</th><th>목적</th><th>질문 패턴</th></tr></thead>
+      <tbody>
+        <tr><td>① 명료화 질문</td><td>방금 한 말을 더 구체적으로</td><td>"그게 구체적으로 어떤 상황이었나요?"</td></tr>
+        <tr><td>② 가정 점검 질문</td><td>당연하게 여기는 전제를 드러내기</td><td>"항상 그런가요? 그렇게 생각하는 전제가 뭘까요?"</td></tr>
+        <tr><td>③ 근거·증거 질문</td><td>생각의 출처를 묻기</td><td>"그렇게 판단한 근거는요?"</td></tr>
+        <tr><td>④ 관점 질문</td><td>다른 입장에서 보기</td><td>"다르게 생각하는 사람은 뭐라고 할까요?"</td></tr>
+        <tr><td>⑤ 함의·결과 질문</td><td>그 생각이 이어지면 어떻게 되는지</td><td>"그게 맞다면 다음엔 어떻게 될까요?"</td></tr>
+        <tr><td>⑥ 메타 질문</td><td>질문 자체를 돌아보기</td><td>"왜 지금 이 질문을 하고 있다고 생각하세요?"</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 진행흐름 -->
+  <section class="block" id="timeline">
+    <span class="eyebrow">운영 계획</span>
+    <h2>오늘(4시간) 진행 흐름</h2>
+    <p class="sub">16:00부터 20:00까지, 10단계로 진행합니다.</p>
+
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">16:00~16:15</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">도입</div><div class="t-desc">과정 소개, 오늘 활동 설명("ChatGPT가 여러분에게 질문할 겁니다"), 소크라테스 문답 6유형 간단 소개</div><span class="t-dur">15분</span></div></div>
+      <div class="t-item"><div class="t-time">16:15~16:25</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">프롬프트 세팅 시연</div><div class="t-desc">교수자가 화면 공유로 ChatGPT에 접속 → 프롬프트를 붙여넣는 과정을 직접 시연</div><span class="t-dur">10분</span></div></div>
+      <div class="t-item"><div class="t-time">16:25~16:35</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">워밍업</div><div class="t-desc">활동지 0단계(메모 3줄)를 각자 작성 — 바로 대화를 시작하기 어색한 사람을 위한 준비</div><span class="t-dur">10분</span></div></div>
+      <div class="t-item"><div class="t-time">16:35~17:35</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">1라운드 · ChatGPT와 1:1 소크라테스 대화</div><div class="t-desc">각자 프롬프트를 ChatGPT에 붙여넣고 개별 대화 진행. 교수자는 순회하며 트러블슈팅</div><span class="t-dur">60분</span></div></div>
+      <div class="t-item"><div class="t-time">17:35~17:45</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">휴식</div><div class="t-desc">—</div><span class="t-dur">10분</span></div></div>
+      <div class="t-item"><div class="t-time">17:45~18:05</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">2라운드 · 대화 정리 요청</div><div class="t-desc">ChatGPT에게 "이제 정리해줘" 요청 → 지식 체계(동심원) 결과 받기 → 활동지 2단계에 옮겨 적고 다듬기</div><span class="t-dur">20분</span></div></div>
+      <div class="t-item"><div class="t-time">18:05~18:45</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">3라운드 · 소그룹 공유</div><div class="t-desc">3~4인조로 서로의 ChatGPT 결과물 비교, 공통점/차이점 이야기</div><span class="t-dur">40분</span></div></div>
+      <div class="t-item"><div class="t-time">18:45~19:20</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">4라운드 · 전체 공유</div><div class="t-desc">자원자 2~3명 발표, 교수자가 소크라테스 질문(④⑤유형 위주)으로 피드백</div><span class="t-dur">35분</span></div></div>
+      <div class="t-item"><div class="t-time">19:20~19:50</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">메타 토론</div><div class="t-desc">"ChatGPT가 질문자가 되어보니 어땠나?", "앞으로 업무에서 이 방식을 어디에 쓸 수 있을까?"</div><span class="t-dur">30분</span></div></div>
+      <div class="t-item"><div class="t-time">19:50~20:00</div><div class="t-dotcol"><div class="t-dot"></div></div><div class="t-body"><div class="t-stage">마무리</div><div class="t-desc">오늘 나온 지식 체계를 9주 로드맵과 연결, 다음 차시(10/16) 예고</div><span class="t-dur">10분</span></div></div>
+    </div>
+  </section>
+
+  <!-- 프롬프트 -->
+  <section class="block" id="prompt">
+    <span class="eyebrow">핵심 도구</span>
+    <h2>ChatGPT용 소크라테스 프롬프트</h2>
+    <p class="sub">학생 배포용 — 그대로 복사해서 ChatGPT에 붙여넣기. 본인 ChatGPT(무료 계정이면 충분, 모델 무관)를 새 대화창에서 열고, 아래 내용을 통째로 복사해 붙여넣은 뒤 전송합니다. 계정이 없으면 미리 가입을 안내하거나, Gemini·Copilot 등 다른 대화형 AI로 대체해도 같은 프롬프트가 거의 그대로 작동합니다.</p>
+
+    <div class="prompt-wrap">
+      <button class="copy-btn" id="copyBtn" onclick="copyPrompt()">복사하기</button>
+      <div class="prompt-box" id="promptText">당신은 지금부터 저의 '소크라테스식 질문 파트너'입니다. 저는 유한대학교 AX특강(AI 활용·디지털 전환 특강)을 듣는 졸업생이고, 오늘은 첫 시간입니다. 목표는 당신이 저에게 정답이나 설명을 먼저 알려주는 것이 아니라, 질문을 통해 제가 AI·디지털 도구에 대해 이미 알고 있는 것, 경험한 것, 궁금한 것을 스스로 끌어내고 정리하도록 돕는 것입니다.
+
+다음 규칙을 반드시 지켜주세요.
+
+1. 저에게 지식이나 정답을 먼저 설명하지 마세요. 대신 질문으로 제 생각을 끌어내세요.
+2. 한 번에 질문을 하나만 하세요. 제가 답하면 그 답을 바탕으로 다음 중 하나의 방식으로 더 깊이 파고드는 질문을 이어가세요.
+   (a) 더 구체적으로 설명해 달라는 질문
+   (b) 제가 당연하게 여기는 전제를 점검하는 질문
+   (c) 그렇게 생각하는 근거를 묻는 질문
+   (d) 다른 관점에서 보면 어떨지 묻는 질문
+   (e) 그 생각이 맞다면 어떤 결과로 이어질지 묻는 질문
+3. 제가 "모르겠다"고 답하면 바로 알려주지 말고, 더 쉬운 질문으로 쪼개서 다시 물어보세요.
+4. 가끔 "왜 지금 이 질문을 하고 있다고 생각하세요?" 같은 메타 질문도 섞어주세요.
+5. "맞습니다/틀렸습니다"처럼 평가하지 마세요. 호기심 있는 태도로 반응해 주세요.
+6. 대화는 다음 순서로 자연스럽게 이어가 주세요.
+   1) 제가 최근에 AI·디지털 도구를 써본 구체적 경험 묻기
+   2) 그 경험에서 느낀 점과 그 이유를 파고들기
+   3) "AI를 잘 쓴다"는 것이 저에게 어떤 의미인지 끌어내기
+   4) AX(AI 전환)이 제 일·삶에 어떤 의미가 될 수 있을지 질문으로 넓히기
+   5) 제가 더 알고 싶어진 것, 궁금해진 것을 스스로 발견하게 돕기
+7. 제가 "이제 정리해줘"라고 말하면, 그때까지의 대화만 근거로 삼아 아래 세 영역으로 나눠 정리해 주세요. 당신이 새로운 지식이나 사실을 추가하지 마세요.
+   - 내가 이미 알고 있던 것
+   - 대화하면서 새롭게 발견한 것
+   - 더 알고 싶어진 것
+
+준비되면 저에게 첫 질문을 던져주세요.</div>
+    </div>
+
+    <h3>대화 중 ChatGPT가 규칙을 어길 때 쓰는 재지시 문구</h3>
+    <p>학생들에게 미리 알려줄 것 — ChatGPT가 질문 대신 바로 설명·정답을 주면 아래처럼 되돌립니다.</p>
+    <div class="redirect-grid">
+      <div class="redirect-card">"지금 설명을 해주셨는데, 저에게 질문으로 다시 물어봐 주세요."</div>
+      <div class="redirect-card">"답을 주지 말고, 제가 스스로 생각하게 질문해 주세요."</div>
+      <div class="redirect-card">"한 번에 질문 하나만요. 제 답을 듣고 다음 질문을 해주세요."</div>
+    </div>
+  </section>
+
+  <!-- 활동지 -->
+  <section class="block" id="worksheet">
+    <span class="eyebrow">참가자 배포용</span>
+    <h2>활동지</h2>
+
+    <h3>0단계 · 워밍업 메모 (16:25~16:35)</h3>
+    <p>ChatGPT와 대화를 시작하기 전에, 부담 없이 떠오르는 대로 3줄만 적습니다. 대화 중 막히면 다시 참고하세요.</p>
+    <div class="ws">
+      <label>① 요즘 업무·일상에서 써본 AI 도구/서비스 이름</label>
+      <input type="text">
+      <label>② 그걸 쓰면서 가장 편리했던 순간 또는 가장 당황했던 순간</label>
+      <input type="text">
+      <label>③ 'AX(AI 전환)'이라는 말을 들으면 가장 먼저 떠오르는 것</label>
+      <input type="text">
+      <p class="save-note">※ 입력 내용은 저장되지 않습니다 — 종이에 옮겨 적거나 캡처해 두세요.</p>
+    </div>
+
+    <h3>1단계 · ChatGPT 대화 기록 (16:35~17:35, 60분, 선택)</h3>
+    <p>대화 중 인상 깊었던 질문과 내 답을 옮겨 적는 칸입니다.</p>
+    <table>
+      <thead><tr><th style="width:55%">ChatGPT가 던진 질문</th><th>내 답(한 줄 요약)</th></tr></thead>
+      <tbody>
+        <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+      </tbody>
+    </table>
+
+    <h3>2단계 · 지식 체계 받아 적기 (17:45~18:05)</h3>
+    <p>대화 끝에 "이제 정리해줘"라고 요청하면 ChatGPT가 세 영역으로 정리해 줍니다. 그 결과를 아래 구조에 옮겨 적고, 내 언어로 한 번 더 다듬어보세요.</p>
+
+    <div class="ring-diagram">
+      <div class="ring-wrap">
+        <div class="ring ring-outer">더 알고 싶은 것</div>
+        <div class="ring ring-mid">발견한 것</div>
+        <div class="ring ring-inner">이미 아는 것</div>
+      </div>
+    </div>
+
+    <div class="ws-notes">
+      <div class="ws-note"><span class="dot" style="background:#cfd6e0"></span><strong>더 알고 싶은 것</strong>
+        <textarea rows="3"></textarea>
+      </div>
+      <div class="ws-note"><span class="dot" style="background:var(--blue)"></span><strong>발견한 것</strong>
+        <textarea rows="3"></textarea>
+      </div>
+      <div class="ws-note"><span class="dot" style="background:var(--orange)"></span><strong>이미 아는 것</strong>
+        <textarea rows="3"></textarea>
+      </div>
+    </div>
+    <p class="save-note">※ 입력 내용은 저장되지 않습니다 — 캡처하거나 종이에 옮겨 적어 보관하세요.</p>
+  </section>
+
+  <footer>
+    <p>유한대학교 AX특강 · 2026-10-02 1차시 오리엔테이션</p>
+    <p>참고: 소크라테스 질문 6유형 구분은 Richard Paul의 "Critical Thinking" 프레임워크를 교육 현장에서 흔히 쓰는 방식으로 정리한 것입니다.</p>
+  </footer>
+
+</div>
+
+<script>
+function copyPrompt(){
+  var text = document.getElementById('promptText').innerText;
+  var btn = document.getElementById('copyBtn');
+  function done(){
+    btn.textContent = '복사됨 ✓';
+    btn.classList.add('copied');
+    setTimeout(function(){ btn.textContent = '복사하기'; btn.classList.remove('copied'); }, 1800);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text, done); });
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, cb){
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try { document.execCommand('copy'); } catch(e){}
+  document.body.removeChild(ta);
+  if(cb) cb();
+}
+
+</script>
+
+</body>
+</html>
