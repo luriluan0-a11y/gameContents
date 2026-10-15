@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AX특강 2차시 — 쌓아두지 말고 흐르게: PARA로 내 자료 정리하기</title>
+<style>
+  :root{
+    --navy:#1a3a5c;
+    --ink:#171b21;
+    --blue:#2e6da4;
+    --orange:#f0a500;
+    --orange-hover:#d4920a;
+    --canvas:#ececef;
+    --card:#ffffff;
+    --line:#e4e6eb;
+    --text:#2a2e35;
+    --text-light:#6b7280;
+    --text-faint:#9aa0aa;
+    --field-bg:#f4f5f7;
+    --p:#1a3a5c; --a:#2e6da4; --r:#c98a12; --ar:#7b8494;
+    --ok:#3a8a5c; --no:#b5523b;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Pretendard','Malgun Gothic','Apple SD Gothic Neo',sans-serif;color:var(--text);line-height:1.7;background:var(--canvas);}
+  .ico{width:22px;height:22px;stroke:var(--orange);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;}
+
+  /* Nav */
+  .navwrap{position:sticky;top:0;z-index:100;display:flex;justify-content:center;padding:14px 16px 0;}
+  nav{background:rgba(255,255,255,.88);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:999px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 10px 8px 20px;max-width:1040px;width:100%;box-shadow:0 4px 18px rgba(20,25,35,.06);overflow-x:auto;}
+  .nav-logo{color:var(--navy);font-weight:800;text-decoration:none;font-size:.86rem;white-space:nowrap;}
+  .nav-links{list-style:none;display:flex;gap:2px;white-space:nowrap;}
+  .nav-links a{color:var(--text-light);text-decoration:none;padding:7px 11px;border-radius:999px;font-size:.78rem;font-weight:600;transition:all .15s;}
+  .nav-links a:hover{background:var(--navy);color:#fff;}
+
+  /* Page */
+  .page{max-width:1040px;margin:0 auto;padding:28px 16px 60px;display:flex;flex-direction:column;gap:18px;}
+  .block{background:var(--card);border-radius:26px;border:1px solid var(--line);box-shadow:0 10px 28px rgba(20,25,35,.05);padding:44px 40px;position:relative;overflow:hidden;}
+  @media(max-width:640px){.block{padding:30px 22px;border-radius:20px;}}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.72rem;font-weight:700;letter-spacing:.04em;color:var(--navy);background:#eef3f8;padding:6px 14px;border-radius:999px;margin-bottom:18px;}
+  h2{font-size:1.28rem;color:var(--ink);margin-bottom:6px;letter-spacing:-.01em;}
+  h2 + .sub{color:var(--text-light);font-size:.88rem;margin-bottom:22px;}
+  h3{font-size:1rem;color:var(--ink);margin:26px 0 10px;}
+  p{color:var(--text-light);font-size:.92rem;margin-bottom:10px;}
+  ul,ol{margin:0 0 14px 20px;color:var(--text-light);font-size:.92rem;}
+  li{margin-bottom:7px;}
+  li::marker{color:var(--orange);}
+  strong{color:var(--text);}
+
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;}
+  .btn{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:12px 22px;text-decoration:none;font-weight:700;font-size:.84rem;border:none;cursor:pointer;transition:all .15s;}
+  .btn-dark{background:var(--ink);color:#fff;}
+  .btn-dark:hover{background:#000;}
+  .btn-orange{background:var(--orange);color:#fff;}
+  .btn-orange:hover{background:var(--orange-hover);}
+
+  /* Hero */
+  .hero-waves{position:absolute;top:0;right:0;width:58%;height:100%;opacity:.9;pointer-events:none;}
+  .hero-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:36px;position:relative;z-index:1;align-items:start;}
+  @media(max-width:780px){.hero-grid{grid-template-columns:1fr;}}
+  .dots{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+  .dots .d{display:flex;gap:3px;}
+  .dots .d span{width:7px;height:7px;border-radius:50%;background:var(--line);}
+  .dots .d span.on{background:var(--orange);}
+  .dots .label{font-size:.76rem;color:var(--text-faint);font-weight:600;}
+  .hero h1{font-size:2rem;font-weight:800;color:var(--ink);line-height:1.35;letter-spacing:-.02em;margin-bottom:16px;}
+  @media(max-width:480px){.hero h1{font-size:1.6rem;}}
+  .hero .lead{font-size:.95rem;color:var(--text-light);max-width:440px;}
+  .meta-card{background:var(--field-bg);border:1px solid var(--line);border-radius:18px;padding:22px;}
+  .field{margin-bottom:14px;}
+  .field:last-child{margin-bottom:0;}
+  .field label{display:block;font-size:.76rem;font-weight:700;color:var(--ink);margin-bottom:6px;}
+  .field .val{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:.82rem;color:var(--text-light);}
+
+  .big-line{margin-top:28px;padding:26px 24px;border-top:1px solid var(--line);position:relative;z-index:1;text-align:center;}
+  .big-line .q{font-size:1.4rem;font-weight:800;color:var(--navy);letter-spacing:-.01em;}
+  .big-line .q em{font-style:normal;color:var(--orange);}
+  .big-line p{margin:8px 0 0;}
+
+  .feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:10px;padding-top:26px;border-top:1px solid var(--line);position:relative;z-index:1;}
+  @media(max-width:860px){.feature-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:480px){.feature-grid{grid-template-columns:1fr;}}
+  .feature .ico{margin-bottom:10px;}
+  .feature h4{font-size:.9rem;color:var(--ink);margin-bottom:4px;}
+  .feature p{font-size:.8rem;color:var(--text-light);margin:0;}
+
+  /* Pain cards */
+  .pain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0 22px;}
+  @media(max-width:720px){.pain-grid{grid-template-columns:1fr;}}
+  .pain{background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:16px 18px;font-size:.86rem;color:var(--text);}
+  .pain .emo{font-size:1.3rem;display:block;margin-bottom:6px;}
+  .switch{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:600px){.switch{grid-template-columns:1fr;}}
+  .switch div{border-radius:14px;padding:18px 20px;font-weight:700;font-size:.95rem;}
+  .switch .bad{background:#f7ece9;color:var(--no);}
+  .switch .good{background:#e8f1f8;color:var(--navy);}
+  .switch small{display:block;font-weight:600;font-size:.74rem;opacity:.75;margin-bottom:4px;}
+
+  /* PARA cards */
+  .para-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0 8px;}
+  @media(max-width:860px){.para-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:460px){.para-grid{grid-template-columns:1fr;}}
+  .para{border-radius:18px;padding:20px 18px;color:#fff;display:flex;flex-direction:column;gap:6px;}
+  .para .letter{font-size:2.2rem;font-weight:900;line-height:1;}
+  .para .name{font-size:.82rem;font-weight:700;opacity:.9;}
+  .para .rule{background:rgba(255,255,255,.18);border-radius:999px;padding:4px 12px;font-size:.78rem;font-weight:700;align-self:flex-start;margin:4px 0;}
+  .para .desc{font-size:.8rem;opacity:.92;}
+  .para .ex{font-size:.76rem;opacity:.85;border-top:1px solid rgba(255,255,255,.25);padding-top:8px;margin-top:4px;}
+  .para.p{background:var(--p);} .para.a{background:var(--a);} .para.r{background:var(--r);} .para.ar{background:var(--ar);}
+
+  .tips{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px;}
+  @media(max-width:720px){.tips{grid-template-columns:1fr;}}
+  .tip{background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+  .tip .n{display:inline-flex;width:26px;height:26px;border-radius:50%;background:var(--orange);color:#fff;font-weight:800;font-size:.8rem;align-items:center;justify-content:center;margin-bottom:8px;}
+  .tip h4{font-size:.88rem;color:var(--ink);margin-bottom:4px;}
+  .tip p{font-size:.8rem;margin:0;}
+
+  /* Quiz */
+  .quiz{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
+  .q-row{display:grid;grid-template-columns:30px 1fr auto;gap:12px;align-items:center;background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:12px 14px;}
+  @media(max-width:640px){.q-row{grid-template-columns:30px 1fr;} .q-btns{grid-column:1 / -1;}}
+  .q-num{font-weight:800;color:var(--navy);font-size:.85rem;}
+  .q-text{font-size:.88rem;color:var(--text);}
+  .q-btns{display:flex;gap:6px;flex-wrap:wrap;}
+  .q-btns button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:.78rem;font-weight:700;color:var(--text-light);cursor:pointer;font-family:inherit;}
+  .q-btns button:hover{border-color:var(--navy);color:var(--navy);}
+  .q-btns button.right{background:var(--ok);border-color:var(--ok);color:#fff;}
+  .q-btns button.wrong{background:var(--no);border-color:var(--no);color:#fff;}
+  .q-score{margin-top:14px;font-size:.88rem;font-weight:700;color:var(--navy);}
+
+  /* Folder tree */
+  .tree{background:var(--ink);color:#dce3ec;border-radius:16px;padding:22px 24px;font-family:'Consolas','Malgun Gothic',monospace;font-size:.86rem;line-height:1.9;white-space:pre;overflow-x:auto;margin:16px 0;}
+  .tree .c{color:#8fa3b8;}
+  .tree .o{color:var(--orange);font-weight:700;}
+
+  /* Table */
+  table{width:100%;border-collapse:collapse;font-size:.85rem;margin:14px 0;}
+  th{color:var(--text-faint);font-size:.74rem;font-weight:700;letter-spacing:.03em;padding:8px 12px;text-align:left;border-bottom:2px solid var(--line);}
+  td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text-light);}
+  tr:last-child td{border-bottom:none;}
+  .table-wrap{overflow-x:auto;}
+
+  /* Timeline */
+  .timeline{position:relative;margin:24px 0 0;padding-left:6px;}
+  .t-item{display:grid;grid-template-columns:92px 22px 1fr;gap:4px 14px;position:relative;}
+  @media(max-width:480px){.t-item{grid-template-columns:78px 18px 1fr;gap:4px 8px;}}
+  .t-item .t-time{font-weight:800;color:var(--ink);font-size:.78rem;padding-top:2px;white-space:nowrap;}
+  .t-item .t-dotcol{display:flex;flex-direction:column;align-items:center;}
+  .t-item .t-dot{width:10px;height:10px;border-radius:50%;background:var(--orange);margin-top:5px;flex-shrink:0;}
+  .t-item .t-line{width:2px;flex:1;background:var(--line);margin-top:2px;}
+  .t-item:last-child .t-line{display:none;}
+  .t-item .t-body{padding-bottom:22px;}
+  .t-item .t-stage{font-weight:700;color:var(--navy);font-size:.86rem;margin-bottom:2px;}
+  .t-item .t-desc{font-size:.82rem;color:var(--text-light);}
+  .t-item .t-dur{display:inline-block;margin-top:4px;font-size:.72rem;color:var(--text-faint);background:var(--field-bg);padding:2px 9px;border-radius:999px;}
+
+  /* Prompt */
+  .warn{display:flex;gap:12px;background:#fdf6e6;border:1px solid #f1dfb2;border-radius:14px;padding:14px 16px;margin:14px 0;font-size:.86rem;color:var(--text);}
+  .warn .ic{font-weight:900;color:var(--r);}
+  .prompt-wrap{position:relative;margin:16px 0;}
+  .prompt-box{background:var(--ink);color:#dce3ec;border-radius:16px;padding:22px 24px;padding-top:56px;font-size:.82rem;line-height:1.75;white-space:pre-wrap;word-break:break-word;max-height:440px;overflow-y:auto;font-family:'Consolas','Malgun Gothic',monospace;}
+  .copy-btn{position:absolute;top:14px;right:14px;background:var(--orange);color:#fff;border:none;padding:8px 16px;border-radius:999px;font-size:.78rem;cursor:pointer;font-weight:700;transition:background .15s;font-family:inherit;}
+  .copy-btn:hover{background:var(--orange-hover);}
+  .copy-btn.copied{background:var(--ok);}
+  .redirect-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:14px;}
+  @media(max-width:720px){.redirect-grid{grid-template-columns:1fr;}}
+  .redirect-card{background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:16px 18px;font-size:.84rem;color:var(--text);font-style:italic;}
+
+  /* Worksheet */
+  .ws{background:var(--field-bg);border:1px solid var(--line);border-radius:18px;padding:24px 26px;margin:16px 0;}
+  @media(max-width:640px){.ws{padding:18px 16px;}}
+  .ws-files{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;}
+  @media(max-width:600px){.ws-files{grid-template-columns:1fr;}}
+  .ws-file{display:flex;align-items:center;gap:8px;}
+  .ws-file span{font-weight:800;color:var(--navy);font-size:.8rem;width:22px;text-align:right;}
+  .ws input[type=text], .ws select{width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:.86rem;font-family:inherit;color:var(--text);}
+  .ws-file select{width:110px;flex-shrink:0;}
+  .steps{counter-reset:s;list-style:none;margin:10px 0 0;}
+  .steps li{counter-increment:s;position:relative;padding-left:38px;margin-bottom:12px;color:var(--text);}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:0;width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-weight:800;font-size:.8rem;display:flex;align-items:center;justify-content:center;}
+  .routine{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:14px 0;}
+  @media(max-width:720px){.routine{grid-template-columns:1fr;}}
+  .routine div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;}
+  .routine .min{font-size:1.5rem;font-weight:900;color:var(--orange);line-height:1;}
+  .routine h4{font-size:.88rem;color:var(--ink);margin:6px 0 4px;}
+  .routine p{font-size:.8rem;margin:0;}
+  .save-note{font-size:.74rem;color:var(--text-faint);margin-top:10px;}
+
+  footer{text-align:center;padding:36px 20px 10px;color:var(--text-faint);font-size:.78rem;}
+  footer a{color:var(--blue);}
+  footer p{font-size:.78rem;color:var(--text-faint);}
+
+  @media print{
+    .navwrap,.copy-btn,.btn-row{display:none;}
+    body{background:#fff;}
+    .block{box-shadow:none;border-radius:0;break-inside:avoid;}
+    .prompt-box,.tree{max-height:none;color:#111;background:#f2f2f2;}
+  }
+</style>
+</head>
+<body>
+
+<div class="navwrap">
+<nav>
+  <a class="nav-logo" href="#top">AX특강 2차시</a>
+  <ul class="nav-links">
+    <li><a href="#why">왜 쌓일까</a></li>
+    <li><a href="#para">PARA</a></li>
+    <li><a href="#quiz">퀴즈</a></li>
+    <li><a href="#number">번호</a></li>
+    <li><a href="#timeline">진행흐름</a></li>
+    <li><a href="#prompt">프롬프트</a></li>
+    <li><a href="#worksheet">활동지</a></li>
+  </ul>
+</nav>
+</div>
+
+<div class="page" id="top">
+
+  <!-- HERO -->
+  <section class="block hero">
+    <svg class="hero-waves" viewBox="0 0 600 420" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M40,360 C200,260 300,110 600,0" stroke="#e8eaef" stroke-width="1.4" fill="none"/>
+      <path d="M70,390 C230,290 330,140 600,40" stroke="#e8eaef" stroke-width="1.4" fill="none"/>
+      <path d="M100,420 C260,320 360,170 600,80" stroke="#e8eaef" stroke-width="1.4" fill="none"/>
+      <path d="M10,320 C170,230 270,90 560,-10" stroke="#eef1f5" stroke-width="1.2" fill="none"/>
+    </svg>
+    <div class="hero-grid">
+      <div>
+        <div class="dots">
+          <span class="d"><span class="on"></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>
+          <span class="label">2 / 9회차 · 자료 정리</span>
+        </div>
+        <h1>쌓아두지 말고 흐르게<br>PARA로 내 자료 정리하기</h1>
+        <p class="lead">다운로드 폴더, 바탕화면, "최종_진짜최종" 파일들. 오늘은 내 자료를 4칸으로 나누고, ChatGPT와 함께 직접 정리해 봅니다.</p>
+        <div class="btn-row">
+          <a class="btn btn-dark" href="#para">PARA 4칸 보기</a>
+          <a class="btn btn-orange" href="#prompt">ChatGPT 프롬프트 바로가기</a>
+        </div>
+      </div>
+      <div class="meta-card">
+        <div class="field"><label>대상</label><div class="val">유한대학교 졸업생</div></div>
+        <div class="field"><label>오늘</label><div class="val">2026-10-16(금) · 2차시 · 16:00~20:00 (4시간)</div></div>
+        <div class="field"><label>준비물</label><div class="val">노트북(또는 PC), ChatGPT 계정 (Gemini·Copilot도 가능)</div></div>
+        <div class="field"><label>지난 시간</label><div class="val">1차시: ChatGPT와 문답하며 "이미 아는 것 / 발견한 것 / 더 알고 싶은 것" 정리</div></div>
+      </div>
+    </div>
+
+    <div class="big-line">
+      <div class="q">폴더는 <em>창고</em>가 아니라 <em>흐름</em>이다</div>
+      <p>모으는 데서 끝나면 창고가 됩니다. 지금 하는 일에 쓰이고, 끝나면 보관으로 넘어가야 흐름이 됩니다.</p>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature">
+        <svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.6" y2="16.6"/></svg>
+        <h4>원인 알기</h4>
+        <p>내 폴더가 왜 엉망이 되는지 이유를 안다.</p>
+      </div>
+      <div class="feature">
+        <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <h4>4칸으로 나누기</h4>
+        <p>PARA 4칸으로 어떤 자료든 나눌 수 있다.</p>
+      </div>
+      <div class="feature">
+        <svg class="ico" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <h4>ChatGPT와 실습</h4>
+        <p>내 파일 10개를 ChatGPT와 대화하며 직접 분류한다.</p>
+      </div>
+      <div class="feature">
+        <svg class="ico" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.5 15A8.5 8.5 0 1 1 18.4 6L23 10"/></svg>
+        <h4>습관 만들기</h4>
+        <p>매주 10분 정리 루틴을 하나 정한다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY -->
+  <section class="block" id="why">
+    <span class="eyebrow">진단</span>
+    <h2>왜 자료가 쌓이기만 할까?</h2>
+    <p class="sub">이런 경험, 한 번쯤 있지 않나요?</p>
+    <div class="pain-grid">
+      <div class="pain"><span class="emo">🔍</span>분명히 받아 둔 파일인데 <strong>어디 있는지 몰라서</strong> 다시 다운로드한다.</div>
+      <div class="pain"><span class="emo">📄</span><code>최종.hwp</code>, <code>최종_진짜최종.hwp</code>, <code>최종_수정본(2).hwp</code>가 같이 있다.</div>
+      <div class="pain"><span class="emo">🖥️</span>바탕화면이 아이콘으로 꽉 차서 <strong>배경 사진이 안 보인다.</strong></div>
+    </div>
+    <p>원인은 대부분 하나입니다. <strong>"이건 무슨 주제지?"로 나누려고 해서</strong>입니다. 주제는 끝이 없어서 폴더가 계속 늘어나고, 결국 아무 데나 넣게 됩니다. PARA는 질문을 바꿉니다.</p>
+    <div class="switch">
+      <div class="bad"><small>이렇게 묻지 말고</small>"이건 무슨 주제지?"</div>
+      <div class="good"><small>이렇게 묻는다</small>"이건 지금 내 일과 얼마나 가까운가?"</div>
+    </div>
+  </section>
+
+  <!-- PARA -->
+  <section class="block" id="para">
+    <span class="eyebrow">핵심 개념</span>
+    <h2>PARA — 모든 자료를 4칸으로</h2>
+    <p class="sub">생산성 전문가 티아고 포르테(Tiago Forte)가 만든 디지털 자료 정리법. 네 칸의 앞 글자를 땄습니다.</p>
+    <div class="para-grid">
+      <div class="para p">
+        <span class="letter">P</span><span class="name">Projects · 프로젝트</span>
+        <span class="rule">마감이 있다</span>
+        <span class="desc">목표가 있고 지금 진행 중인 일</span>
+        <span class="ex">○○회사 자기소개서(11/3 마감), 자격증 시험 준비</span>
+      </div>
+      <div class="para a">
+        <span class="letter">A</span><span class="name">Areas · 영역</span>
+        <span class="rule">계속 관리한다</span>
+        <span class="desc">끝나는 날 없이 계속 챙기는 일</span>
+        <span class="ex">건강, 돈 관리, 취업 준비 전반, 운동</span>
+      </div>
+      <div class="para r">
+        <span class="letter">R</span><span class="name">Resources · 자료</span>
+        <span class="rule">언젠가 참고한다</span>
+        <span class="desc">관심 있거나 나중에 쓸 만한 자료</span>
+        <span class="ex">엑셀 꿀팁, AI 도구 기사, 면접 질문 모음</span>
+      </div>
+      <div class="para ar">
+        <span class="letter">A</span><span class="name">Archives · 보관</span>
+        <span class="rule">끝났다</span>
+        <span class="desc">위 세 칸에서 끝났거나 쉬는 것</span>
+        <span class="ex">졸업작품, 합격 발표가 끝난 지원서</span>
+      </div>
+    </div>
+
+    <h3>꼭 기억할 세 가지</h3>
+    <div class="tips">
+      <div class="tip"><span class="n">1</span><h4>상태가 바뀌면 칸을 옮긴다</h4><p>자기소개서는 쓰는 동안은 P, 발표가 끝나면 Archives.</p></div>
+      <div class="tip"><span class="n">2</span><h4>P와 A는 "끝"으로 구분</h4><p>"취업 준비"는 끝이 없으니 A, "○○회사 지원"은 마감이 있으니 P.</p></div>
+      <div class="tip"><span class="n">3</span><h4>애매하면 일단 Inbox</h4><p>지금 고민하지 말고 <code>00_Inbox</code>에. 일주일에 한 번 몰아서 정리한다. (PARA 4칸 바깥의 임시 칸)</p></div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="block" id="quiz">
+    <span class="eyebrow">미니 퀴즈</span>
+    <h2>어느 칸일까?</h2>
+    <p class="sub">버튼을 눌러 보세요. 맞으면 초록, 틀리면 붉은색으로 표시됩니다.</p>
+    <div class="quiz" id="quizList"></div>
+    <div class="q-score" id="qScore">0 / 10 맞힘</div>
+  </section>
+
+  <!-- NUMBER -->
+  <section class="block" id="number">
+    <span class="eyebrow">정리 규칙</span>
+    <h2>폴더에 번호를 붙이면 순서가 생긴다</h2>
+    <p class="sub">번호는 중요도가 아니라 <strong>주소</strong>입니다. 컴퓨터가 항상 같은 순서로 정렬해 줍니다.</p>
+<div class="tree">내 자료/
+├── <span class="o">00_Inbox</span>       <span class="c">← 일단 넣는 곳 (매주 비우기)</span>
+├── <span class="o">10_Projects</span>    <span class="c">← 마감 있는 일</span>
+├── <span class="o">20_Areas</span>       <span class="c">← 계속 챙기는 일</span>
+├── <span class="o">30_Resources</span>   <span class="c">← 참고 자료</span>
+└── <span class="o">40_Archive</span>     <span class="c">← 끝난 것</span></div>
+    <ul>
+      <li><strong>10 단위로 띄우는 이유</strong>: 나중에 사이에 새 칸이 필요하면 <code>15_</code> 같은 번호를 끼워 넣을 수 있습니다.</li>
+      <li><strong>안쪽도 같은 방식</strong>: <code>10_Projects/11_○○회사지원</code>, <code>10_Projects/12_정보처리기사</code></li>
+      <li><strong>파일 이름 규칙 하나만</strong>: 날짜가 중요하면 <code>2026-10-16_면접준비.md</code>처럼 날짜를 앞에. "최종", "진짜최종"은 쓰지 않습니다.</li>
+    </ul>
+    <p>참고: 폴더에 10 단위 번호를 붙여 정리하는 방식은 <strong>Johnny.Decimal</strong>이라는 정리법에서도 쓰입니다.</p>
+  </section>
+
+  <!-- TIMELINE -->
+  <section class="block" id="timeline">
+    <span class="eyebrow">진행 흐름</span>
+    <h2>오늘(4시간) 진행 흐름</h2>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">16:00~16:15</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">도입</div><div class="t-desc">1차시 "더 알고 싶은 것" 돌아보기, 오늘 한 문장 소개</div><span class="t-dur">15분</span></div></div>
+      <div class="t-item"><div class="t-time">16:15~16:40</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">진단</div><div class="t-desc">내 다운로드 폴더·바탕화면을 옆 사람과 비교, "왜 쌓이기만 할까?"</div><span class="t-dur">25분</span></div></div>
+      <div class="t-item"><div class="t-time">16:40~17:10</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">개념 — PARA</div><div class="t-desc">PARA 4칸 설명 + 미니 퀴즈 10문항</div><span class="t-dur">30분</span></div></div>
+      <div class="t-item"><div class="t-time">17:10~17:25</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">개념 — 번호와 이름</div><div class="t-desc">폴더 번호 붙이기, 파일 이름 규칙</div><span class="t-dur">15분</span></div></div>
+      <div class="t-item"><div class="t-time">17:25~17:35</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">휴식</div><span class="t-dur">10분</span></div></div>
+      <div class="t-item"><div class="t-time">17:35~18:30</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">실습 1 · ChatGPT와 내 파일 분류</div><div class="t-desc">활동지 1단계 파일 10개 → 프롬프트로 ChatGPT와 대화하며 분류</div><span class="t-dur">55분</span></div></div>
+      <div class="t-item"><div class="t-time">18:30~19:10</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">실습 2 · 연습 폴더 만들기</div><div class="t-desc">새 연습 폴더에 PARA 폴더를 만들고 파일 복사본을 넣어 보기</div><span class="t-dur">40분</span></div></div>
+      <div class="t-item"><div class="t-time">19:10~19:40</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">공유</div><div class="t-desc">3~4인조 결과 비교 → 자원자 2~3명 발표</div><span class="t-dur">30분</span></div></div>
+      <div class="t-item"><div class="t-time">19:40~19:55</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">습관 만들기</div><div class="t-desc">매주 10분 정리 루틴 정하기</div><span class="t-dur">15분</span></div></div>
+      <div class="t-item"><div class="t-time">19:55~20:00</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">마무리</div><div class="t-desc">다음 차시(10/23) 예고</div><span class="t-dur">5분</span></div></div>
+    </div>
+  </section>
+
+  <!-- PROMPT -->
+  <section class="block" id="prompt">
+    <span class="eyebrow">실습 1 · 학생 배포용</span>
+    <h2>ChatGPT용 분류 도우미 프롬프트</h2>
+    <p class="sub">새 대화창을 열고, 아래 내용을 통째로 복사해서 붙여넣은 뒤 전송하세요.</p>
+    <div class="warn"><span class="ic">!</span><div><strong>개인정보 주의</strong> — 파일 <strong>이름만</strong> 입력합니다. 파일 내용은 붙여넣지 않습니다. 이름에 실명·연락처·주민번호 등이 있으면 지우거나 <code>○○</code>로 바꿔서 입력하세요.</div></div>
+    <div class="prompt-wrap">
+      <button class="copy-btn" id="copyBtn" type="button" onclick="copyPrompt()">복사하기</button>
+<div class="prompt-box" id="promptText">당신은 지금부터 저의 '자료 정리 코치'입니다. 저는 유한대학교 AX특강을 듣는 졸업생이고, 오늘은 PARA 방법으로 제 파일을 정리하는 연습을 합니다.
+
+PARA는 자료를 4칸으로 나누는 방법입니다.
+- Projects: 마감이 있고 지금 진행 중인 일
+- Areas: 끝나는 날 없이 계속 챙기는 일
+- Resources: 관심 있거나 나중에 참고할 자료
+- Archives: 끝났거나 쉬고 있는 것
+애매하면 Inbox(나중에 정리)에 둘 수 있습니다.
+
+다음 규칙을 지켜주세요.
+1. 제가 파일 이름 목록을 보내면, 정답을 바로 알려주지 마세요.
+2. 파일 하나씩 순서대로, 제가 스스로 칸을 고를 수 있게 질문을 하나만 해주세요. 예: "이 일에 마감이 있나요?", "이건 지금도 진행 중인가요, 끝났나요?", "앞으로도 계속 챙겨야 하는 일인가요?"
+3. 제가 칸을 고르면 이유를 한 줄로 물어보고, 다음 파일로 넘어가세요.
+4. 제가 헷갈려하면 힌트를 주되, 마지막 선택은 제가 하게 해주세요.
+5. 모든 파일이 끝나면 아래 표로 정리해 주세요. 제가 고른 답을 그대로 쓰고, 다르게 볼 수도 있는 파일이 있으면 "다시 생각해 볼 점" 칸에 짧게 적어주세요.
+   | 파일 이름 | 내가 고른 칸 | 이유 | 다시 생각해 볼 점 |
+6. 마지막으로 제 결과를 보고 폴더 구조(00_Inbox, 10_Projects, 20_Areas, 30_Resources, 40_Archive)를 제안해 주세요.
+
+준비되면 "파일 이름 10개를 보내주세요"라고 말해 주세요.</div>
+    </div>
+    <h3>ChatGPT가 규칙을 어길 때 이렇게 말하세요</h3>
+    <div class="redirect-grid">
+      <div class="redirect-card">"정답을 바로 알려주지 말고, 제가 고를 수 있게 질문해 주세요."</div>
+      <div class="redirect-card">"한 번에 파일 하나만, 질문 하나만 해주세요."</div>
+      <div class="redirect-card">"제가 고른 칸을 그대로 표에 써 주세요."</div>
+    </div>
+  </section>
+
+  <!-- WORKSHEET -->
+  <section class="block" id="worksheet">
+    <span class="eyebrow">활동지</span>
+    <h2>오늘의 활동지</h2>
+    <p class="sub">세 단계로 진행합니다. 입력한 내용은 저장되지 않으니 마지막에 캡처해 두세요.</p>
+
+    <h3>1단계 · 내 파일 10개 고르기 <small style="color:var(--text-faint);font-weight:600;">17:35~</small></h3>
+    <p>다운로드 폴더, 바탕화면, 카카오톡 받은 파일 폴더에서 파일 이름 10개를 골라 적습니다. 오래된 것과 최근 것을 섞을수록 재미있어요. ChatGPT와 정한 칸은 오른쪽에서 고르세요.</p>
+    <div class="ws"><div class="ws-files" id="wsFiles"></div></div>
+
+    <h3>2단계 · 연습 폴더 만들기 <small style="color:var(--text-faint);font-weight:600;">18:30~</small></h3>
+    <div class="warn"><span class="ic">!</span><div><strong>안전 규칙</strong> — 원래 폴더는 건드리지 않습니다. 파일은 <strong>옮기지 말고 복사</strong>합니다. 지우지 않습니다.</div></div>
+    <ol class="steps">
+      <li>바탕화면에 <code>PARA_연습</code> 폴더를 만든다.</li>
+      <li>그 안에 <code>00_Inbox</code>, <code>10_Projects</code>, <code>20_Areas</code>, <code>30_Resources</code>, <code>40_Archive</code> 5개 폴더를 만든다.</li>
+      <li>1단계 파일 10개의 <strong>복사본</strong>을 ChatGPT와 정한 칸에 넣는다.</li>
+      <li>이름이 헷갈리는 파일은 <code>날짜_내용</code> 규칙으로 이름을 바꿔 본다.</li>
+    </ol>
+
+    <h3>3단계 · 매주 10분 정리 루틴 <small style="color:var(--text-faint);font-weight:600;">19:40~</small></h3>
+    <p>정리는 한 번에 끝나지 않습니다. 일주일에 10분만 쓰면 다시 쌓이지 않습니다.</p>
+    <div class="routine">
+      <div><span class="min">4분</span><h4>① Inbox 비우기</h4><p><code>00_Inbox</code>에 쌓인 파일 3개를 제 칸으로 보내기</p></div>
+      <div><span class="min">3분</span><h4>② 끝난 일 보내기</h4><p><code>10_Projects</code>에서 끝난 일 1개를 <code>40_Archive</code>로</p></div>
+      <div><span class="min">3분</span><h4>③ 자료 꺼내 쓰기</h4><p><code>30_Resources</code>에서 이번 주에 쓸 자료 1개를 진행 중인 일에 꺼내 쓰기</p></div>
+    </div>
+    <div class="ws">
+      <div class="ws-files">
+        <div class="ws-file"><span>📅</span><input type="text" placeholder="나의 정리 요일·시간 (예: 일요일 21시)"></div>
+        <div class="ws-file"><span>🔔</span><input type="text" placeholder="휴대폰 캘린더에 반복 일정 등록했나요? (완료/예정)"></div>
+      </div>
+      <p class="save-note">※ 입력 내용은 저장되지 않습니다 — 캡처하거나 종이에 옮겨 적어 보관하세요.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>유한대학교 AX특강 · 2026-10-16 2차시</p>
+    <p>참고: Tiago Forte, <a href="https://www.simonandschuster.ca/books/The-PARA-Method/Tiago-Forte/9781668045565" target="_blank" rel="noopener"><em>The PARA Method</em></a> (Simon &amp; Schuster) · <a href="https://johnnydecimal.com/documentation/areas-and-categories" target="_blank" rel="noopener">Johnny.Decimal — Areas and categories</a></p>
+  </footer>
+
+</div>
+
+<script>
+var QUIZ = [
+  ["11월 3일 마감 ○○회사 자기소개서", "P"],
+  ["매달 쓰는 가계부", "A"],
+  ["유튜브에서 본 엑셀 단축키 정리", "R"],
+  ["작년에 끝난 졸업작품 자료", "AR"],
+  ["12월 정보처리기사 실기 대비 오답노트", "P"],
+  ["건강검진 결과지", "A"],
+  ["나중에 써 보고 싶은 AI 도구 기사 모음", "R"],
+  ["합격 발표가 끝난 지원서", "AR"],
+  ["매주 운동 기록", "A"],
+  ["다음 주 친구 결혼식 축사 준비", "P"]
+];
+var LABELS = {P:"Projects", A:"Areas", R:"Resources", AR:"Archives"};
+var solved = {};
+
+function renderQuiz(){
+  var box = document.getElementById('quizList');
+  QUIZ.forEach(function(q, i){
+    var row = document.createElement('div');
+    row.className = 'q-row';
+    row.innerHTML = '<span class="q-num">' + (i+1) + '</span><span class="q-text"></span><span class="q-btns"></span>';
+    row.querySelector('.q-text').textContent = q[0];
+    var btns = row.querySelector('.q-btns');
+    Object.keys(LABELS).forEach(function(k){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = LABELS[k];
+      b.onclick = function(){
+        btns.querySelectorAll('button').forEach(function(x){ x.classList.remove('right','wrong'); });
+        if(k === q[1]){ b.classList.add('right'); solved[i] = true; }
+        else { b.classList.add('wrong'); delete solved[i]; }
+        document.getElementById('qScore').textContent = Object.keys(solved).length + ' / ' + QUIZ.length + ' 맞힘';
+      };
+      btns.appendChild(b);
+    });
+    box.appendChild(row);
+  });
+}
+
+function renderFiles(){
+  var box = document.getElementById('wsFiles');
+  for(var i=1;i<=10;i++){
+    var d = document.createElement('div');
+    d.className = 'ws-file';
+    d.innerHTML = '<span>' + i + '</span><input type="text" placeholder="파일 이름 (개인정보는 ○○로)">' +
+      '<select aria-label="칸 선택"><option value="">칸 선택</option><option>00_Inbox</option><option>10_Projects</option><option>20_Areas</option><option>30_Resources</option><option>40_Archive</option></select>';
+    box.appendChild(d);
+  }
+}
+
+function copyPrompt(){
+  var text = document.getElementById('promptText').innerText;
+  var btn = document.getElementById('copyBtn');
+  function done(){
+    btn.textContent = '복사됨 ✓';
+    btn.classList.add('copied');
+    setTimeout(function(){ btn.textContent = '복사하기'; btn.classList.remove('copied'); }, 1800);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text, done); });
+  } else { fallbackCopy(text, done); }
+}
+function fallbackCopy(text, cb){
+  var ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); } catch(e){}
+  document.body.removeChild(ta);
+  if(cb) cb();
+}
+
+renderQuiz();
+renderFiles();
+</script>
+
+</body>
+</html>
