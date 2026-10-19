@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>게임 테스트·QA 알바 모음</title>
+<style>
+  :root{
+    --navy:#1a3a5c; --blue:#2e6da4; --blue-soft:#e3edf7; --orange:#c98a00; --orange-soft:#fbf0d6;
+    --green:#3f7a5a; --green-soft:#e2efe7; --purple:#6b5b95; --purple-soft:#ece8f4;
+    --bg:#f3f5f8; --card:#ffffff; --line:#d9e0e8; --text:#1d2a38; --muted:#5b6b7c; --danger:#b5523b;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --navy:#9cc3e8; --blue:#6fa6d8; --blue-soft:#1d3149; --orange:#e0b04a; --orange-soft:#33291a;
+      --green:#7fbf98; --green-soft:#1b3125; --purple:#a898d2; --purple-soft:#2a2440;
+      --bg:#0f1823; --card:#172333; --line:#2a3a4d; --text:#e6ecf2; --muted:#9aabbc; --danger:#e08a74;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --navy:#9cc3e8; --blue:#6fa6d8; --blue-soft:#1d3149; --orange:#e0b04a; --orange-soft:#33291a;
+    --green:#7fbf98; --green-soft:#1b3125; --purple:#a898d2; --purple-soft:#2a2440;
+    --bg:#0f1823; --card:#172333; --line:#2a3a4d; --text:#e6ecf2; --muted:#9aabbc; --danger:#e08a74;
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Pretendard','Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 16px 48px;}
+  header h1{font-size:1.6rem;color:var(--navy);line-height:1.3;margin-bottom:6px;}
+  header p{color:var(--muted);font-size:.9rem;}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0;}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center;}
+  .stat b{display:block;font-size:1.5rem;color:var(--navy);line-height:1.2;}
+  .stat span{font-size:.78rem;color:var(--muted);}
+  .notice{background:var(--orange-soft);border-radius:12px;padding:12px 14px;font-size:.85rem;margin-bottom:16px;}
+  .notice strong{color:var(--orange);}
+  .filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+  .filters button{font:inherit;font-size:.85rem;font-weight:700;border:1.5px solid var(--line);background:var(--card);color:var(--muted);border-radius:999px;padding:7px 14px;cursor:pointer;}
+  .filters button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:var(--card);}
+  .list{display:grid;gap:12px;}
+  .job{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:8px;}
+  .job.closed{opacity:.5;}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;}
+  .tag{font-size:.72rem;font-weight:800;border-radius:6px;padding:2px 8px;}
+  .tag.qa{background:var(--blue-soft);color:var(--blue);}
+  .tag.ops{background:var(--green-soft);color:var(--green);}
+  .tag.sw{background:var(--purple-soft);color:var(--purple);}
+  .tag.short{background:var(--orange-soft);color:var(--orange);}
+  .dday{font-size:.78rem;font-weight:800;border-radius:999px;padding:3px 10px;white-space:nowrap;background:var(--blue-soft);color:var(--navy);}
+  .dday.soon{background:var(--danger);color:#fff;}
+  .dday.always{background:var(--green-soft);color:var(--green);}
+  .job h2{font-size:1.02rem;line-height:1.4;}
+  .meta{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:.86rem;}
+  .meta dt{color:var(--muted);}
+  .job a{justify-self:start;font-size:.86rem;font-weight:800;color:var(--card);background:var(--blue);text-decoration:none;border-radius:10px;padding:8px 14px;}
+  .job a:hover{background:var(--navy);}
+  .also{font-size:.78rem;color:var(--muted);}
+  .also a{background:none;color:var(--blue);padding:0;text-decoration:underline;font-weight:600;}
+  .excluded{margin-top:24px;background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:14px 16px;font-size:.85rem;color:var(--muted);}
+  .excluded h3{font-size:.92rem;color:var(--text);margin-bottom:6px;}
+  .excluded ul{padding-left:18px;}
+  footer{margin-top:24px;font-size:.78rem;color:var(--muted);text-align:center;}
+  @media (max-width:480px){ header h1{font-size:1.35rem;} .stat b{font-size:1.25rem;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>게임 테스트·QA 알바 모음</h1>
+    <p>알바몬에서 "게임테스트 · 게임QA · 게임테스터 · QA테스트"로 검색한 공고 · 2026년 10월 19일 확인</p>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><b id="n-qa">9</b><span>게임 QA</span></div>
+    <div class="stat"><b id="n-ops">6</b><span>운영·모니터링</span></div>
+    <div class="stat"><b id="n-short">3</b><span>짧은 알바</span></div>
+  </div>
+
+  <div class="notice"><strong>지원 전에 꼭 확인하세요.</strong> 검색 목록 기준으로 정리해서 근무 시간·회사명·마감일이 바뀌었을 수 있습니다. 대부분 6개월~1년 이상 계약직이니, 짧게 일할 사람은 "짧은 알바" 필터를 쓰세요.</div>
+
+  <div class="filters" role="group" aria-label="분류 필터">
+    <button type="button" data-f="all" aria-pressed="true">전체</button>
+    <button type="button" data-f="qa" aria-pressed="false">게임 QA·테스트</button>
+    <button type="button" data-f="ops" aria-pressed="false">운영·모니터링·제작</button>
+    <button type="button" data-f="sw" aria-pressed="false">게임 외 SW QA</button>
+    <button type="button" data-f="short" aria-pressed="false">짧은 알바</button>
+  </div>
+
+  <div class="list" id="list"></div>
+
+  <div class="excluded">
+    <h3>목록에서 뺀 공고</h3>
+    <ul>
+      <li>"게임 모니터 조립 테스트 업무" (경기 부천, 4건) — 실제 업무는 모니터 제품 조립</li>
+      <li>"QA테스트" 검색의 자동차·반도체·PC 조립·제품 검사 공고 — 게임·소프트웨어 테스트가 아님</li>
+    </ul>
+  </div>
+
+  <footer>출처: 알바몬(albamon.com) 검색 결과 · 게임 QA 취업반 지도 자료</footer>
+</div>
+
+<script>
+const BASE = "https://www.albamon.com/jobs/detail/";
+// cat: qa / ops / sw, short: 6개월 이하, due: YYYY-MM-DD 또는 null(상시)
+const JOBS = [
+  {cat:"qa", title:"[큐로드] 디바이스 성능 측정 QA", co:"리드커리어㈜", area:"서울 영등포구 여의도동", pay:"연봉 2,700만원", term:"6개월~1년 / 월~금", due:"2026-11-06", id:"119796769", also:["119737880"]},
+  {cat:"qa", title:"게임환경 하드웨어 기기성능 테스트 QA (11월 입사)", co:"㈜데일리워크", area:"서울 영등포구 여의도동 (국회의사당역)", pay:"연봉 2,700만원", term:"1년 이상 / 월~금", due:"2026-10-30", id:"119821266"},
+  {cat:"qa", title:"플랫폼 QA 테스터 (카카오 계열 QA 전문사)", co:"표시 없음", area:"경기 성남시 수정구 (제2판교 인근)", pay:"월 2,208,340원", term:"1년 이상 / 월~금", due:"2026-10-23", id:"119632042"},
+  {cat:"qa", title:"국내 유명 게임사 모바일 MMORPG 게임 QA", co:"표시 없음", area:"서울 은평구 수색동", pay:"월 2,290,200원", term:"1년 이상 / 월~금", due:"2026-10-21", id:"119747725"},
+  {cat:"qa", title:"글로벌게임사 게임 QA (성과급 지급)", co:"표시 없음 / ㈜휴머니아", area:"서울 마포구 상암동", pay:"월 2,290,200원", term:"1년 이상 / 주5일", due:"2026-10-21", id:"119742846", also:["502063258"]},
+  {cat:"qa", short:true, title:"큐로드 모바일 게임 QA 담당자", co:"큐로드 (게재: 인트로맨㈜)", area:"서울 강남구 역삼동 (역삼역)", pay:"월 2,250,000원 (수습 있음)", term:"3~6개월 / 월~금 10:00~19:00", due:null, id:"119499284"},
+  {cat:"qa", title:"큐로드 게임 QA 담당자 (11월 출근)", co:"큐로드", area:"서울 영등포구", pay:"연봉 2,700만원", term:"6개월~1년 / 주5일", due:null, id:"502063023"},
+  {cat:"qa", title:"게임 QA 담당자 (광주)", co:"㈜큐로드", area:"광주 동구", pay:"연봉 2,700만원", term:"1년 이상 / 주5일", due:"2026-11-11", id:"502062236"},
+  {cat:"qa", title:"게임 LQA 담당자 (영어, 광주)", co:"㈜큐로드", area:"광주 동구", pay:"연봉 2,700만원", term:"1년 이상 / 주5일", due:"2026-11-11", id:"502062240"},
+  {cat:"ops", short:true, title:"모바일 게임 스테이지 제작·사무보조 알바", co:"㈜액션핏", area:"서울 서초구 (강남역)", pay:"시급 10,320원", term:"1~3개월 / 월~금 10:30~19:30", due:null, id:"119785822"},
+  {cat:"ops", short:true, title:"PC 게임 운영 지원 (로그 조회·불건전 이용자 대응)", co:"메타엠", area:"서울 금천구 가산동", pay:"연봉 2,700만원", term:"3~6개월 / 월~금", due:"2026-10-26", id:"119573094"},
+  {cat:"ops", title:"배틀그라운드 모니터링 담당자", co:"메타엠", area:"서울 금천구 가산동", pay:"연봉 2,830만원", term:"6개월~1년 / 요일 협의", due:"2026-10-28", id:"119630180"},
+  {cat:"ops", title:"게임운영(GM) 담당자 (라그나로크 경험자 우대)", co:"표시 없음", area:"서울 마포구 상암동", pay:"월 2,290,200원", term:"1년 이상 / 월~금", due:"2026-10-30", id:"119698114"},
+  {cat:"ops", title:"글로벌게임사 게임운영(GM) 직원", co:"표시 없음", area:"서울 마포구 상암동", pay:"월 2,290,200원", term:"1년 이상 / 월~금", due:"2026-10-19", id:"119695647"},
+  {cat:"ops", title:"판교 유명게임사 모니터링 교대근무 (3조 2교대)", co:"표시 없음", area:"경기 성남시 분당구 (판교)", pay:"월 3,016,670원", term:"1년 이상 / 요일 협의", due:"2026-10-19", id:"119614323"},
+  {cat:"sw", title:"OTT 서비스 QA 테스트", co:"㈜데일리워크", area:"서울 광진구 (구의역)", pay:"연봉 2,700만원", term:"1년 이상 / 월~금", due:"2026-10-30", id:"119820726"},
+  {cat:"sw", title:"내비 SW 평가 테스트·전자지도 DB 검수", co:"인플랩㈜", area:"서울 마포구 도화동", pay:"월 2,357,895원", term:"1년 이상 / 월~금", due:"2026-10-23", id:"119692143"}
+];
+const CAT = {qa:["qa","게임 QA·테스트"], ops:["ops","운영·모니터링·제작"], sw:["sw","게임 외 SW QA"]};
+
+function today(){ const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+function dday(due){
+  if(!due) return {txt:"상시모집", cls:"always", left:Infinity};
+  const [y,m,d] = due.split("-").map(Number);
+  const left = Math.round((new Date(y, m-1, d) - today()) / 86400000);
+  if(left < 0) return {txt:"마감", cls:"", left};
+  return {txt: left === 0 ? "오늘 마감" : "D-" + left, cls: left <= 3 ? "soon" : "", left};
+}
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+function render(filter){
+  const box = document.getElementById("list");
+  const rows = JOBS
+    .filter(j => filter === "all" || (filter === "short" ? j.short : j.cat === filter))
+    .map(j => ({j, dd: dday(j.due)}))
+    .sort((a, b) => (a.dd.left < 0) - (b.dd.left < 0) || a.dd.left - b.dd.left);
+  box.innerHTML = rows.map(({j, dd}) => `
+    <article class="job ${dd.left < 0 ? "closed" : ""}">
+      <div class="top">
+        <div class="tags"><span class="tag ${CAT[j.cat][0]}">${CAT[j.cat][1]}</span>${j.short ? '<span class="tag short">짧은 알바</span>' : ""}</div>
+        <span class="dday ${dd.cls}">${dd.txt}</span>
+      </div>
+      <h2>${esc(j.title)}</h2>
+      <dl class="meta">
+        <dt>회사</dt><dd>${esc(j.co)}</dd>
+        <dt>지역</dt><dd>${esc(j.area)}</dd>
+        <dt>급여</dt><dd>${esc(j.pay)}</dd>
+        <dt>기간</dt><dd>${esc(j.term)}</dd>
+        <dt>마감</dt><dd>${j.due ? j.due.replace(/-/g, ".") : "상시모집"}</dd>
+      </dl>
+      <a href="${BASE + j.id}" target="_blank" rel="noopener">알바몬에서 공고 보기 →</a>
+      ${j.also ? `<span class="also">같은 공고: ${j.also.map(x => `<a href="${BASE + x}" target="_blank" rel="noopener">${x}</a>`).join(", ")}</span>` : ""}
+    </article>`).join("");
+}
+
+document.querySelectorAll(".filters button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".filters button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  render(b.dataset.f);
+}));
+render("all");
+</script>
+</body>
+</html>
