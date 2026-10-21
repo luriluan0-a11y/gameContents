@@ -1,0 +1,513 @@
+<title>볼트를 흐르게</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: 한 화면에 한 장씩 넘기는 발표 페이지. 각 장의 머리에 폴더 경로식 표지(사례·단계)를 달고, 표·프롬프트는 볼트의 실제 경로 표기를 그대로 쓴다. */
+:root {
+  --bg: #f4f7fa;
+  --surface: #ffffff;
+  --ink: #142536;
+  --muted: #566a7e;
+  --line: #d5dee8;
+  --navy: #1a3a5c;
+  --blue: #2e6da4;
+  --amber: #f0a500;
+  --amber-ink: #8a5d00;
+  --good: #2f7d57;
+  --bad: #b04a3a;
+  --chip-bg: #e7eef6;
+  --font-display: "Gowun Batang", "Noto Serif KR", "Batang", serif;
+  --font-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", "D2Coding", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1a26; --surface: #162536; --ink: #e5ecf4; --muted: #9eb0c2; --line: #2a3e54;
+    --navy: #9fc1e3; --blue: #79a9d8; --amber: #f0a500; --amber-ink: #f3bd45;
+    --good: #6cc196; --bad: #e08a7c; --chip-bg: #1f344b; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1a26; --surface: #162536; --ink: #e5ecf4; --muted: #9eb0c2; --line: #2a3e54;
+  --navy: #9fc1e3; --blue: #79a9d8; --amber: #f0a500; --amber-ink: #f3bd45;
+  --good: #6cc196; --bad: #e08a7c; --chip-bg: #1f344b; color-scheme: dark;
+}
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+@media (min-width: 900px) and (min-height: 620px) {
+  html { scroll-snap-type: y mandatory; }
+  .slide { min-height: 100vh; scroll-snap-align: start; }
+}
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.65;
+  word-break: keep-all; overflow-wrap: anywhere;
+}
+.slide {
+  display: flex; align-items: center;
+  border-bottom: 1px solid var(--line);
+  padding-block: 72px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.inner { width: 100%; max-width: 1040px; margin: 0 auto; display: grid; gap: 28px; min-width: 0; }
+.tag {
+  font-family: var(--font-mono); font-size: 13px; letter-spacing: .04em; color: var(--muted);
+  display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center;
+}
+.tag b { color: var(--blue); font-weight: 500; }
+h1, h2 { font-family: var(--font-display); font-weight: 700; text-wrap: balance; margin: 0; line-height: 1.3; color: var(--navy); }
+h1 { font-size: clamp(36px, 6vw, 64px); }
+h2 { font-size: clamp(26px, 3.6vw, 40px); }
+h3 { font-size: 18px; margin: 0 0 6px; color: var(--ink); }
+p { margin: 0; max-width: 65ch; }
+.lead { font-size: clamp(18px, 2vw, 21px); color: var(--muted); }
+.lead strong, p strong, li strong { color: var(--ink); }
+mark { background: none; color: var(--amber-ink); font-weight: 700; }
+code, .path { font-family: var(--font-mono); font-size: .9em; background: var(--chip-bg); padding: 1px 6px; border-radius: 4px; }
+
+.cols { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.cols > * { min-width: 0; }
+.box { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px 22px; }
+.box p, .box li { font-size: 16px; }
+ul.clean { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
+
+/* 흐름 레일: 질문 → 노트 → 적용 → 강의 */
+.flow { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; }
+.flow .step { flex: 1 1 180px; min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+.flow .step small { display: block; font-family: var(--font-mono); color: var(--amber-ink); font-size: 12px; letter-spacing: .06em; margin-bottom: 4px; }
+.flow .arrow { align-self: center; color: var(--muted); font-size: 22px; }
+@media (max-width: 640px) { .flow .arrow { display: none; } }
+
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 520px; font-size: 16px; }
+th, td { text-align: left; padding: 11px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 13px; letter-spacing: .04em; color: var(--muted); font-weight: 500; background: var(--chip-bg); }
+tr:last-child td { border-bottom: 0; }
+td.num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.chip { display: inline-block; font-size: 13px; font-weight: 700; padding: 2px 10px; border-radius: 999px; white-space: nowrap; }
+.chip.ok { color: var(--good); border: 1px solid var(--good); }
+.chip.no { color: var(--bad); border: 1px solid var(--bad); }
+.chip.mid { color: var(--amber-ink); border: 1px solid var(--amber-ink); }
+
+.prompt {
+  background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--amber);
+  border-radius: 6px 10px 10px 6px; padding: 18px 20px; display: grid; gap: 12px; min-width: 0;
+}
+.prompt pre { margin: 0; white-space: pre-wrap; font-family: var(--font-mono); font-size: 14.5px; line-height: 1.7; color: var(--ink); }
+.prompt .head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.prompt .head span { font-size: 13px; color: var(--muted); font-family: var(--font-mono); }
+button.copy {
+  font: inherit; font-size: 13px; color: var(--blue); background: transparent; border: 1px solid var(--blue);
+  border-radius: 6px; padding: 4px 12px; cursor: pointer;
+}
+button.copy:hover { background: var(--chip-bg); }
+button:focus-visible, a:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+
+blockquote { margin: 0; padding: 4px 0 4px 20px; border-left: 3px solid var(--blue); font-family: var(--font-display); font-size: clamp(19px, 2.2vw, 23px); color: var(--ink); max-width: 60ch; }
+blockquote cite { display: block; margin-top: 8px; font-family: var(--font-body); font-style: normal; font-size: 14px; color: var(--muted); }
+
+.big-num { font-family: var(--font-display); font-size: clamp(40px, 6vw, 60px); line-height: 1; color: var(--navy); font-variant-numeric: tabular-nums; }
+.stat { display: grid; gap: 8px; }
+.stat p { font-size: 15px; color: var(--muted); }
+
+.tree { font-family: var(--font-mono); font-size: 14px; line-height: 1.8; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 20px; overflow-x: auto; white-space: pre; color: var(--ink); }
+.tree .dim { color: var(--muted); }
+.tree .hl { color: var(--amber-ink); }
+
+.cover h1 { max-width: 14ch; }
+.cover .who { font-family: var(--font-mono); font-size: 14px; color: var(--muted); }
+.cover .presenter { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: baseline; font-size: 17px; color: var(--muted); }
+.cover .presenter strong { color: var(--navy); font-size: 19px; }
+.cover .presenter span { font-family: var(--font-mono); font-size: 14px; font-variant-numeric: tabular-nums; }
+.part { background: var(--navy); }
+.part h2, .part .lead, .part .tag, .part .tag b { color: var(--bg); }
+.part .lead { opacity: .85; }
+
+/* 넘기기 버튼 */
+.nav {
+  position: fixed; z-index: 5;
+  right: calc(16px + env(safe-area-inset-right, 0px));
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  display: flex; align-items: center; gap: 6px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px;
+  box-shadow: 0 4px 16px rgba(10, 30, 50, .12);
+}
+.nav button { font: inherit; width: 40px; height: 40px; border-radius: 50%; border: 0; background: transparent; color: var(--ink); cursor: pointer; font-size: 18px; }
+.nav button:hover { background: var(--chip-bg); }
+.nav output { font-family: var(--font-mono); font-size: 13px; color: var(--muted); min-width: 64px; text-align: center; font-variant-numeric: tabular-nums; }
+</style>
+
+<main id="deck">
+
+<section class="slide cover" id="s-cover">
+  <div class="inner">
+    <div class="tag"><b>GPters 24기</b><span>AI 활용 사례 발표</span></div>
+    <h1>고여 있던 볼트를 흐르게</h1>
+    <p class="lead">스터디자료를 내 볼트 진단서로 쓰고, 질문 하나를 공부 노트와 다음 날 강의 자료로 이은 두 가지 사례입니다. 도구는 Claude Code와 Obsidian입니다.</p>
+    <p class="presenter">발표자: <strong>공대언니</strong><span>2026.10.19</span><span>콘텐츠&amp;지식 발표회</span></p>
+    <div class="flow" aria-label="오늘의 흐름">
+      <div class="step"><small>사례 A</small>스터디자료 → 내 볼트와 대조 → 아카이브 13건 · 주간 3·2·1</div>
+      <div class="step"><small>사례 B</small>"PARA가 뭐지?" → 공부 노트 → 볼트 정리 → 졸업생 특강</div>
+    </div>
+    <p class="who">→ 방향키 · 스페이스로 넘깁니다</p>
+  </div>
+</section>
+
+<section class="slide" id="s-before">
+  <div class="inner">
+    <div class="tag"><b>Before</b><span>2026년 10월 중순의 내 볼트</span></div>
+    <h2>폴더는 있었지만 흐르지 않았습니다</h2>
+    <div class="cols">
+      <div class="box stat"><div class="big-num">14</div><p><span class="path">진행 중/특강</span> 폴더에 쌓인 특강 자료. 대부분 몇 달 전에 끝난 수업이었습니다.</p></div>
+      <div class="box stat"><div class="big-num">0</div><p>만들어만 두고 한 번도 쓰지 않은 <span class="path">400_archive</span>의 파일 수입니다.</p></div>
+      <div class="box stat"><div class="big-num">18</div><p>번호 없는 잡메모 폴더에 섞여 있던 개인 메모입니다. 업무 밖의 일을 둘 자리가 없었습니다.</p></div>
+    </div>
+    <p class="lead">"PARA 비슷한 번호 체계"라고 소개해 왔지만, PARA가 정확히 뭔지는 설명하지 못했습니다. 폴더를 옮기면 어떤 링크가 깨질지 몰라서 손도 못 대고 있었습니다.</p>
+  </div>
+</section>
+
+<section class="slide part" id="s-part-a">
+  <div class="inner">
+    <div class="tag"><b>사례 A</b><span>스터디자료를 내 볼트 진단서로</span></div>
+    <h2>「쌓아두지 말고 흐르게 하세요」를 읽고, 무엇을 바꿀지 물었습니다</h2>
+    <p class="lead">24기에 공유된 7+1 폴더 관리법 스터디자료를 그대로 따라 하는 대신, 내 볼트와 한 칸씩 비교했습니다.</p>
+  </div>
+</section>
+
+<section class="slide" id="s-a-ask">
+  <div class="inner">
+    <div class="tag"><b>사례 A · 1</b><span>질문 바꾸기</span></div>
+    <h2>"요약해줘"가 아니라 "나에게 적용할 게 있는지"</h2>
+    <div class="prompt">
+      <div class="head"><span>실제로 보낸 요청</span></div>
+      <pre>@260924-쌓아두지-말고-흐르게-하세요-요약자료.md 내용을 검토하고
+나에게 적용할만한 내용이 있는지 검토해서 알려줘.</pre>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s-a-table">
+  <div class="inner">
+    <div class="tag"><b>사례 A · 2</b><span>대조표</span></div>
+    <h2>구조는 이미 같았고, 빈 칸은 두 개였습니다</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>스터디자료의 폴더</th><th>내 볼트</th><th>상태</th></tr></thead>
+        <tbody>
+          <tr><td>inbox</td><td>없음</td><td><span class="chip no">빈 칸</span></td></tr>
+          <tr><td>system</td><td>규칙 파일 <span class="path">AGENTS.md</span></td><td><span class="chip ok">있음</span></td></tr>
+          <tr><td>projects / operations</td><td>"진행 중" 폴더에 섞여 있음</td><td><span class="chip mid">부분적</span></td></tr>
+          <tr><td>collected</td><td><span class="path">300_collected</span></td><td><span class="chip ok">있음</span></td></tr>
+          <tr><td>knowledge</td><td><span class="path">600_knowledge</span></td><td><span class="chip ok">있음</span></td></tr>
+          <tr><td>share</td><td><span class="path">200_created</span></td><td><span class="chip ok">있음</span></td></tr>
+          <tr><td>archive</td><td><span class="path">400_archive</span> (비어 있음)</td><td><span class="chip no">안 쓰는 중</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="lead">볼트를 처음부터 다시 짤 필요가 없다는 결론이 나오자, 고민이 "빈 칸 두 개를 어떻게 채울까"로 줄었습니다.</p>
+  </div>
+</section>
+
+<section class="slide" id="s-a-skip">
+  <div class="inner">
+    <div class="tag"><b>사례 A · 3</b><span>걸러내기</span></div>
+    <h2>스터디자료대로 하면 오히려 손해인 것도 골랐습니다</h2>
+    <div class="cols">
+      <div class="box"><h3>폴더 번호 바꾸기</h3><p>매일 아침 특정 폴더에 파일을 만드는 예약 자동화가 여러 개 돌고 있어서, 이름을 바꾸면 자동화가 깨집니다. 스터디자료에서도 숫자는 중요도가 아니라 정렬과 주소라고 했습니다.</p></div>
+      <div class="box"><h3>projects와 operations 분리</h3><p>나누려면 자동화가 쓰는 폴더를 옮겨야 합니다. 폴더 대신 규칙 파일에 성격만 적어 두는 것으로 충분했습니다.</p></div>
+      <div class="box"><h3>입문자용 실습 파일</h3><p><span class="path">START-HERE.md</span>, <span class="path">STARTER.zip</span>은 이미 체계가 있는 볼트에는 필요 없었습니다.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s-a-archive">
+  <div class="inner">
+    <div class="tag"><b>사례 A · 4</b><span>끝난 프로젝트 아카이브</span></div>
+    <h2>"끝났는지"는 내가 정하고, 깨질 링크는 AI가 먼저 찾았습니다</h2>
+    <p>Claude Code는 특강 폴더 14개마다 마지막 작업일, 파일 수, 용량을 뽑고 이 폴더들을 가리키는 링크를 찾았습니다. 저는 최근까지 작업한 1건만 남기고 13건을 골랐습니다.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>위치</th><th>내용</th><th>곳</th><th>처리</th></tr></thead>
+        <tbody>
+          <tr><td>논문 연구계획 노트</td><td>특강 자료를 전체 경로로 링크</td><td class="num">2</td><td>새 경로로 수정</td></tr>
+          <tr><td>특강 노트 2개</td><td>이미지 삽입 링크</td><td class="num">10</td><td><strong>원래부터 깨져 있던 링크</strong>를 바로잡음</td></tr>
+          <tr><td>학생 피드백 문서 5개</td><td>본문에 글자로 적힌 "검토 기준: (경로)"</td><td class="num">5</td><td>새 경로로 수정</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="lead">옵시디언은 깨진 링크를 조용히 남겨 둡니다. 옮기기 전에 찾았더니, 예전에 폴더 이름을 바꾸면서 깨진 링크 <mark>10곳</mark>까지 함께 고쳤습니다.</p>
+  </div>
+</section>
+
+<section class="slide" id="s-a-321">
+  <div class="inner">
+    <div class="tag"><b>사례 A · 5</b><span>매주 10분, 3·2·1</span></div>
+    <h2>습관은 빈 양식이 아니라 이번 주 후보로 시작했습니다</h2>
+    <div class="cols">
+      <div class="box"><h3>3 · 분류하기</h3><p>볼트 최상위에 흩어진 파일들. 열어 보니 내용이 하나도 없는 빈 캔버스·베이스 파일 6개도 있었습니다.</p></div>
+      <div class="box"><h3>2 · 원문 확인하기</h3><p>그 주에 AI가 자동으로 만든 논문 요약 5건. 원문 대조 전인 "AI 초안"이라 확인 대상이 됐습니다.</p></div>
+      <div class="box"><h3>1 · 연결하기</h3><p>AI 지식관리 위키를 진행 중인 특강 자료와 잇기. 게임 관련 논문 요약을 학생 지도용 회사 노트와 잇기.</p></div>
+    </div>
+    <p>마지막으로 규칙 파일에 두 줄을 남겼습니다. 끝난 프로젝트는 확인 후 원래 상위 폴더 이름 그대로 <span class="path">400_archive/</span>로 옮긴다. AI가 만든 요약은 원문 대조 전까지 인용하지 않는다.</p>
+  </div>
+</section>
+
+<section class="slide part" id="s-part-b">
+  <div class="inner">
+    <div class="tag"><b>사례 B</b><span>질문 하나에서 다음 날 강의 자료까지</span></div>
+    <h2>"내가 쓰던 게 PARA였어?"</h2>
+    <p class="lead">늘 "PARA 비슷하게" 쓴다고 말하면서 정작 PARA를 설명하지 못했습니다. 그 질문 하나가 하루 동안 네 단계로 이어졌습니다.</p>
+  </div>
+</section>
+
+<section class="slide" id="s-b-rule">
+  <div class="inner">
+    <div class="tag"><b>사례 B · 1</b><span>저장 위치도 맡기기</span></div>
+    <h2>AI가 내가 정해 둔 위키 규칙을 지켰습니다</h2>
+    <div class="prompt">
+      <div class="head"><span>실제로 보낸 요청</span></div>
+      <pre>PARA 비슷한 번호 체계라는 내용이 뭔지 정리를 좀 해주면 좋겠어.
+어디에 저장할지는 내 볼트를 검토해서 기록해주면 될 것 같아</pre>
+    </div>
+    <blockquote>이 위키는 볼트 안 원문 자료에 근거한 내용만 쓰는 규칙이 있습니다. 볼트에 PARA 원문 자료가 없으므로 위키 대신 개인 공부 노트 폴더에 저장하겠습니다.<cite>Claude Code의 답</cite></blockquote>
+    <p>주제로만 보면 AI 지식관리 위키가 맞는 자리였지만, AI는 위키의 규칙 문서를 먼저 읽었습니다. 출처 없는 내용이 지식 페이지에 섞이지 않게 하려고 만든 규칙이 처음으로 작동하는 걸 봤습니다.</p>
+  </div>
+</section>
+
+<section class="slide" id="s-b-note">
+  <div class="inner">
+    <div class="tag"><b>사례 B · 2</b><span>공부 노트</span></div>
+    <h2>분류는 PARA, 번호는 Johnny.Decimal이었습니다</h2>
+    <div class="cols">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>내 폴더</th><th>PARA로 보면</th></tr></thead>
+          <tbody>
+            <tr><td><span class="path">10_진행 중</span></td><td>Projects와 Areas가 <strong>섞여 있음</strong></td></tr>
+            <tr><td><span class="path">20_산출물</span></td><td>PARA에 없음 (내가 더한 층)</td></tr>
+            <tr><td><span class="path">30_수집</span></td><td>Resources</td></tr>
+            <tr><td><span class="path">40_보관</span></td><td>Archives</td></tr>
+            <tr><td><span class="path">60_지식</span></td><td>PARA에 없음 (내 말로 정리한 지식)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="box">
+        <h3>노트에 넣은 두 가지 장치</h3>
+        <ul class="clean">
+          <li><strong>사실은 출처 각주로.</strong> PARA(티아고 포르테)와 Johnny.Decimal의 정의는 웹 검색으로 확인한 페이지를 달고, 2차 자료는 따로 표시했습니다.</li>
+          <li><strong>해석은 인용 블록으로.</strong> "네 칸은 주제가 아니라 지금 내 행동과 얼마나 가까운가의 순서" 같은 해석은 <code>&gt; 해석:</code>으로 구분했습니다.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="lead">폴더 이름은 발표 당시 이름입니다. 지금은 <span class="path">100_working</span>처럼 3자리로 바뀌었습니다.</p>
+  </div>
+</section>
+
+<section class="slide" id="s-b-apply">
+  <div class="inner">
+    <div class="tag"><b>사례 B · 3</b><span>배운 걸 바로 내 볼트에</span></div>
+    <h2>비교표에서 빈 칸을 찾아 잡메모 폴더를 해체했습니다</h2>
+    <p>PARA의 Areas, 즉 업무 밖에서 계속 챙기는 개인적인 일을 둘 자리가 없었습니다. AI는 바로 옮기지 않고 파일 18개를 하나씩 열어 "파일 → 내용 → 제안 위치" 표를 만든 뒤, 제가 정할 것 두 가지만 물었습니다.</p>
+    <div class="cols">
+      <div class="box"><h3>개인 영역을 어디에 둘까</h3><p>새 최상위 폴더로 만들기로 했습니다. 지금의 <span class="path">800_personal</span>입니다.</p></div>
+      <div class="box"><h3>자동화가 쓰는 파일은 언제 옮길까</h3><p>오늘 옮기기로 했습니다. 자동화는 다른 PC에서 돌고 있어서, 그 PC의 에이전트에게 보낼 경로 변경 요청 메시지를 AI가 대신 써 줬습니다.</p></div>
+    </div>
+    <p class="lead">"보내지 않으면 내일 아침 실패 알림이 온다. 잘못된 곳에 기록되지는 않는다"는 설명 덕분에, 안 보냈을 때 어떻게 되는지도 미리 알았습니다.</p>
+  </div>
+</section>
+
+<section class="slide" id="s-b-class">
+  <div class="inner">
+    <div class="tag"><b>사례 B · 4</b><span>다음 날 졸업생 특강 2차시</span></div>
+    <h2>나를 위한 노트를 학생 눈높이로 옮겼습니다</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>공부 노트 (나를 위한 것)</th><th>강의 자료 (학생을 위한 것)</th></tr></thead>
+        <tbody>
+          <tr><td>내 볼트 폴더와 PARA 비교표</td><td><code>최종_진짜최종.hwp</code>, 꽉 찬 바탕화면 같은 공감 장면</td></tr>
+          <tr><td>Projects·Areas 정의</td><td>칸마다 한 줄 기준: 마감이 있다 / 계속 관리한다 / 언젠가 참고한다 / 끝났다</td></tr>
+          <tr><td>Johnny.Decimal 번호 규칙</td><td><code>00_Inbox</code>~<code>40_Archive</code> 폴더 다섯 개</td></tr>
+          <tr><td>해석 블록</td><td>"이렇게 묻지 말고 → 이렇게 묻는다" 비교 카드</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="cols">
+      <div class="box"><h3>ChatGPT는 정답 대신 질문</h3><p>학생이 파일 이름 10개를 보내면 ChatGPT가 "마감이 있나요?"처럼 질문을 하나씩만 하고, 칸은 학생이 고릅니다. 1차시 소크라테스 문답의 철학을 이었습니다.</p></div>
+      <div class="box"><h3>수업 안전장치</h3><p>파일 내용은 넣지 않고 이름만, 실명은 ○○로, 연습은 원본 대신 복사본으로. 학생 화면과 교수자 가이드 양쪽에 넣었습니다.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s-after">
+  <div class="inner">
+    <div class="tag"><b>After</b><span>두 사례를 합친 결과</span></div>
+    <h2>폴더가 다시 흐르기 시작했습니다</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>항목</th><th>Before</th><th>After</th></tr></thead>
+        <tbody>
+          <tr><td>진행 중 특강 폴더</td><td>14개, 대부분 끝난 수업</td><td>진행 중 1개만 남음</td></tr>
+          <tr><td>아카이브</td><td>비어 있음</td><td>끝난 특강 13건을 원래 구조 그대로 보관</td></tr>
+          <tr><td>깨진 링크</td><td>이미지 링크 10곳이 이미 깨짐</td><td>이동으로 생길 7곳 + 기존 10곳 모두 수정</td></tr>
+          <tr><td>주기 점검</td><td>없음</td><td>3·2·1 템플릿과 후보가 채워진 첫 주 노트</td></tr>
+          <tr><td>PARA 이해</td><td>"비슷하게 쓰는 중"</td><td>원래 방법과 내 구조의 같은 점·다른 점을 설명</td></tr>
+          <tr><td>개인 영역</td><td>잡메모 폴더에 섞임</td><td>개인 영역 폴더 신설, 자동화 경로까지 정리</td></tr>
+          <tr><td>강의 자료</td><td>2차시 주제 미정</td><td>교수자용 마크다운 + 학생용 HTML(퀴즈·프롬프트·활동지)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="tree" aria-label="정리 후 폴더 구조"><span class="dim">100_working/104_특강/</span>        ← 진행 중인 것만
+<span class="hl">400_archive/104_특강/</span>        ← 끝난 13건 (원래 상위 폴더 이름 유지)
+<span class="hl">500_periodic/501_주간점검/</span>    ← 템플릿 + 첫 주 노트
+<span class="hl">800_personal/</span>                ← 업무 밖 개인 영역 (PARA의 Areas)</div>
+  </div>
+</section>
+
+<section class="slide" id="s-tips">
+  <div class="inner">
+    <div class="tag"><b>배운 것</b><span>다음에도 쓸 원칙</span></div>
+    <h2>AI에게 맡길 것과 내가 쥘 것</h2>
+    <div class="cols">
+      <div class="box">
+        <h3>이렇게 했더니 좋았습니다</h3>
+        <ul class="clean">
+          <li><strong>요약 말고 적용을 묻기.</strong> 내 상황과의 대조표가 나오고, 하지 말아야 할 것까지 걸러집니다.</li>
+          <li><strong>판단은 내가, 재료는 AI가.</strong> 마지막 작업일·링크 영향을 뽑게 하면 결정이 몇 초 만에 끝납니다.</li>
+          <li><strong>규칙 파일을 써 두기.</strong> 저장 위치를 맡겨도 AI가 규칙을 읽고 엉뚱한 곳에 넣지 않습니다.</li>
+          <li><strong>사실과 해석을 나눠 적기.</strong> 가르칠 때 무엇을 단정해도 되는지 바로 보입니다.</li>
+          <li><strong>내 일에 먼저 적용하고 가르치기.</strong> 직접 헷갈린 지점이 퀴즈와 교수자 가이드에 들어갑니다.</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>이렇게 하면 안 됩니다</h3>
+        <ul class="clean">
+          <li>좋은 스터디자료의 폴더 체계를 통째로 들여오기. 역할이 같은 폴더의 이름만 바꾸면 자동화와 링크만 깨집니다.</li>
+          <li>파일 탐색기에서 폴더를 끌어다 옮기기. 옵시디언 밖에서 옮기면 링크가 갱신되지 않습니다.</li>
+          <li>AI가 정리한 개념 글을 출처 확인 없이 지식 저장소에 넣기.</li>
+          <li>학생 실습에서 AI에 파일 "내용"을 넣게 하기. 이름만으로 충분합니다.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s-prompts">
+  <div class="inner">
+    <div class="tag"><b>가져가세요</b><span>재사용 프롬프트 · [대괄호]만 바꾸면 됩니다</span></div>
+    <h2>바로 써 볼 수 있는 프롬프트 넷</h2>
+    <div class="cols">
+      <div class="prompt">
+        <div class="head"><span>남의 방법론을 내 상황에 대조하기</span><button class="copy" type="button" data-copy="p1">복사</button></div>
+        <pre id="p1">[첨부한 스터디자료/글]의 내용을 검토하고, 내 [볼트/폴더/작업 방식]에 적용할 만한 내용이 있는지 알려줘.
+- 스터디자료의 각 요소를 내 현재 상태와 표로 비교해서 "이미 있음 / 빈 칸 / 부분적"으로 나눠줘.
+- 적용할 것은 우선순위 순으로, 적용하지 않아도 되는 것은 이유와 함께 알려줘.
+- 자동화나 링크처럼 바꾸면 깨질 수 있는 것이 있으면 위험도도 같이 적어줘.</pre>
+      </div>
+      <div class="prompt">
+        <div class="head"><span>끝난 프로젝트 안전하게 아카이브하기</span><button class="copy" type="button" data-copy="p2">복사</button></div>
+        <pre id="p2">[진행 중 폴더]의 하위 폴더마다 마지막 작업 날짜, 파일 수, 용량을 보여주고, 볼트 전체에서 이 폴더들을 전체 경로로 가리키는 링크나 경로 표기를 찾아줘.
+끝났는지는 내가 고를게. 고른 폴더는 [보관 폴더] 아래에 원래 상위 폴더 이름을 유지해서 옮기고, 찾은 경로 참조를 새 경로로 고친 뒤, 옛 경로가 남은 곳이 없는지 다시 확인해줘.</pre>
+      </div>
+      <div class="prompt">
+        <div class="head"><span>개념 공부 노트 (출처·해석 구분)</span><button class="copy" type="button" data-copy="p3">복사</button></div>
+        <pre id="p3">[개념 이름]이 뭔지 정리해줘. 저장 위치는 내 볼트 규칙(AGENTS.md 등)을 읽고 정해줘.
+- 정의나 사실은 실제로 확인한 출처 링크를 각주로 달아줘. 2차 자료면 2차 자료라고 표시해줘.
+- 네 해석이나 적용 아이디어는 `&gt; 해석:` 블록으로 구분해줘.
+- 내가 지금 쓰는 방식과 무엇이 같고 다른지 비교표를 넣어줘.</pre>
+      </div>
+      <div class="prompt">
+        <div class="head"><span>주간 점검 첫 주 노트 만들기</span><button class="copy" type="button" data-copy="p4">복사</button></div>
+        <pre id="p4">매주 10분 [점검 방식, 예: 3·2·1] 점검 템플릿을 [주기 노트 폴더]에 만들어줘. 그리고 이번 주 노트는 빈칸 대신 내 볼트에서 실제 후보를 찾아서 채워줘. 링크는 모두 실제 파일로 연결되는지 확인해줘.</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s-end">
+  <div class="inner">
+    <div class="tag"><b>마무리</b><span>다음에 할 일</span></div>
+    <blockquote>폴더는 창고가 아니라 흐름입니다.<cite>24기 스터디자료 「쌓아두지 말고 흐르게 하세요」에서</cite></blockquote>
+    <div class="cols">
+      <div class="box"><h3>사례 A 다음</h3><ul class="clean"><li>3·2·1을 4주 돌려 보고 템플릿 다듬기</li><li>미룬 두 가지: Inbox 폴더, AI 요약의 "검토 완료" 표시</li><li>논문·공부 폴더에도 아카이브 확대</li></ul></div>
+      <div class="box"><h3>사례 B 다음</h3><ul class="clean"><li>퀴즈에서 많이 틀린 문항을 3차시 설계에 반영</li><li>PARA 원문을 수집해 공부 노트를 위키 개념 페이지로</li><li>다른 PC의 자동화 경로 변경 확인</li></ul></div>
+    </div>
+    <p class="lead">질문 → 공부 노트 → 내 일에 적용 → 가르치기. 이 흐름은 폴더 관리가 아닌 주제에도 그대로 쓸 수 있습니다. 감사합니다.</p>
+  </div>
+</section>
+
+</main>
+
+<nav class="nav" aria-label="슬라이드 넘기기">
+  <button type="button" id="prev" aria-label="이전 장">←</button>
+  <output id="count" aria-live="polite">1 / 17</output>
+  <button type="button" id="next" aria-label="다음 장">→</button>
+</nav>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var count = document.getElementById('count');
+  var current = 0;
+
+  function show(i) {
+    current = i;
+    count.textContent = (i + 1) + ' / ' + slides.length;
+  }
+  function go(i) {
+    i = Math.max(0, Math.min(slides.length - 1, i));
+    slides[i].scrollIntoView({ block: 'start' });
+    show(i);
+  }
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) show(slides.indexOf(e.target));
+      });
+    }, { rootMargin: '-45% 0px -50% 0px' });
+    slides.forEach(function (s) { io.observe(s); });
+  }
+  show(0);
+
+  document.getElementById('prev').addEventListener('click', function () { go(current - 1); });
+  document.getElementById('next').addEventListener('click', function () { go(current + 1); });
+
+  document.addEventListener('keydown', function (e) {
+    var t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+    if (t && t.tagName === 'BUTTON' && (e.key === ' ' || e.key === 'Enter')) return;
+    var k = e.key;
+    if (k === 'ArrowRight' || k === 'ArrowDown' || k === 'PageDown' || (k === ' ' && !e.shiftKey)) { e.preventDefault(); go(current + 1); }
+    else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp' || (k === ' ' && e.shiftKey)) { e.preventDefault(); go(current - 1); }
+    else if (k === 'Home') { e.preventDefault(); go(0); }
+    else if (k === 'End') { e.preventDefault(); go(slides.length - 1); }
+  });
+
+  document.querySelectorAll('button.copy').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var pre = document.getElementById(btn.getAttribute('data-copy'));
+      var text = pre.textContent;
+      function selectFallback() {
+        var r = document.createRange();
+        r.selectNodeContents(pre);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(r);
+        btn.textContent = '선택됨 · Ctrl+C';
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () {
+          btn.textContent = '복사됨';
+          setTimeout(function () { btn.textContent = '복사'; }, 1600);
+        }, selectFallback);
+      } else {
+        selectFallback();
+      }
+    });
+  });
+})();
+</script>
