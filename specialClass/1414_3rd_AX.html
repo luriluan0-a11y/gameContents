@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AX특강 3차시 — 한 번 부탁하고 매번 받기: 크론잡으로 반복 일 맡기기</title>
+<style>
+  :root{
+    --navy:#1a3a5c;
+    --ink:#171b21;
+    --blue:#2e6da4;
+    --orange:#f0a500;
+    --orange-hover:#d4920a;
+    --canvas:#ececef;
+    --card:#ffffff;
+    --line:#e4e6eb;
+    --text:#2a2e35;
+    --text-light:#6b7280;
+    --text-faint:#9aa0aa;
+    --field-bg:#f4f5f7;
+    --p:#1a3a5c; --a:#2e6da4; --r:#c98a12; --ar:#7b8494;
+    --ok:#3a8a5c; --no:#b5523b;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Pretendard','Malgun Gothic','Apple SD Gothic Neo',sans-serif;color:var(--text);line-height:1.7;background:var(--canvas);}
+  .ico{width:22px;height:22px;stroke:var(--orange);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;}
+
+  /* Nav */
+  .navwrap{position:sticky;top:0;z-index:100;display:flex;justify-content:center;padding:14px 16px 0;}
+  nav{background:rgba(255,255,255,.88);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:999px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 10px 8px 20px;max-width:1040px;width:100%;box-shadow:0 4px 18px rgba(20,25,35,.06);overflow-x:auto;}
+  .nav-logo{color:var(--navy);font-weight:800;text-decoration:none;font-size:.86rem;white-space:nowrap;}
+  .nav-links{list-style:none;display:flex;gap:2px;white-space:nowrap;}
+  .nav-links a{color:var(--text-light);text-decoration:none;padding:7px 11px;border-radius:999px;font-size:.78rem;font-weight:600;transition:all .15s;}
+  .nav-links a:hover{background:var(--navy);color:#fff;}
+
+  /* Page */
+  .page{max-width:1040px;margin:0 auto;padding:28px 16px 60px;display:flex;flex-direction:column;gap:18px;}
+  .block{background:var(--card);border-radius:26px;border:1px solid var(--line);box-shadow:0 10px 28px rgba(20,25,35,.05);padding:44px 40px;position:relative;overflow:hidden;}
+  @media(max-width:640px){.block{padding:30px 22px;border-radius:20px;}}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.72rem;font-weight:700;letter-spacing:.04em;color:var(--navy);background:#eef3f8;padding:6px 14px;border-radius:999px;margin-bottom:18px;}
+  h2{font-size:1.28rem;color:var(--ink);margin-bottom:6px;letter-spacing:-.01em;}
+  h2 + .sub{color:var(--text-light);font-size:.88rem;margin-bottom:22px;}
+  h3{font-size:1rem;color:var(--ink);margin:26px 0 10px;}
+  p{color:var(--text-light);font-size:.92rem;margin-bottom:10px;}
+  ul,ol{margin:0 0 14px 20px;color:var(--text-light);font-size:.92rem;}
+  li{margin-bottom:7px;}
+  li::marker{color:var(--orange);}
+  strong{color:var(--text);}
+
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;}
+  .btn{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:12px 22px;text-decoration:none;font-weight:700;font-size:.84rem;border:none;cursor:pointer;transition:all .15s;}
+  .btn-dark{background:var(--ink);color:#fff;}
+  .btn-dark:hover{background:#000;}
+  .btn-orange{background:var(--orange);color:#fff;}
+  .btn-orange:hover{background:var(--orange-hover);}
+
+  /* Hero */
+  .hero-waves{position:absolute;top:0;right:0;width:58%;height:100%;opacity:.9;pointer-events:none;}
+  .hero-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:36px;position:relative;z-index:1;align-items:start;}
+  @media(max-width:780px){.hero-grid{grid-template-columns:1fr;}}
+  .dots{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+  .dots .d{display:flex;gap:3px;}
+  .dots .d span{width:7px;height:7px;border-radius:50%;background:var(--line);}
+  .dots .d span.on{background:var(--orange);}
+  .dots .label{font-size:.76rem;color:var(--text-faint);font-weight:600;}
+  .hero h1{font-size:2rem;font-weight:800;color:var(--ink);line-height:1.35;letter-spacing:-.02em;margin-bottom:16px;}
+  @media(max-width:480px){.hero h1{font-size:1.6rem;}}
+  .hero .lead{font-size:.95rem;color:var(--text-light);max-width:440px;}
+  .meta-card{background:var(--field-bg);border:1px solid var(--line);border-radius:18px;padding:22px;}
+  .field{margin-bottom:14px;}
+  .field:last-child{margin-bottom:0;}
+  .field label{display:block;font-size:.76rem;font-weight:700;color:var(--ink);margin-bottom:6px;}
+  .field .val{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:.82rem;color:var(--text-light);}
+
+  .big-line{margin-top:28px;padding:26px 24px;border-top:1px solid var(--line);position:relative;z-index:1;text-align:center;}
+  .big-line .q{font-size:1.4rem;font-weight:800;color:var(--navy);letter-spacing:-.01em;}
+  .big-line .q em{font-style:normal;color:var(--orange);}
+  .big-line p{margin:8px 0 0;}
+
+  .feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:10px;padding-top:26px;border-top:1px solid var(--line);position:relative;z-index:1;}
+  @media(max-width:860px){.feature-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:480px){.feature-grid{grid-template-columns:1fr;}}
+  .feature .ico{margin-bottom:10px;}
+  .feature h4{font-size:.9rem;color:var(--ink);margin-bottom:4px;}
+  .feature p{font-size:.8rem;color:var(--text-light);margin:0;}
+
+  /* Pain cards */
+  .pain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0 22px;}
+  @media(max-width:720px){.pain-grid{grid-template-columns:1fr;}}
+  .pain{background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:16px 18px;font-size:.86rem;color:var(--text);}
+  .pain .emo{font-size:1.3rem;display:block;margin-bottom:6px;}
+  .switch{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:600px){.switch{grid-template-columns:1fr;}}
+  .switch div{border-radius:14px;padding:18px 20px;font-weight:700;font-size:.95rem;}
+  .switch .bad{background:#f7ece9;color:var(--no);}
+  .switch .good{background:#e8f1f8;color:var(--navy);}
+  .switch small{display:block;font-weight:600;font-size:.74rem;opacity:.75;margin-bottom:4px;}
+
+  /* PARA cards */
+  .para-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0 8px;}
+  @media(max-width:860px){.para-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:460px){.para-grid{grid-template-columns:1fr;}}
+  .para{border-radius:18px;padding:20px 18px;color:#fff;display:flex;flex-direction:column;gap:6px;}
+  .para .letter{font-size:2.2rem;font-weight:900;line-height:1;}
+  .para .name{font-size:.82rem;font-weight:700;opacity:.9;}
+  .para .rule{background:rgba(255,255,255,.18);border-radius:999px;padding:4px 12px;font-size:.78rem;font-weight:700;align-self:flex-start;margin:4px 0;}
+  .para .desc{font-size:.8rem;opacity:.92;}
+  .para .ex{font-size:.76rem;opacity:.85;border-top:1px solid rgba(255,255,255,.25);padding-top:8px;margin-top:4px;}
+  .para.p{background:var(--p);} .para.a{background:var(--a);} .para.r{background:var(--r);} .para.ar{background:var(--ar);}
+
+  .tips{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px;}
+  @media(max-width:720px){.tips{grid-template-columns:1fr;}}
+  .tip{background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+  .tip .n{display:inline-flex;width:26px;height:26px;border-radius:50%;background:var(--orange);color:#fff;font-weight:800;font-size:.8rem;align-items:center;justify-content:center;margin-bottom:8px;}
+  .tip h4{font-size:.88rem;color:var(--ink);margin-bottom:4px;}
+  .tip p{font-size:.8rem;margin:0;}
+
+  /* Quiz */
+  .quiz{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
+  .q-row{display:grid;grid-template-columns:30px 1fr auto;gap:12px;align-items:center;background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:12px 14px;}
+  @media(max-width:640px){.q-row{grid-template-columns:30px 1fr;} .q-btns{grid-column:1 / -1;}}
+  .q-num{font-weight:800;color:var(--navy);font-size:.85rem;}
+  .q-text{font-size:.88rem;color:var(--text);}
+  .q-btns{display:flex;gap:6px;flex-wrap:wrap;}
+  .q-btns button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:.78rem;font-weight:700;color:var(--text-light);cursor:pointer;font-family:inherit;}
+  .q-btns button:hover{border-color:var(--navy);color:var(--navy);}
+  .q-btns button.right{background:var(--ok);border-color:var(--ok);color:#fff;}
+  .q-btns button.wrong{background:var(--no);border-color:var(--no);color:#fff;}
+  .q-score{margin-top:14px;font-size:.88rem;font-weight:700;color:var(--navy);}
+
+  /* Folder tree */
+  .tree{background:var(--ink);color:#dce3ec;border-radius:16px;padding:22px 24px;font-family:'Consolas','Malgun Gothic',monospace;font-size:.86rem;line-height:1.9;white-space:pre;overflow-x:auto;margin:16px 0;}
+  .tree .c{color:#8fa3b8;}
+  .tree .o{color:var(--orange);font-weight:700;}
+
+  /* Table */
+  table{width:100%;border-collapse:collapse;font-size:.85rem;margin:14px 0;}
+  th{color:var(--text-faint);font-size:.74rem;font-weight:700;letter-spacing:.03em;padding:8px 12px;text-align:left;border-bottom:2px solid var(--line);}
+  td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text-light);}
+  tr:last-child td{border-bottom:none;}
+  .table-wrap{overflow-x:auto;}
+
+  /* Timeline */
+  .timeline{position:relative;margin:24px 0 0;padding-left:6px;}
+  .t-item{display:grid;grid-template-columns:92px 22px 1fr;gap:4px 14px;position:relative;}
+  @media(max-width:480px){.t-item{grid-template-columns:78px 18px 1fr;gap:4px 8px;}}
+  .t-item .t-time{font-weight:800;color:var(--ink);font-size:.78rem;padding-top:2px;white-space:nowrap;}
+  .t-item .t-dotcol{display:flex;flex-direction:column;align-items:center;}
+  .t-item .t-dot{width:10px;height:10px;border-radius:50%;background:var(--orange);margin-top:5px;flex-shrink:0;}
+  .t-item .t-line{width:2px;flex:1;background:var(--line);margin-top:2px;}
+  .t-item:last-child .t-line{display:none;}
+  .t-item .t-body{padding-bottom:22px;}
+  .t-item .t-stage{font-weight:700;color:var(--navy);font-size:.86rem;margin-bottom:2px;}
+  .t-item .t-desc{font-size:.82rem;color:var(--text-light);}
+  .t-item .t-dur{display:inline-block;margin-top:4px;font-size:.72rem;color:var(--text-faint);background:var(--field-bg);padding:2px 9px;border-radius:999px;}
+
+  /* Prompt */
+  .warn{display:flex;gap:12px;background:#fdf6e6;border:1px solid #f1dfb2;border-radius:14px;padding:14px 16px;margin:14px 0;font-size:.86rem;color:var(--text);}
+  .warn .ic{font-weight:900;color:var(--r);}
+  .prompt-wrap{position:relative;margin:16px 0;}
+  .prompt-box{background:var(--ink);color:#dce3ec;border-radius:16px;padding:22px 24px;padding-top:56px;font-size:.82rem;line-height:1.75;white-space:pre-wrap;word-break:break-word;max-height:440px;overflow-y:auto;font-family:'Consolas','Malgun Gothic',monospace;}
+  .copy-btn{position:absolute;top:14px;right:14px;background:var(--orange);color:#fff;border:none;padding:8px 16px;border-radius:999px;font-size:.78rem;cursor:pointer;font-weight:700;transition:background .15s;font-family:inherit;}
+  .copy-btn:hover{background:var(--orange-hover);}
+  .copy-btn.copied{background:var(--ok);}
+  .redirect-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:14px;}
+  @media(max-width:720px){.redirect-grid{grid-template-columns:1fr;}}
+  .redirect-card{background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:16px 18px;font-size:.84rem;color:var(--text);font-style:italic;}
+
+  /* Worksheet */
+  .ws{background:var(--field-bg);border:1px solid var(--line);border-radius:18px;padding:24px 26px;margin:16px 0;}
+  @media(max-width:640px){.ws{padding:18px 16px;}}
+  .ws-files{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;}
+  @media(max-width:600px){.ws-files{grid-template-columns:1fr;}}
+  .ws-file{display:flex;align-items:center;gap:8px;}
+  .ws-file span{font-weight:800;color:var(--navy);font-size:.8rem;width:22px;text-align:right;}
+  .ws input[type=text], .ws select{width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:.86rem;font-family:inherit;color:var(--text);}
+  .ws-file select{width:110px;flex-shrink:0;}
+  .steps{counter-reset:s;list-style:none;margin:10px 0 0;}
+  .steps li{counter-increment:s;position:relative;padding-left:38px;margin-bottom:12px;color:var(--text);}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:0;width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-weight:800;font-size:.8rem;display:flex;align-items:center;justify-content:center;}
+  .routine{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:14px 0;}
+  @media(max-width:720px){.routine{grid-template-columns:1fr;}}
+  .routine div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;}
+  .routine .min{font-size:1.5rem;font-weight:900;color:var(--orange);line-height:1;}
+  .routine h4{font-size:.88rem;color:var(--ink);margin:6px 0 4px;}
+  .routine p{font-size:.8rem;margin:0;}
+  .save-note{font-size:.74rem;color:var(--text-faint);margin-top:10px;}
+
+  footer{text-align:center;padding:36px 20px 10px;color:var(--text-faint);font-size:.78rem;}
+  footer a{color:var(--blue);}
+  footer p{font-size:.78rem;color:var(--text-faint);}
+
+  @media print{
+    .navwrap,.copy-btn,.btn-row{display:none;}
+    body{background:#fff;}
+    .block{box-shadow:none;border-radius:0;break-inside:avoid;}
+    .prompt-box,.tree{max-height:none;color:#111;background:#f2f2f2;}
+  }
+
+  /* 3차시 추가 */
+  code{font-family:'Consolas',monospace;background:var(--field-bg);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:.84em;color:var(--navy);}
+  .cmp td:first-child{font-weight:700;color:var(--ink);white-space:nowrap;}
+  .cmp td.hl{color:var(--navy);font-weight:700;}
+  .formula{background:var(--field-bg);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:16px 0;font-size:.92rem;color:var(--text);line-height:1.9;}
+  .formula b{display:inline-block;border-radius:8px;padding:0 8px;color:#fff;font-weight:700;margin:2px 0;}
+  .formula .f1{background:var(--p);} .formula .f2{background:var(--a);} .formula .f3{background:var(--r);} .formula .f4{background:var(--ar);}
+  .cron-fields{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:18px 0 6px;text-align:center;}
+  .cron-fields div{background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:12px 6px;}
+  .cron-fields .v{font-family:'Consolas',monospace;font-size:1.6rem;font-weight:800;color:var(--navy);line-height:1.2;}
+  .cron-fields .k{font-size:.76rem;font-weight:700;color:var(--text);}
+  .cron-fields .r{font-size:.7rem;color:var(--text-faint);}
+  .cron-read{text-align:center;font-size:.9rem;font-weight:700;color:var(--navy);margin-bottom:14px;}
+  .q-row .q-text code{font-size:.95em;}
+  .cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0 4px;}
+  .cat-tabs button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-size:.8rem;font-weight:700;color:var(--text-light);cursor:pointer;font-family:inherit;}
+  .cat-tabs button.on{background:var(--navy);border-color:var(--navy);color:#fff;}
+  .req-list{display:flex;flex-direction:column;gap:10px;margin-top:12px;}
+  .req{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;}
+  .req .t{font-size:.88rem;color:var(--text);}
+  .req .t .star{display:inline-block;font-size:.7rem;font-weight:800;color:#fff;background:var(--orange);border-radius:999px;padding:1px 8px;margin-left:6px;vertical-align:1px;}
+  .req button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:.76rem;font-weight:700;color:var(--navy);cursor:pointer;font-family:inherit;white-space:nowrap;}
+  .req button.copied{background:var(--ok);border-color:var(--ok);color:#fff;}
+  .tool-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px;}
+  @media(max-width:780px){.tool-grid{grid-template-columns:1fr;}}
+  .tool{border:1px solid var(--line);border-radius:18px;padding:20px;}
+  .tool .tag{display:inline-block;font-size:.7rem;font-weight:700;border-radius:999px;padding:3px 10px;margin-bottom:8px;}
+  .tool .tag.go{background:#e6f1ea;color:var(--ok);} .tool .tag.paid{background:#fdf6e6;color:var(--r);} .tool .tag.later{background:#eef0f3;color:var(--ar);}
+  .tool h4{font-size:.95rem;color:var(--ink);margin-bottom:6px;}
+  .tool ul{font-size:.82rem;margin-bottom:0;}
+  .card-table input{width:100%;background:#fff;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:.82rem;font-family:inherit;color:var(--text);}
+  .card-table td{padding:6px 6px;}
+  .card-table td:first-child{font-weight:700;color:var(--ink);white-space:nowrap;font-size:.8rem;}
+  .checks label{display:flex;gap:8px;align-items:center;font-size:.86rem;color:var(--text);margin-bottom:8px;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div class="navwrap">
+<nav>
+  <a class="nav-logo" href="#top">AX특강 3차시</a>
+  <ul class="nav-links">
+    <li><a href="#what">크론잡이란</a></li>
+    <li><a href="#formula">4요소</a></li>
+    <li><a href="#quiz">퀴즈</a></li>
+    <li><a href="#case">실제 사례</a></li>
+    <li><a href="#ask">요청 예시</a></li>
+    <li><a href="#tools">도구</a></li>
+    <li><a href="#timeline">진행흐름</a></li>
+    <li><a href="#prompt">프롬프트</a></li>
+    <li><a href="#worksheet">활동지</a></li>
+  </ul>
+</nav>
+</div>
+
+<div class="page" id="top">
+
+  <!-- HERO -->
+  <section class="block hero">
+    <svg class="hero-waves" viewBox="0 0 600 420" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M40,360 C200,260 300,110 600,0" stroke="#e8eaef" stroke-width="1.4" fill="none"/>
+      <path d="M70,390 C230,290 330,140 600,40" stroke="#e8eaef" stroke-width="1.4" fill="none"/>
+      <path d="M100,420 C260,320 360,170 600,80" stroke="#e8eaef" stroke-width="1.4" fill="none"/>
+      <path d="M10,320 C170,230 270,90 560,-10" stroke="#eef1f5" stroke-width="1.2" fill="none"/>
+    </svg>
+    <div class="hero-grid">
+      <div>
+        <div class="dots">
+          <span class="d"><span class="on"></span><span class="on"></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span></span>
+          <span class="label">3 / 9회차 · 반복 일 맡기기</span>
+        </div>
+        <h1>한 번 부탁하고 매번 받기<br>크론잡으로 반복 일 맡기기</h1>
+        <p class="lead">매일 아침 뉴스, 매주 채용 공고, 매주 정리 루틴. "내가 매번 시작해야 하는 일"을 AI 예약 작업에 맡기는 법을 배우고, 오늘 하나를 실제로 예약합니다.</p>
+        <div class="btn-row">
+          <a class="btn btn-dark" href="#ask">무엇을 요청할 수 있나</a>
+          <a class="btn btn-orange" href="#prompt">ChatGPT 프롬프트 바로가기</a>
+        </div>
+      </div>
+      <div class="meta-card">
+        <div class="field"><label>대상</label><div class="val">유한대학교 졸업생</div></div>
+        <div class="field"><label>오늘</label><div class="val">2026-10-23(금) · 3차시 · 16:00~20:00 (4시간)</div></div>
+        <div class="field"><label>준비물</label><div class="val">노트북(또는 PC), 휴대폰, ChatGPT 계정 (Gemini 유료 구독자는 Gemini도 가능)</div></div>
+        <div class="field"><label>지난 시간</label><div class="val">2차시: PARA 4칸으로 내 자료 정리, "매주 10분 정리 루틴" 정하기</div></div>
+      </div>
+    </div>
+
+    <div class="big-line">
+      <div class="q">한 번 <em>부탁</em>하고, 매번 <em>받는다</em></div>
+      <p>"언제 · 무엇을"을 한 번만 정해 두면, 그 시각마다 AI가 알아서 일을 하고 결과를 보내 줍니다.</p>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature">
+        <svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+        <h4>크론잡 이해</h4>
+        <p>알람과 크론잡이 어떻게 다른지 내 말로 설명한다.</p>
+      </div>
+      <div class="feature">
+        <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <h4>4요소로 요청</h4>
+        <p>언제 · 무엇을 · 어떤 모양으로 · 조건으로 요청문을 쓴다.</p>
+      </div>
+      <div class="feature">
+        <svg class="ico" viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg>
+        <h4>맡길 일 구분</h4>
+        <p>맡겨도 되는 일과 맡기면 안 되는 일을 가른다.</p>
+      </div>
+      <div class="feature">
+        <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><polyline points="9 15 11 17 15 13"/></svg>
+        <h4>실제로 예약</h4>
+        <p>내 크론잡 1개를 등록하고 일주일 동안 받아 본다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT -->
+  <section class="block" id="what">
+    <span class="eyebrow">개념 1</span>
+    <h2>크론잡이란?</h2>
+    <p class="sub">정해진 시각에, 정해진 일을, 자동으로 하는 작업</p>
+    <ul>
+      <li><strong>cron(크론)</strong>은 유닉스·리눅스 컴퓨터에 들어 있는 <strong>"시간 예약 실행" 프로그램</strong>입니다. 그리스어로 시간을 뜻하는 <em>chronos</em>에서 왔다고 알려져 있습니다.</li>
+      <li><strong>크론잡(cron job)</strong>은 크론에 등록한 작업 하나를 말합니다.</li>
+      <li>요즘은 <strong>ChatGPT·Gemini에도 "예약 작업" 기능</strong>이 있어서, 코딩을 몰라도 말로 크론잡을 만들 수 있습니다.</li>
+    </ul>
+
+    <h3>알람 vs 크론잡</h3>
+    <div class="table-wrap">
+      <table class="cmp">
+        <thead><tr><th></th><th>휴대폰 알람</th><th>AI 크론잡</th></tr></thead>
+        <tbody>
+          <tr><td>정해진 시각에</td><td>울린다</td><td class="hl">일을 한다</td></tr>
+          <tr><td>하는 일</td><td>"일어나!" 소리만</td><td>찾고 · 요약하고 · 정리해서</td></tr>
+          <tr><td>내가 할 일</td><td>알람을 끄고 직접 일을 시작</td><td class="hl">결과를 읽기만 하면 됨</td></tr>
+          <tr><td>예</td><td>8:00 "뉴스 볼 시간" 알림</td><td>8:00 오늘 주요 뉴스 5개를 3줄씩 요약해 보내 줌</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="switch">
+      <div class="bad"><small>매번 내가 시작하면</small>바쁜 날 빠지고, 결국 잊는다</div>
+      <div class="good"><small>크론잡에 맡기면</small>알람 + 비서 — 결과가 먼저 와 있다</div>
+    </div>
+  </section>
+
+  <!-- FORMULA -->
+  <section class="block" id="formula">
+    <span class="eyebrow">개념 2</span>
+    <h2>크론잡의 4요소 — 요청문 공식</h2>
+    <p class="sub">네 칸을 채우면 어떤 크론잡이든 만들 수 있습니다. 하나라도 빠지면 AI가 마음대로 정합니다.</p>
+    <div class="para-grid">
+      <div class="para p"><span class="letter">①</span><span class="name">언제</span><span class="rule">몇 시에, 얼마나 자주?</span><span class="desc">매일 · 평일 · 매주 ○요일 · 매달 ○일 · 한 번만</span><span class="ex">예) 매주 월요일 오전 8시</span></div>
+      <div class="para a"><span class="letter">②</span><span class="name">무엇을</span><span class="rule">어떤 일을?</span><span class="desc">찾기 · 요약 · 문제 내기 · 알려 주기 · 질문하기</span><span class="ex">예) 서울 지역 신입 사무직 채용 공고 찾기</span></div>
+      <div class="para r"><span class="letter">③</span><span class="name">어떤 모양으로</span><span class="rule">형식·길이는?</span><span class="desc">표 · 3줄 요약 · 개수 제한 · 링크 포함</span><span class="ex">예) 회사명·마감일·링크 표로 5개까지</span></div>
+      <div class="para ar"><span class="letter">④</span><span class="name">조건</span><span class="rule">언제는 보내지 말까?</span><span class="desc">없으면 한 줄만 · 반복 금지 · 출처 필수</span><span class="ex">예) 새 공고 없으면 "없음" 한 줄만</span></div>
+    </div>
+    <div class="formula">
+      <b class="f1">매주 월요일 오전 8시에</b>, <b class="f2">이번 주 서울 지역 신입 사무직 채용 공고를 찾아서</b> <b class="f3">회사명·마감일·링크를 표로 5개까지</b> 정리해 줘. <b class="f4">새 공고가 없으면 "이번 주 새 공고 없음"이라고 한 줄만</b> 보내 줘.
+    </div>
+    <div class="warn"><span class="ic">TIP</span><div><strong>④ 조건이 품질을 가릅니다.</strong> "없으면 보내지 마", "3줄 넘지 마", "출처 링크 꼭 붙여" 같은 조건이 있어야 매번 받아도 지치지 않습니다.</div></div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="block" id="quiz">
+    <span class="eyebrow">개념 3 · 미니 퀴즈</span>
+    <h2>크론 표현식 맛보기 — 외울 필요는 없어요</h2>
+    <p class="sub">컴퓨터의 크론은 시간을 5칸 암호로 적습니다. 우리는 말로 하면 되지만, 읽을 줄만 알아 둡시다.</p>
+    <div class="cron-fields">
+      <div><div class="v">0</div><div class="k">분</div><div class="r">0~59</div></div>
+      <div><div class="v">8</div><div class="k">시</div><div class="r">0~23</div></div>
+      <div><div class="v">*</div><div class="k">일</div><div class="r">1~31</div></div>
+      <div><div class="v">*</div><div class="k">월</div><div class="r">1~12</div></div>
+      <div><div class="v">*</div><div class="k">요일</div><div class="r">0=일 · 1=월</div></div>
+    </div>
+    <div class="cron-read">= 매일 08:00</div>
+    <div class="tips">
+      <div class="tip"><span class="n">*</span><h4>별표</h4><p>"아무 때나(매번)". 일·월·요일이 *면 매일입니다.</p></div>
+      <div class="tip"><span class="n">-</span><h4>범위</h4><p><code>1-5</code> = 1부터 5까지. 요일 칸이면 월~금(평일).</p></div>
+      <div class="tip"><span class="n">/</span><h4>간격</h4><p><code>*/2</code> = 2마다 한 번. 시 칸이면 2시간마다.</p></div>
+    </div>
+    <h3>언제 실행될까? 골라 보세요</h3>
+    <div class="quiz" id="quizList"></div>
+    <div class="q-score" id="qScore">0 / 6 맞힘</div>
+  </section>
+
+  <!-- CASE -->
+  <section class="block" id="case">
+    <span class="eyebrow">실제 사례</span>
+    <h2>강사 PC에서 매일 돌아가는 크론잡</h2>
+    <p class="sub">개인정보가 들어가는 항목은 뺐습니다.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>언제</th><th>무엇을</th><th>결과</th></tr></thead>
+        <tbody>
+          <tr><td><strong>매일 06:20</strong></td><td>자료 폴더에 문제가 없는지 점검</td><td><strong>문제 있을 때만</strong> 메신저 알림 (없으면 조용)</td></tr>
+          <tr><td><strong>매일 06:30</strong></td><td>오늘 환율을 찾아 메모 갱신</td><td>메모 파일 한 줄 추가</td></tr>
+          <tr><td><strong>매일 08:00경</strong></td><td>관심 분야 뉴스를 찾아 요약</td><td>요약 문서 + 메신저로 전달</td></tr>
+          <tr><td><strong>매주 월 07:50</strong></td><td>주간 점검 노트를 템플릿으로 미리 만들기</td><td>이번 주 점검 노트</td></tr>
+          <tr><td><strong>매일 08:59</strong></td><td>새로 넣은 논문 파일을 찾아 요약</td><td>논문별 요약 노트</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="tips">
+      <div class="tip"><span class="n">1</span><h4>아침 일찍 돈다</h4><p>출근하면 결과가 이미 와 있습니다.</p></div>
+      <div class="tip"><span class="n">2</span><h4>조건이 있다</h4><p>"문제 있을 때만 알림" — 알림 피로가 없습니다.</p></div>
+      <div class="tip"><span class="n">3</span><h4>정해 둔 폴더에 쌓는다</h4><p>2차시 PARA와 한 세트. 결과가 흩어지지 않습니다.</p></div>
+    </div>
+  </section>
+
+  <!-- ASK -->
+  <section class="block" id="ask">
+    <span class="eyebrow">무엇을 요청할 수 있나</span>
+    <h2>분야별 요청 예시</h2>
+    <p class="sub">[ ] 안만 내 상황에 맞게 바꿔서 ChatGPT에 그대로 붙여 넣으세요.</p>
+    <div class="cat-tabs" id="catTabs"></div>
+    <div class="req-list" id="reqList"></div>
+
+    <h3>맡기면 안 되는 일 · 잘 안 되는 일</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>하지 말 것 / 잘 안 됨</th><th>이유</th></tr></thead>
+        <tbody>
+          <tr><td><strong>내 컴퓨터 파일 직접 정리·삭제</strong></td><td>ChatGPT 예약 작업은 내 PC를 만질 수 없습니다. 알림·체크리스트까지만 받습니다.</td></tr>
+          <tr><td><strong>결제·송금·주문</strong></td><td>돈이 나가는 일은 사람이 직접 확인합니다.</td></tr>
+          <tr><td><strong>주민번호·계좌·비밀번호가 들어간 요청</strong></td><td>요청문은 서비스에 저장됩니다. 개인정보는 넣지 않습니다.</td></tr>
+          <tr><td><strong>환율·주가·마감일 같은 정확한 숫자</strong></td><td>AI가 틀릴 수 있습니다. 출처 링크를 붙이게 하고, 중요한 건 원문에서 확인합니다.</td></tr>
+          <tr><td><strong>너무 잦은 반복 (매시간 등)</strong></td><td>요금제마다 횟수·개수 제한이 있고, 알림 피로도 커집니다.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TOOLS -->
+  <section class="block" id="tools">
+    <span class="eyebrow">도구 안내</span>
+    <h2>어디서 만들까?</h2>
+    <div class="warn"><span class="ic">!</span><div><strong>기능·제한은 자주 바뀝니다.</strong> 아래는 2026-10-23 수업 준비 때 확인한 내용입니다. 다르면 오늘 강사 화면을 기준으로 따라 하세요.</div></div>
+    <div class="tool-grid">
+      <div class="tool">
+        <span class="tag go">오늘 실습</span>
+        <h4>ChatGPT · 예약 작업</h4>
+        <ul>
+          <li>대화창에 "매일 오전 8시에 ~해 줘"처럼 <strong>언제 + 무엇을</strong>을 말하면 만들어집니다.</li>
+          <li>예약 페이지에서 다음 실행 시각 확인, <strong>일시정지·수정·삭제</strong>.</li>
+          <li>무료도 가능: 하루 1회 이하, 아침·오후·밤 시간대 실행, 활성 작업 수 제한(무료 3개·Plus 5개).</li>
+          <li>음성 대화·GPTs에서는 안 됩니다.</li>
+        </ul>
+      </div>
+      <div class="tool">
+        <span class="tag paid">유료 구독자</span>
+        <h4>Gemini · 예약 작업</h4>
+        <ul>
+          <li>Google AI Pro·Ultra 등 유료 구독에서 제공된다고 보도되었습니다.</li>
+          <li>대화로 말하거나 예약 작업 화면에서 만듭니다.</li>
+          <li>지정 시각 근처에 실행될 수 있어 분 단위로 정확하지 않을 수 있습니다.</li>
+        </ul>
+      </div>
+      <div class="tool">
+        <span class="tag later">오늘은 소개만</span>
+        <h4>컴퓨터 크론 · AI 에이전트</h4>
+        <ul>
+          <li><strong>크론 / Windows 작업 스케줄러</strong>: 내 PC에서 프로그램을 정해진 시각에 실행. 파일 정리처럼 내 컴퓨터를 다루는 일은 이쪽.</li>
+          <li><strong>AI 에이전트 도구</strong>(Claude Code, Codex 등): 강사 사례처럼 파일을 읽고 쓰는 크론잡.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section class="block" id="timeline">
+    <span class="eyebrow">진행 흐름</span>
+    <h2>오늘(4시간) 진행 흐름</h2>
+    <div class="timeline">
+      <div class="t-item"><div class="t-time">16:00~16:15</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">도입</div><div class="t-desc">2차시 정리 루틴 지켰는지 손들기 → "매번 내가 시작해야 하는 일은 왜 빠질까?"</div><span class="t-dur">15분</span></div></div>
+      <div class="t-item"><div class="t-time">16:15~16:40</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">개념 — 크론잡이란</div><div class="t-desc">알람 vs 크론잡, 강사 실제 사례 화면 보기</div><span class="t-dur">25분</span></div></div>
+      <div class="t-item"><div class="t-time">16:40~17:05</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">개념 — 4요소와 표현식</div><div class="t-desc">요청문 공식 + 크론 표현식 미니 퀴즈 6문항</div><span class="t-dur">25분</span></div></div>
+      <div class="t-item"><div class="t-time">17:05~17:25</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">개념 — 무엇을 맡길까</div><div class="t-desc">분야별 요청 예시 훑기, 맡기면 안 되는 일</div><span class="t-dur">20분</span></div></div>
+      <div class="t-item"><div class="t-time">17:25~17:35</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">휴식</div><span class="t-dur">10분</span></div></div>
+      <div class="t-item"><div class="t-time">17:35~18:25</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">실습 1 · 내 반복 일 찾기</div><div class="t-desc">활동지 1단계 → "크론잡 설계 코치" 프롬프트로 크론잡 카드 3장 만들기</div><span class="t-dur">50분</span></div></div>
+      <div class="t-item"><div class="t-time">18:25~19:05</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">실습 2 · 실제로 예약하기</div><div class="t-desc">카드 1개를 ChatGPT 예약 작업으로 등록 → 수정·일시정지 해 보기</div><span class="t-dur">40분</span></div></div>
+      <div class="t-item"><div class="t-time">19:05~19:35</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">공유</div><div class="t-desc">3~4인조 "내 크론잡" 소개 → 자원자 2~3명 화면 공유</div><span class="t-dur">30분</span></div></div>
+      <div class="t-item"><div class="t-time">19:35~19:55</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">정리</div><div class="t-desc">2차시 정리 루틴을 크론잡으로 등록 + 일주일 관찰 계획</div><span class="t-dur">20분</span></div></div>
+      <div class="t-item"><div class="t-time">19:55~20:00</div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage">마무리</div><div class="t-desc">다음 차시(10/30) 예고 — 일주일 동안 받은 결과 캡처해 오기</div><span class="t-dur">5분</span></div></div>
+    </div>
+  </section>
+
+  <!-- PROMPT -->
+  <section class="block" id="prompt">
+    <span class="eyebrow">실습 1 · 학생 배포용</span>
+    <h2>ChatGPT용 "크론잡 설계 코치" 프롬프트</h2>
+    <p class="sub">새 대화창을 열고, 아래 내용을 통째로 복사해서 붙여넣은 뒤 전송하세요.</p>
+    <div class="warn"><span class="ic">!</span><div><strong>개인정보 주의</strong> — 실명·회사 내부 정보·계좌·연락처는 넣지 않습니다. "○○회사", "우리 팀"처럼 바꿔 말하세요.</div></div>
+    <div class="prompt-wrap">
+      <button class="copy-btn" id="copyBtn" type="button" onclick="copyPrompt()">복사하기</button>
+<div class="prompt-box" id="promptText">당신은 지금부터 저의 '크론잡 설계 코치'입니다. 저는 유한대학교 AX특강을 듣는 졸업생이고, 오늘은 정해진 때마다 반복되는 일을 AI 예약 작업(크론잡)으로 맡기는 연습을 합니다.
+
+크론잡 요청문은 4요소로 씁니다.
+① 언제: 몇 시에, 얼마나 자주 (매일/평일/매주 ○요일/매달 ○일/한 번만)
+② 무엇을: AI가 해 줄 일
+③ 어떤 모양으로: 결과의 형식과 길이 (표, 3줄 요약, 링크 포함 등)
+④ 조건: 언제는 보내지 말지, 꼭 지킬 것 (없으면 한 줄만, 출처 링크 붙이기 등)
+
+다음 규칙을 지켜주세요.
+1. 먼저 제 하루·한 주를 알 수 있는 질문을 한 번에 하나씩, 3개까지 해 주세요. (예: "매일 아침 습관처럼 찾아보는 정보가 있나요?", "매주 해야 하는데 자꾸 잊는 일이 있나요?", "요즘 준비하고 있는 시험이나 목표가 있나요?")
+2. 제 답을 바탕으로 크론잡 후보 5개를 제안해 주세요. 결제·송금, 내 컴퓨터 파일을 직접 고치는 일, 개인정보가 필요한 일은 후보에서 빼 주세요.
+3. 제가 3개를 고르면, 하나씩 4요소를 제가 직접 정하도록 질문해 주세요. 제가 정하지 않은 칸은 마음대로 채우지 마세요.
+4. 3개가 끝나면 아래 표로 정리해 주세요.
+   | # | 언제 | 무엇을 | 어떤 모양으로 | 조건 | 크론 표현식 |
+   크론 표현식은 "분 시 일 월 요일" 5칸으로 적고, 한 번만 실행하는 일은 "한 번"이라고 적어 주세요.
+5. 마지막으로 각 크론잡을 ChatGPT 예약 작업에 그대로 붙여넣을 수 있는 완성 요청문으로 써 주세요.
+6. 아직 예약 작업을 만들지는 마세요. 제가 "이걸로 예약해 줘"라고 할 때만 만들어 주세요.
+
+준비되면 첫 번째 질문을 해 주세요.</div>
+    </div>
+    <h3>ChatGPT가 규칙을 어길 때 이렇게 말하세요</h3>
+    <div class="redirect-grid">
+      <div class="redirect-card">"질문은 한 번에 하나만 해 주세요."</div>
+      <div class="redirect-card">"제가 정하지 않은 칸은 비워 두고 저에게 물어봐 주세요."</div>
+      <div class="redirect-card">"아직 예약하지 말고 요청문만 보여 주세요."</div>
+    </div>
+  </section>
+
+  <!-- WORKSHEET -->
+  <section class="block" id="worksheet">
+    <span class="eyebrow">활동지</span>
+    <h2>내 크론잡 만들기</h2>
+    <p class="sub">세 단계로 진행합니다. 입력 칸은 화면에서 바로 써도 됩니다.</p>
+
+    <h3>1단계 · 내 반복 일 찾기 (17:35~)</h3>
+    <p>"매번 내가 시작해야 해서 자꾸 빠지는 일"이면 좋은 후보입니다.</p>
+    <div class="ws">
+      <div class="ws-files">
+        <div class="ws-file"><span>📅</span><input type="text" placeholder="매일 — 예) 아침마다 날씨·뉴스 확인"></div>
+        <div class="ws-file"><span>🗓</span><input type="text" placeholder="매주 — 예) 채용 공고 보기, 정리 루틴"></div>
+        <div class="ws-file"><span>📆</span><input type="text" placeholder="매달 — 예) 지원 현황 정리, 목표 점검"></div>
+        <div class="ws-file"><span>⏰</span><input type="text" placeholder="한 번만 — 예) 원서 마감, 약속"></div>
+      </div>
+    </div>
+
+    <h3>2단계 · 크론잡 카드 + 실제 예약 (18:25~)</h3>
+    <div class="ws">
+      <div class="table-wrap">
+        <table class="card-table">
+          <thead><tr><th></th><th>카드 1</th><th>카드 2</th><th>카드 3</th></tr></thead>
+          <tbody id="cardRows"></tbody>
+        </table>
+      </div>
+      <ol class="steps">
+        <li>카드 중 <strong>하나</strong>를 골라 ChatGPT에 "이걸로 예약해 줘"라고 말합니다.</li>
+        <li>예약 페이지에서 내 작업이 보이는지, <strong>다음 실행 시각</strong>이 맞는지 확인합니다.</li>
+        <li>시각을 바꾸는 <strong>수정</strong>과 <strong>일시정지 → 다시 시작</strong>을 한 번씩 해 봅니다.</li>
+        <li>바로 확인하고 싶으면 "오늘 ○시 ○분에 한 번만 실행해 줘"로 테스트 작업을 만들고, 확인 후 <strong>삭제</strong>합니다.</li>
+      </ol>
+    </div>
+
+    <h3>3단계 · 정리 루틴을 크론잡으로 + 일주일 관찰 (19:35~)</h3>
+    <div class="ws">
+      <div class="ws-files">
+        <div class="ws-file"><span>📅</span><input type="text" placeholder="2차시에 정한 정리 요일·시간 (예: 일요일 21시)"></div>
+        <div class="ws-file"><span>✅</span><input type="text" placeholder="크론잡 등록 완료? (완료/예정)"></div>
+      </div>
+      <div class="req" style="margin-top:12px;"><span class="t" id="routineReq">매주 [일요일] [밤 9시]에 10분 정리 루틴 체크리스트(Inbox 3개 제자리로 · 끝난 일 1개 보관으로 · 자료 1개 꺼내 쓰기)를 보내 줘.</span><button type="button" onclick="copyText(document.getElementById('routineReq').innerText, this)">복사</button></div>
+      <h3 style="margin-top:20px;">다음 차시(10/30)까지 관찰할 것</h3>
+      <div class="checks">
+        <label><input type="checkbox"> 결과가 제때 왔나?</label>
+        <label><input type="checkbox"> 매번 읽고 싶은 길이·모양이었나?</label>
+        <label><input type="checkbox"> 바꾸고 싶은 요소(언제/무엇을/모양/조건)를 적어 두었나?</label>
+        <label><input type="checkbox"> 계속 둘지, 멈출지 정했나?</label>
+      </div>
+      <p class="save-note">※ 입력 내용은 저장되지 않습니다 — 캡처하거나 종이에 옮겨 적어 보관하세요.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>유한대학교 AX특강 · 2026-10-23 3차시</p>
+    <p>참고: <a href="https://help.openai.com/en/articles/10291617-tasks-in-chatgpt" target="_blank" rel="noopener">OpenAI Help — Scheduled tasks in ChatGPT</a> · <a href="https://www.androidauthority.com/gemini-scheduled-actions-rollout-3565152" target="_blank" rel="noopener">Android Authority — Gemini scheduled actions</a> · <a href="https://en.wikipedia.org/wiki/Cron" target="_blank" rel="noopener">Wikipedia — cron</a></p>
+  </footer>
+
+</div>
+
+<script>
+var QUIZ = [
+  ["0 8 * * *", "매일 08:00", ["매일 08:00", "매월 8일", "8분마다"]],
+  ["30 6 * * 1-5", "평일 06:30", ["매일 06:30", "평일 06:30", "1~5일 06:30"]],
+  ["0 7 * * 1", "매주 월 07:00", ["매달 1일 07:00", "매주 월 07:00", "매일 07:01"]],
+  ["0 9 1 * *", "매달 1일 09:00", ["매달 1일 09:00", "매주 월 09:00", "1월 09:00"]],
+  ["0 21 * * 0", "매주 일 21:00", ["매일 21:00", "매주 일 21:00", "실행 안 됨"]],
+  ["0 */2 * * *", "2시간마다", ["2분마다", "2시간마다", "매달 2일"]]
+];
+var solved = {};
+
+function renderQuiz(){
+  var box = document.getElementById('quizList');
+  QUIZ.forEach(function(q, i){
+    var row = document.createElement('div');
+    row.className = 'q-row';
+    row.innerHTML = '<span class="q-num">' + (i+1) + '</span><span class="q-text"><code></code></span><span class="q-btns"></span>';
+    row.querySelector('code').textContent = q[0];
+    var btns = row.querySelector('.q-btns');
+    q[2].forEach(function(opt){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = opt;
+      b.onclick = function(){
+        btns.querySelectorAll('button').forEach(function(x){ x.classList.remove('right','wrong'); });
+        if(opt === q[1]){ b.classList.add('right'); solved[i] = true; }
+        else { b.classList.add('wrong'); delete solved[i]; }
+        document.getElementById('qScore').textContent = Object.keys(solved).length + ' / ' + QUIZ.length + ' 맞힘';
+      };
+      btns.appendChild(b);
+    });
+    box.appendChild(row);
+  });
+}
+
+var REQS = {
+  "정보 모으기": [
+    "매일 오전 8시에 [IT·AI] 분야 주요 뉴스 3개를 찾아 각각 2줄 요약과 출처 링크를 보내 줘.",
+    "매주 금요일 오후 6시에 이번 주말 [서울]에서 열리는 무료 전시·행사 3개를 알려 줘.",
+    "매주 월요일 오전 9시에 [게임 QA] 신입 채용 공고를 찾아 회사명·마감일·링크를 표로 정리해 줘. 새 공고가 없으면 한 줄만 보내 줘."
+  ],
+  "공부·자격증": [
+    "평일 오전 7시 30분에 [정보처리기사 실기] 문제 3개를 내 줘. 정답은 맨 아래에 따로 적어 줘.",
+    "매일 저녁 9시에 [비즈니스 영어] 표현 5개를 예문과 함께 보내 줘. 이미 보낸 표현은 반복하지 마.",
+    "매주 일요일 저녁 8시에 이번 주에 보낸 문제 중 어려웠을 만한 것 3개를 다시 내 줘."
+  ],
+  "취업·일": [
+    "매주 화요일 오전 8시에 [마케팅 직무] 면접 예상 질문 1개와 답변 뼈대(STAR 방식)를 보내 줘.",
+    "매달 1일 오전 9시에 지난달에 지원한 회사 목록을 정리하라고 알려 주고, 정리용 표 양식을 보내 줘."
+  ],
+  "생활·습관": [
+    "평일 오전 7시에 오늘 [서울] 날씨와 어울리는 옷차림을 한 줄로 알려 줘.",
+    "매주 일요일 오후 5시에 냉장고 재료 [달걀·두부·김치]로 만들 수 있는 다음 주 저녁 메뉴 5개를 추천해 줘.",
+    "★매주 [일요일] [밤 9시]에 10분 정리 루틴 체크리스트(Inbox 3개 제자리로 · 끝난 일 1개 보관으로 · 자료 1개 꺼내 쓰기)를 보내 줘."
+  ],
+  "돌아보기": [
+    "매주 금요일 저녁 7시에 이번 주를 돌아보는 질문 3개를 하나씩 해 줘. (잘한 일 / 아쉬운 일 / 다음 주 한 가지)",
+    "매달 마지막 날 밤 9시에 이번 달 목표를 얼마나 이뤘는지 묻는 질문을 보내 줘."
+  ],
+  "한 번만": [
+    "10월 30일 오후 3시에 'AX특강 4차시, 노트북 챙기기'라고 알려 줘.",
+    "[11월 3일] 원서 마감 3일 전 오전 9시에 자기소개서 최종 점검 체크리스트를 보내 줘."
+  ]
+};
+
+function renderReqs(cat){
+  var tabs = document.getElementById('catTabs');
+  tabs.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', b.textContent === cat); });
+  var list = document.getElementById('reqList');
+  list.innerHTML = '';
+  REQS[cat].forEach(function(r){
+    var star = r.charAt(0) === '★';
+    var text = star ? r.slice(1) : r;
+    var d = document.createElement('div');
+    d.className = 'req';
+    d.innerHTML = '<span class="t"></span><button type="button">복사</button>';
+    d.querySelector('.t').textContent = text;
+    if(star){ var s = document.createElement('span'); s.className = 'star'; s.textContent = '오늘 꼭 해 보기'; d.querySelector('.t').appendChild(s); }
+    d.querySelector('button').onclick = function(){ copyText(text, this); };
+    list.appendChild(d);
+  });
+}
+
+function renderTabs(){
+  var tabs = document.getElementById('catTabs');
+  Object.keys(REQS).forEach(function(cat){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = cat;
+    b.onclick = function(){ renderReqs(cat); };
+    tabs.appendChild(b);
+  });
+  renderReqs(Object.keys(REQS)[0]);
+}
+
+function renderCards(){
+  var rows = ['① 언제', '② 무엇을', '③ 어떤 모양으로', '④ 조건', '크론 표현식'];
+  var body = document.getElementById('cardRows');
+  rows.forEach(function(r){
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td>';
+    tr.firstChild.textContent = r;
+    body.appendChild(tr);
+  });
+}
+
+function copyText(text, btn){
+  var label = btn.textContent;
+  function done(){
+    btn.textContent = '복사됨 ✓';
+    btn.classList.add('copied');
+    setTimeout(function(){ btn.textContent = label; btn.classList.remove('copied'); }, 1800);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text, done); });
+  } else { fallbackCopy(text, done); }
+}
+function copyPrompt(){
+  copyText(document.getElementById('promptText').innerText, document.getElementById('copyBtn'));
+}
+function fallbackCopy(text, cb){
+  var ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); } catch(e){}
+  document.body.removeChild(ta);
+  if(cb) cb();
+}
+
+renderQuiz();
+renderTabs();
+renderCards();
+</script>
+
+</body>
+</html>
