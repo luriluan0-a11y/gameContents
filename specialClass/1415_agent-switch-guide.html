@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent와 사랑에 빠지지 않기</title>
+<style>
+  :root{
+    --navy:#1a3a5c; --ink:#171b21; --blue:#2e6da4; --orange:#f0a500;
+    --canvas:#ececef; --card:#ffffff; --line:#e4e6eb; --text:#2a2e35; --text-light:#5f6672;
+    --text-faint:#9aa0aa; --field-bg:#f4f5f7; --tint:#eef3f8;
+    --ok:#3a8a5c; --no:#b5523b; --warn-bg:#fdf6e6; --warn-line:#f1dfb2; --danger-bg:#f7ece9; --danger-line:#ecc9bf;
+    --p:#1a3a5c; --a:#2e6da4; --r:#c98a12; --ar:#7b8494;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Pretendard','Malgun Gothic','Apple SD Gothic Neo',sans-serif;color:var(--text);line-height:1.7;background:var(--canvas);}
+
+  .navwrap{position:sticky;top:0;z-index:100;display:flex;justify-content:center;padding:14px 16px 0;}
+  nav{background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:999px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 10px 8px 20px;max-width:1040px;width:100%;box-shadow:0 4px 18px rgba(20,25,35,.06);overflow-x:auto;}
+  .nav-logo{color:var(--navy);font-weight:800;text-decoration:none;font-size:.86rem;white-space:nowrap;}
+  .nav-links{list-style:none;display:flex;gap:2px;white-space:nowrap;}
+  .nav-links a{color:var(--text-light);text-decoration:none;padding:7px 11px;border-radius:999px;font-size:.78rem;font-weight:600;}
+  .nav-links a:hover{background:var(--navy);color:#fff;}
+
+  .page{max-width:1040px;margin:0 auto;padding:28px 16px 60px;display:flex;flex-direction:column;gap:18px;}
+  .block{background:var(--card);border-radius:26px;border:1px solid var(--line);box-shadow:0 10px 28px rgba(20,25,35,.05);padding:42px 40px;scroll-margin-top:84px;}
+  @media(max-width:640px){.block{padding:28px 18px;border-radius:20px;}}
+  .eyebrow{display:inline-flex;font-size:.72rem;font-weight:700;letter-spacing:.04em;color:var(--navy);background:var(--tint);padding:6px 14px;border-radius:999px;margin-bottom:16px;}
+  h1{font-size:2.1rem;font-weight:800;color:var(--ink);line-height:1.3;letter-spacing:-.02em;margin-bottom:10px;}
+  @media(max-width:480px){h1{font-size:1.6rem;}}
+  .subtitle{font-size:1.1rem;color:var(--blue);font-weight:700;margin-bottom:16px;}
+  h2{font-size:1.3rem;color:var(--ink);margin-bottom:6px;letter-spacing:-.01em;}
+  h2 .num{color:var(--orange);margin-right:6px;}
+  h2 + .sub{color:var(--text-light);font-size:.9rem;margin-bottom:22px;}
+  h3{font-size:1rem;color:var(--ink);margin:0 0 8px;}
+  p{color:var(--text-light);font-size:.93rem;margin-bottom:10px;}
+  ul,ol{margin:0 0 10px 20px;color:var(--text-light);font-size:.92rem;}
+  li{margin-bottom:5px;}
+  li::marker{color:var(--orange);}
+  strong{color:var(--text);}
+  code{background:var(--field-bg);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:.84em;word-break:break-all;}
+  a.link{color:var(--blue);font-weight:700;}
+
+  .lead{font-size:1rem;color:var(--text-light);max-width:720px;}
+  .keyline{margin-top:22px;background:var(--navy);color:#fff;border-radius:18px;padding:18px 22px;font-size:.98rem;font-weight:600;line-height:1.6;}
+  .keyline b{color:var(--orange);}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;}
+  .meta span{background:var(--field-bg);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:.8rem;color:var(--text-light);font-weight:600;}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  @media(max-width:760px){.grid2,.grid3{grid-template-columns:1fr;}}
+  .tile{background:var(--field-bg);border:1px solid var(--line);border-radius:18px;padding:20px 22px;}
+  .tile .tag{font-size:.72rem;font-weight:800;color:var(--orange);letter-spacing:.04em;}
+  .tile h3{margin-top:2px;}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px;}
+  @media(max-width:640px){.compare{grid-template-columns:1fr;}}
+  .bad,.good{border-radius:16px;padding:16px 18px;font-size:.9rem;}
+  .bad{background:var(--danger-bg);border:1px solid var(--danger-line);}
+  .good{background:#e9f3ed;border:1px solid #c7e1d0;}
+  .bad h3{color:var(--no);} .good h3{color:var(--ok);}
+
+  .para{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:8px 0 16px;}
+  @media(max-width:720px){.para{grid-template-columns:1fr 1fr;}}
+  .para div{border-radius:16px;padding:16px;color:#fff;}
+  .para b{display:block;font-size:1.4rem;line-height:1;}
+  .para span{display:block;font-weight:800;margin:6px 0 4px;}
+  .para small{font-size:.8rem;opacity:.92;line-height:1.5;display:block;}
+  .pp{background:var(--p);} .pa{background:var(--a);} .pr{background:var(--r);} .par{background:var(--ar);}
+
+  .tree{background:var(--ink);color:#e6e8ec;border-radius:16px;padding:18px 20px;font-family:Consolas,'D2Coding',monospace;font-size:.84rem;line-height:1.75;white-space:pre;overflow-x:auto;}
+  .tree .c{color:#9aa0aa;}
+
+  .prompt{position:relative;background:var(--field-bg);border:1px solid var(--line);border-left:5px solid var(--navy);border-radius:14px;padding:16px 18px 16px 18px;font-size:.88rem;color:var(--text);white-space:pre-wrap;line-height:1.7;margin:10px 0;}
+  .copy{position:absolute;top:10px;right:10px;background:var(--navy);color:#fff;border:0;border-radius:999px;padding:5px 12px;font-size:.74rem;font-weight:700;cursor:pointer;}
+  .copy:hover{background:var(--blue);}
+  .copy.done{background:var(--ok);}
+  .prompt .body{display:block;padding-right:64px;}
+
+  .note{display:flex;gap:12px;background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:16px;padding:16px 18px;margin:12px 0;}
+  .note.danger{background:var(--danger-bg);border-color:var(--danger-line);}
+  .note .ic{font-size:1.2rem;line-height:1.4;}
+  .note p{margin:0;color:var(--text);font-size:.9rem;}
+
+  .agents{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  @media(max-width:720px){.agents{grid-template-columns:1fr;}}
+  .agent{border:1px solid var(--line);border-radius:18px;padding:20px;text-align:left;}
+  .agent .nm{font-size:1.1rem;font-weight:800;color:var(--ink);}
+  .agent .co{font-size:.8rem;color:var(--text-faint);font-weight:700;margin-bottom:8px;}
+
+  .flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px;}
+  .flow .st{background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 11px;font-size:.78rem;font-weight:700;color:var(--navy);}
+  .flow .st.ai{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .flow .ar{color:var(--text-faint);font-weight:800;font-size:.8rem;}
+  .case{background:var(--field-bg);border:1px solid var(--line);border-radius:18px;padding:18px 20px;}
+  .case .why{font-size:.84rem;color:var(--text-light);margin:4px 0 0;}
+  .legend{font-size:.8rem;color:var(--text-faint);margin-top:10px;}
+  .legend b{display:inline-block;background:var(--navy);color:#fff;border-radius:999px;padding:1px 8px;font-size:.72rem;}
+
+  .btn{display:inline-flex;align-items:center;gap:6px;background:var(--orange);color:#fff;text-decoration:none;font-weight:800;font-size:.88rem;padding:10px 18px;border-radius:999px;margin:6px 6px 0 0;}
+  .btn:hover{background:#d4920a;}
+  .btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--line);}
+  .btn.ghost:hover{border-color:var(--navy);}
+
+  .showcase{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:720px){.showcase{grid-template-columns:1fr;}}
+  .show{border:1px solid var(--line);border-radius:20px;padding:22px;}
+  .show dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:.88rem;margin:10px 0 6px;}
+  .show dt{font-weight:800;color:var(--navy);}
+  .show dd{color:var(--text-light);}
+
+  .steps{counter-reset:s;list-style:none;margin:0;padding:0;}
+  .steps li{counter-increment:s;position:relative;padding:12px 14px 12px 52px;border:1px solid var(--line);border-radius:14px;margin-bottom:8px;color:var(--text);font-size:.9rem;}
+  .steps li::before{content:counter(s);position:absolute;left:14px;top:11px;width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-weight:800;font-size:.8rem;display:flex;align-items:center;justify-content:center;}
+
+  .closing{background:var(--navy);color:#fff;}
+  .closing h2{color:#fff;}
+  .closing p,.closing li{color:#dfe6ee;}
+  .closing strong{color:var(--orange);}
+
+  footer{text-align:center;color:var(--text-faint);font-size:.78rem;padding-top:8px;}
+  @media print{
+    body{background:#fff;} .navwrap,.copy{display:none;}
+    .block{box-shadow:none;border:1px solid #ccc;page-break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+
+<div class="navwrap">
+  <nav>
+    <a class="nav-logo" href="#top">Agent 환승 가이드</a>
+    <ul class="nav-links">
+      <li><a href="#why">왜 환승?</a></li>
+      <li><a href="#brain">두뇌 옮기기</a></li>
+      <li><a href="#agents">Agent 고르기</a></li>
+      <li><a href="#pain">불편한 점 찾기</a></li>
+      <li><a href="#grill">기획서 쓰기</a></li>
+      <li><a href="#cases">사례</a></li>
+    </ul>
+  </nav>
+</div>
+
+<main class="page" id="top">
+
+  <!-- HERO -->
+  <section class="block">
+    <span class="eyebrow">IT 산업체 대상 AI 특강</span>
+    <h1>Agent와 사랑에 빠지지 않기</h1>
+    <p class="subtitle">언제든 갈아탈 수 있는 환승연애를 위한 가이드</p>
+    <p class="lead">AI 에이전트는 몇 달마다 새로 나오고, 어제의 최고가 오늘은 평범해집니다. 한 도구에 내 일과 기억을 다 맡겨 두면 갈아타기 어렵습니다. 오늘은 <strong>내 지식은 내 폴더에 두고, 에이전트는 그때그때 가장 좋은 것을 골라 쓰는 법</strong>을 익힙니다.</p>
+    <div class="keyline">기억은 <b>내 파일</b>에, 일은 <b>그때의 에이전트</b>에게.<br>그래야 언제든 <b>환승</b>할 수 있습니다.</div>
+    <div class="meta">
+      <span>① 나의 두뇌를 컴퓨터에 옮기기</span>
+      <span>② 어떤 Agent를 쓸까</span>
+      <span>③ 내 업무의 불편한 점 찾기</span>
+      <span>④ grill-me로 기획서 쓰기</span>
+      <span>⑤ 사례</span>
+    </div>
+  </section>
+
+  <!-- WHY -->
+  <section class="block" id="why">
+    <h2><span class="num">00</span>왜 "환승연애"인가</h2>
+    <p class="sub">한 에이전트에만 정을 주면 생기는 일</p>
+    <div class="compare">
+      <div class="bad">
+        <h3>✕ 사랑에 빠진 상태</h3>
+        <ul>
+          <li>업무 맥락이 한 서비스의 대화 기록 안에만 있다</li>
+          <li>새 에이전트로 옮기면 처음부터 다시 설명해야 한다</li>
+          <li>요금이 오르거나 서비스가 바뀌어도 떠나기 어렵다</li>
+        </ul>
+      </div>
+      <div class="good">
+        <h3>○ 언제든 환승 가능한 상태</h3>
+        <ul>
+          <li>업무 맥락이 <strong>내 폴더의 마크다운 파일</strong>에 있다</li>
+          <li>어떤 에이전트든 그 폴더를 열면 바로 이어서 일한다</li>
+          <li>더 좋은 도구가 나오면 부담 없이 갈아탄다</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- BRAIN -->
+  <section class="block" id="brain">
+    <h2><span class="num">01</span>나의 두뇌를 컴퓨터에 옮기기</h2>
+    <p class="sub">에이전트가 읽을 수 있게, 내 자료를 정해진 자리에 둔다</p>
+
+    <h3>PARA — 자료를 네 칸으로 나눈다</h3>
+    <div class="para">
+      <div class="pp"><b>P</b><span>Projects</span><small>끝이 있는 일. 마감과 목표가 있다</small></div>
+      <div class="pa"><b>A</b><span>Areas</span><small>끝없이 책임지는 영역. 건강, 재정, 맡은 업무</small></div>
+      <div class="pr"><b>R</b><span>Resources</span><small>나중에 쓸지 모르는 관심 주제·참고 자료</small></div>
+      <div class="par"><b>A</b><span>Archive</span><small>위 셋에서 끝났거나 쉬는 것</small></div>
+    </div>
+
+    <h3>Johnny.Decimal — 칸마다 번호를 붙인다</h3>
+    <p>폴더 이름 앞에 번호를 붙여 <strong>순서와 자리를 고정</strong>합니다. 번호만 말해도 사람과 AI가 같은 폴더를 찾습니다.</p>
+<div class="tree"><span class="c"># 예시 (PARA + 번호)</span>
+000_inbox/            <span class="c">← 아직 자리를 못 정한 것, 일단 여기</span>
+100_working/          <span class="c">← Projects · Areas</span>
+  101_매일할일/
+  102_고객사_제안/
+300_collected/        <span class="c">← Resources: 모은 자료</span>
+400_archive/          <span class="c">← 끝난 일</span></div>
+
+    <div style="margin-top:12px">
+      <a class="btn ghost" href="https://fortelabs.com/blog/para/" target="_blank" rel="noopener">PARA 원문 (Forte Labs) →</a>
+      <a class="btn ghost" href="https://johnnydecimal.com/" target="_blank" rel="noopener">Johnny.Decimal 공식 사이트 →</a>
+    </div>
+
+    <h3 style="margin-top:26px">실습 ① 다운로드 폴더 정리하기</h3>
+    <ul>
+      <li><strong>다운로드 폴더</strong>나 <strong>카카오톡 받은 파일 폴더</strong>를 열어 봅니다.</li>
+      <li>개인정보가 들어 있다면 그 폴더는 쓰지 말고, <strong>개인정보가 없는 다른 폴더</strong>로 실습합니다.</li>
+      <li>파일 목록을 에이전트에게 보여 주고, PARA + 번호 구조로 나눌 안을 받아 봅니다.</li>
+    </ul>
+
+    <h3 style="margin-top:20px">소크라테스 문답법 — AI가 묻고, 내가 답한다</h3>
+    <p>정리 기준은 AI가 정하는 게 아니라 내가 정합니다. AI에게 <strong>답을 달라고 하지 말고 질문을 하게</strong> 하면, 내 머릿속 분류 기준이 말로 나옵니다.</p>
+    <div class="prompt"><button class="copy" type="button">복사</button><span class="body">너는 소크라테스처럼 질문하는 정리 코치야. 답이나 정리안을 먼저 주지 말고, 한 번에 질문 하나씩만 해 줘.
+
+목표: 내 [다운로드 폴더]를 PARA(Projects·Areas·Resources·Archive)와 번호 붙인 폴더 구조로 정리하는 것.
+
+1. 내가 지금 진행 중인 일, 계속 책임지는 영역, 모아 두는 자료가 무엇인지 차례로 물어봐.
+2. 내 답이 모호하면 꼬리 질문으로 구체화해 줘.
+3. 질문이 충분히 쌓이면 그때 폴더 구조(번호 포함) 초안을 제안하고, 내가 고칠 점을 물어봐.</span></div>
+  </section>
+
+  <!-- AGENTS -->
+  <section class="block" id="agents">
+    <h2><span class="num">02</span>어떤 Agent를 쓰십니까?</h2>
+    <p class="sub">오늘은 셋 중 무엇을 써도 됩니다. 같은 폴더를 열면 같은 일을 할 수 있어야 합니다.</p>
+    <div class="agents">
+      <div class="agent"><div class="nm">Claude</div><div class="co">Anthropic · Claude Code</div><p>긴 문서 정리·글쓰기·코드 작업. 폴더의 규칙 문서를 읽고 따른다.</p></div>
+      <div class="agent"><div class="nm">Codex</div><div class="co">OpenAI</div><p>코드 작성·수정에 강한 코딩 에이전트. ChatGPT 계정으로 쓴다.</p></div>
+      <div class="agent"><div class="nm">Gemini</div><div class="co">Google</div><p>Google 계정·Workspace와 잘 어울린다. 무료로 시작하기 쉽다.</p></div>
+    </div>
+
+    <h3 style="margin-top:24px">도구는 VS Code 하나로</h3>
+    <ul>
+      <li>편집기(IDE)는 <strong>VS Code</strong>를 씁니다.</li>
+      <li>각 에이전트는 VS Code의 <strong>확장(Extension)</strong>으로 설치합니다. 확장 탭(<code>Ctrl+Shift+X</code>)에서 이름으로 검색합니다.</li>
+      <li>에이전트를 바꿔도 <strong>열어 둔 폴더와 파일은 그대로</strong>입니다. 이것이 환승의 핵심입니다.</li>
+    </ul>
+    <div class="note"><div class="ic">💡</div><p><strong>규칙 문서 한 장을 폴더에 둡니다.</strong> 폴더 맨 위에 "이 폴더는 무엇이고, 파일은 어디에 두고, 무엇은 건드리지 마라"를 적은 마크다운(예: <code>AGENTS.md</code>)을 두면, 어떤 에이전트로 갈아타도 같은 규칙으로 일합니다.</p></div>
+  </section>
+
+  <!-- PAIN -->
+  <section class="block" id="pain">
+    <h2><span class="num">03</span>나의 업무에서 불편한 점 찾기</h2>
+    <p class="sub">반복적이고 덜 중요한 일은 AI에게, 중요한 일은 나에게</p>
+
+    <div class="note danger"><div class="ic">⚠️</div><p><strong>개인정보부터 지킵니다.</strong> 이름·학번·연락처처럼 사람을 알아볼 수 있는 정보가 AI에 들어가지 않게 합니다. 에이전트는 <strong>암호를 건 zip 파일도 풀 수 있습니다.</strong> 종이에 쓴 것 말고는 컴퓨터에 있는 모든 것이 노출될 수 있다고 생각하세요.</p></div>
+
+    <h3>개인정보 폴더는 아예 못 읽게 설정한다</h3>
+    <p>"읽지 마"라고 부탁하는 것으로는 부족합니다. 에이전트 설정에서 <strong>접근 자체를 막아</strong> 둡니다. Claude Code라면 프로젝트의 <code>.claude/settings.json</code>에 이렇게 적습니다.</p>
+<div class="tree">{
+  "permissions": {
+    "deny": [
+      "Read(./개인서류/**)",
+      "Edit(./개인서류/**)"
+    ]
+  }
+}</div>
+    <p class="legend">다른 에이전트도 각자의 설정으로 막아야 합니다. 설정은 에이전트마다 따로입니다.</p>
+
+    <h3 style="margin-top:26px">자동화 사례</h3>
+    <div class="grid2">
+      <div class="case">
+        <h3>뉴스레터 만들어 배포하기</h3>
+        <div class="flow"><span class="st">내용 정리(마크다운)</span><span class="ar">→</span><span class="st ai">AI 검토</span><span class="ar">→</span><span class="st ai">웹용·메일용 HTML</span><span class="ar">→</span><span class="st ai">GitHub 게시·텔레그램으로 링크</span><span class="ar">→</span><span class="st">배포 요청</span></div>
+      </div>
+      <div class="case">
+        <h3>블로그 글쓰기</h3>
+        <div class="flow"><span class="st">글감 정리(마크다운)</span><span class="ar">→</span><span class="st ai">검토</span><span class="ar">→</span><span class="st ai">이미지 생성</span><span class="ar">→</span><span class="st ai">HTML로 만들기</span><span class="ar">→</span><span class="st">복사해 직접 발행</span></div>
+        <p class="why">네이버 블로그 자동 발행은 차단 사유가 될 수 있어 마지막은 사람이 한다(반자동).</p>
+      </div>
+      <div class="case">
+        <h3>채용 정보 전달하기</h3>
+        <div class="flow"><span class="st ai">채용 사이트에서 정보 추출</span><span class="ar">→</span><span class="st ai">HTML 제작</span><span class="ar">→</span><span class="st ai">GitHub 게시</span><span class="ar">→</span><span class="st">커뮤니티에 공유</span></div>
+      </div>
+      <div class="case">
+        <h3>서류 피드백 해 주기</h3>
+        <div class="flow"><span class="st">개인정보 뺀 서류 받기</span><span class="ar">→</span><span class="st ai">내 피드백 기준(마크다운)으로 검토</span><span class="ar">→</span><span class="st">고칠 수 있는 피드백 파일 전달</span></div>
+      </div>
+      <div class="case">
+        <h3>평가 시스템 만들기</h3>
+        <div class="flow"><span class="st">시험지·답안 규칙 정리</span><span class="ar">→</span><span class="st ai">채점 시스템 개발</span><span class="ar">→</span><span class="st">파일 올리면 세부 평가서</span></div>
+        <p class="why">성적 처리를 AI에 그냥 맡기면 이름·학번이 노출된다. 그래서 AI에게는 "채점 규칙을 가진 시스템"을 만들게 하고, 실제 채점은 그 시스템이 내 컴퓨터에서 한다.</p>
+      </div>
+      <div class="case">
+        <h3>홈페이지 카드뉴스 만들기</h3>
+        <div class="flow"><span class="st">이달 소식 정리</span><span class="ar">→</span><span class="st ai">썸네일·카드뉴스 제작</span><span class="ar">→</span><span class="st">홈페이지 업데이트</span></div>
+      </div>
+    </div>
+    <p class="legend"><b>남색</b> 단계는 AI가 하고, 흰색 단계는 사람이 합니다.</p>
+
+    <div class="keyline">AI에게는 <b>반복적이고 덜 중요한 일</b>을,<br>나는 <b>중요한 일</b>을 합니다.</div>
+  </section>
+
+  <!-- GRILL -->
+  <section class="block" id="grill">
+    <h2><span class="num">04</span>grill-me로 "나에게 필요한 시스템" 기획서 쓰기</h2>
+    <p class="sub">AI가 나를 끝까지 캐물어, 무엇을 만들지 분명해질 때까지</p>
+
+    <h3>스킬(Skill)이란?</h3>
+    <p>에이전트에게 특정 일을 하는 방법을 적어 준 <strong>설명서 폴더</strong>입니다. 남이 잘 만든 스킬을 설치하면 내 에이전트가 그 방식대로 일합니다. <strong>skills.sh</strong>는 이런 스킬을 찾고 설치 수 순위를 볼 수 있는 공개 목록입니다.</p>
+    <a class="btn" href="https://skills.sh/" target="_blank" rel="noopener">skills.sh 둘러보기 →</a>
+
+    <h3 style="margin-top:24px">grill-me 스킬</h3>
+    <ul>
+      <li>보통은 내가 AI에게 묻지만, grill-me는 반대로 <strong>AI가 나에게 질문을 퍼붓습니다.</strong></li>
+      <li>결정할 것을 나뭇가지처럼 펼쳐 놓고, 정해지지 않은 가지가 남지 않을 때까지 묻습니다.</li>
+      <li>내가 동의하기 전에는 아무것도 만들지 않습니다. 기획서를 쓰기 전 단계에 딱 맞습니다.</li>
+      <li>Matt Pocock의 스킬 모음(<code>mattpocock/skills</code>)에 들어 있습니다.</li>
+    </ul>
+    <p>Claude Code에 설치하는 명령(터미널에서 실행):</p>
+    <div class="prompt"><button class="copy" type="button">복사</button><span class="body">npx -y skills add mattpocock/skills --skill grill-me --agent claude-code</span></div>
+    <p class="legend">설치 방법은 바뀔 수 있으니 실행 전에 skills.sh의 grill-me 페이지에서 최신 명령을 확인하세요. 다른 에이전트는 <code>--agent</code> 뒤의 이름을 바꿉니다.</p>
+
+    <h3 style="margin-top:24px">실습 ② 기획서 쓰기</h3>
+    <ol class="steps">
+      <li>03에서 찾은 <strong>내 업무의 불편한 점</strong> 하나를 고릅니다.</li>
+      <li>에이전트에게 grill-me로 시작하자고 말하고, 아래 요청문을 붙여 넣습니다.</li>
+      <li>질문에 하나씩 답합니다. 모르면 "모르겠다, 선택지를 줘"라고 해도 됩니다.</li>
+      <li>질문이 끝나면 기획서를 마크다운 파일로 저장합니다. 이 파일이 다음 에이전트에게도 그대로 넘겨줄 <strong>내 자산</strong>입니다.</li>
+    </ol>
+    <div class="prompt"><button class="copy" type="button">복사</button><span class="body">grill-me로 진행해 줘.
+
+내 업무에서 불편한 점: [예: 매주 같은 형식의 보고서를 손으로 다시 만든다]
+
+"나에게 필요한 시스템" 기획서를 쓰려고 해. 한 번에 질문 하나씩, 결정할 것이 남지 않을 때까지 물어봐.
+끝나면 아래 형식으로 마크다운 기획서를 만들어 줘.
+- 한 줄 소개
+- 누가, 언제 쓰나
+- 지금 방식과 불편한 점
+- 시스템이 하는 일 (입력 → 처리 → 출력)
+- 개인정보·보안 주의점
+- 첫 버전에 넣을 것 / 나중에 넣을 것</span></div>
+  </section>
+
+  <!-- CASES -->
+  <section class="block" id="cases">
+    <h2><span class="num">05</span>사례</h2>
+    <p class="sub">기획서에서 실제 결과물까지</p>
+    <div class="showcase">
+      <div class="show">
+        <span class="eyebrow">시뮬레이션 게임</span>
+        <h3>집사님, 오늘도 야근인가요?</h3>
+        <dl>
+          <dt>목적</dt><dd>고양이를 좋아하지만 키울 수 없는 분들을 위한 고양이 친화 앱</dd>
+          <dt>목표</dt><dd>해커톤 2시간 반 동안 게임 개발. "짓다" 플랫폼 사용</dd>
+          <dt>선택</dt><dd>무료 플랫폼이라 이미지를 최대한 뽑아 쓰는 시뮬레이션 장르로 정함</dd>
+        </dl>
+        <a class="btn" href="https://purr-days.vercel.app/" target="_blank" rel="noopener">게임 해 보기 →</a>
+      </div>
+      <div class="show">
+        <span class="eyebrow">교육 앱</span>
+        <h3>챌린지 보드</h3>
+        <dl>
+          <dt>목적</dt><dd>학생이 미션에 참여하면 점수가 쌓이고, 순위와 점수가 실시간으로 보인다</dd>
+          <dt>목표</dt><dd>모은 포인트로 보석을 뽑는 이벤트 페이지</dd>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLOSING -->
+  <section class="block closing">
+    <h2>오늘 가져갈 것</h2>
+    <ul>
+      <li>내 자료를 <strong>PARA + 번호</strong>로 정리한 폴더 하나</li>
+      <li>폴더 맨 위의 <strong>규칙 문서</strong> 한 장</li>
+      <li>개인정보 폴더를 막아 둔 <strong>에이전트 설정</strong></li>
+      <li>grill-me로 쓴 <strong>"나에게 필요한 시스템" 기획서</strong></li>
+    </ul>
+    <p style="margin-top:12px">이 네 가지가 있으면 내일 더 좋은 에이전트가 나와도, <strong>폴더만 열어 주면 바로 환승</strong>할 수 있습니다.</p>
+  </section>
+
+  <footer>IT 산업체 대상 AI 특강 · Agent와 사랑에 빠지지 않기</footer>
+</main>
+
+<script>
+  // 요청문 복사 버튼
+  document.querySelectorAll('.copy').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var text = btn.parentElement.querySelector('.body').innerText;
+      var done = function () { btn.textContent = '복사됨'; btn.classList.add('done'); setTimeout(function () { btn.textContent = '복사'; btn.classList.remove('done'); }, 1500); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, function () {});
+    });
+  });
+
+  // 복사 막기(가벼운 장치): 오른쪽 클릭, 그림 끌기, 소스 보기·저장·개발자 도구 단축키
+  (function blockCopyShortcuts() {
+    document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    document.addEventListener('dragstart', function (e) { if (e.target instanceof HTMLImageElement) e.preventDefault(); });
+    window.addEventListener('keydown', function (e) {
+      var k = e.key.toLowerCase(), mod = e.ctrlKey || e.metaKey;
+      if (k === 'f12' || (mod && (k === 'u' || k === 's')) || (mod && e.shiftKey && (k === 'i' || k === 'j' || k === 'c'))) {
+        e.preventDefault(); e.stopImmediatePropagation();
+      }
+    }, true);
+  })();
+</script>
+</body>
+</html>
