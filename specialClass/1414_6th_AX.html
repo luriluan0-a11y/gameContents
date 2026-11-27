@@ -3,30 +3,41 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AX특강 6차시 — 라벨링과 라벨링 가이드</title>
+<title>AX특강 6차시 — AI 티 안 나는 이력서·자기소개서</title>
 <style>
   :root{
-    --navy:#1a3a5c; --ink:#171b21; --blue:#2e6da4;
-    --orange:#f0a500; --orange-hover:#d4920a;
-    --canvas:#ececef; --card:#ffffff; --line:#e4e6eb;
-    --text:#2a2e35; --text-light:#6b7280; --text-faint:#9aa0aa; --field-bg:#f4f5f7;
+    --navy:#1a3a5c;
+    --ink:#171b21;
+    --blue:#2e6da4;
+    --orange:#f0a500;
+    --orange-hover:#d4920a;
+    --canvas:#ececef;
+    --card:#ffffff;
+    --line:#e4e6eb;
+    --text:#2a2e35;
+    --text-light:#6b7280;
+    --text-faint:#9aa0aa;
+    --field-bg:#f4f5f7;
+    --p:#1a3a5c; --a:#2e6da4; --r:#c98a12; --ar:#7b8494;
     --ok:#3a8a5c; --no:#b5523b;
-    --l-qa:#1a3a5c; --l-lqa:#2e6da4; --l-ops:#c98a12; --l-other:#7b8494; --l-unsure:#b5523b;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   body{font-family:'Pretendard','Malgun Gothic','Apple SD Gothic Neo',sans-serif;color:var(--text);line-height:1.7;background:var(--canvas);}
+  .ico{width:22px;height:22px;stroke:var(--orange);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;}
 
+  /* Nav */
   .navwrap{position:sticky;top:0;z-index:100;display:flex;justify-content:center;padding:14px 16px 0;}
-  nav{background:rgba(255,255,255,.9);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:999px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 10px 8px 20px;max-width:1040px;width:100%;box-shadow:0 4px 18px rgba(20,25,35,.06);overflow-x:auto;}
+  nav{background:rgba(255,255,255,.88);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:999px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 10px 8px 20px;max-width:1040px;width:100%;box-shadow:0 4px 18px rgba(20,25,35,.06);overflow-x:auto;}
   .nav-logo{color:var(--navy);font-weight:800;text-decoration:none;font-size:.86rem;white-space:nowrap;}
   .nav-links{list-style:none;display:flex;gap:2px;white-space:nowrap;}
-  .nav-links a{color:var(--text-light);text-decoration:none;padding:7px 11px;border-radius:999px;font-size:.78rem;font-weight:600;}
+  .nav-links a{color:var(--text-light);text-decoration:none;padding:7px 11px;border-radius:999px;font-size:.78rem;font-weight:600;transition:all .15s;}
   .nav-links a:hover{background:var(--navy);color:#fff;}
 
+  /* Page */
   .page{max-width:1040px;margin:0 auto;padding:28px 16px 60px;display:flex;flex-direction:column;gap:18px;}
   .block{background:var(--card);border-radius:26px;border:1px solid var(--line);box-shadow:0 10px 28px rgba(20,25,35,.05);padding:44px 40px;position:relative;overflow:hidden;}
-  @media(max-width:640px){.block{padding:28px 18px;border-radius:20px;}}
+  @media(max-width:640px){.block{padding:30px 22px;border-radius:20px;}}
   .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.72rem;font-weight:700;letter-spacing:.04em;color:var(--navy);background:#eef3f8;padding:6px 14px;border-radius:999px;margin-bottom:18px;}
   h2{font-size:1.28rem;color:var(--ink);margin-bottom:6px;letter-spacing:-.01em;}
   h2 + .sub{color:var(--text-light);font-size:.88rem;margin-bottom:22px;}
@@ -36,17 +47,17 @@
   li{margin-bottom:7px;}
   li::marker{color:var(--orange);}
   strong{color:var(--text);}
-  code{font-family:Consolas,'D2Coding',monospace;background:var(--field-bg);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:.82em;color:var(--ink);}
 
   .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;}
-  .btn{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:12px 22px;text-decoration:none;font-weight:700;font-size:.84rem;border:none;cursor:pointer;font-family:inherit;}
+  .btn{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:12px 22px;text-decoration:none;font-weight:700;font-size:.84rem;border:none;cursor:pointer;transition:all .15s;}
   .btn-dark{background:var(--ink);color:#fff;}
+  .btn-dark:hover{background:#000;}
   .btn-orange{background:var(--orange);color:#fff;}
   .btn-orange:hover{background:var(--orange-hover);}
-  .btn-ghost{background:var(--field-bg);color:var(--ink);border:1px solid var(--line);padding:8px 14px;font-size:.78rem;}
 
   /* Hero */
-  .hero-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:36px;align-items:start;}
+  .hero-waves{position:absolute;top:0;right:0;width:58%;height:100%;opacity:.9;pointer-events:none;}
+  .hero-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:36px;position:relative;z-index:1;align-items:start;}
   @media(max-width:780px){.hero-grid{grid-template-columns:1fr;}}
   .dots{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
   .dots .d{display:flex;gap:3px;}
@@ -54,631 +65,553 @@
   .dots .d span.on{background:var(--orange);}
   .dots .label{font-size:.76rem;color:var(--text-faint);font-weight:600;}
   .hero h1{font-size:2rem;font-weight:800;color:var(--ink);line-height:1.35;letter-spacing:-.02em;margin-bottom:16px;}
-  @media(max-width:480px){.hero h1{font-size:1.55rem;}}
-  .hero .lead{font-size:.95rem;color:var(--text-light);max-width:460px;}
+  @media(max-width:480px){.hero h1{font-size:1.6rem;}}
+  .hero .lead{font-size:.95rem;color:var(--text-light);max-width:440px;}
   .meta-card{background:var(--field-bg);border:1px solid var(--line);border-radius:18px;padding:22px;}
   .field{margin-bottom:14px;}
   .field:last-child{margin-bottom:0;}
   .field label{display:block;font-size:.76rem;font-weight:700;color:var(--ink);margin-bottom:6px;}
   .field .val{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:.82rem;color:var(--text-light);}
-  .notice{margin-top:18px;background:#fff7e6;border:1px solid #f3dca6;border-radius:14px;padding:12px 16px;font-size:.82rem;color:#7a5a12;}
 
-  .big-line{margin-top:28px;padding:26px 24px;border-top:1px solid var(--line);text-align:center;}
+  .big-line{margin-top:28px;padding:26px 24px;border-top:1px solid var(--line);position:relative;z-index:1;text-align:center;}
   .big-line .q{font-size:1.4rem;font-weight:800;color:var(--navy);letter-spacing:-.01em;}
   .big-line .q em{font-style:normal;color:var(--orange);}
   .big-line p{margin:8px 0 0;}
-  .feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;padding-top:26px;border-top:1px solid var(--line);}
+
+  .feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:10px;padding-top:26px;border-top:1px solid var(--line);position:relative;z-index:1;}
   @media(max-width:860px){.feature-grid{grid-template-columns:repeat(2,1fr);}}
   @media(max-width:480px){.feature-grid{grid-template-columns:1fr;}}
-  .feature .num{font-size:.72rem;font-weight:800;color:var(--orange);letter-spacing:.06em;}
-  .feature h4{font-size:.9rem;color:var(--ink);margin:2px 0 4px;}
-  .feature p{font-size:.8rem;margin:0;}
+  .feature .ico{margin-bottom:10px;}
+  .feature h4{font-size:.9rem;color:var(--ink);margin-bottom:4px;}
+  .feature p{font-size:.8rem;color:var(--text-light);margin:0;}
 
-  /* cards */
-  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0 18px;}
-  .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:16px 0 18px;}
-  @media(max-width:720px){.grid3,.grid2{grid-template-columns:1fr;}}
-  .card{background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:16px 18px;font-size:.86rem;color:var(--text);}
-  .card .emo{font-size:1.3rem;display:block;margin-bottom:6px;}
-  .card h4{font-size:.92rem;color:var(--ink);margin-bottom:4px;}
-  .card p{font-size:.82rem;margin:0;}
+  /* Pain cards */
+  .pain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0 22px;}
+  @media(max-width:720px){.pain-grid{grid-template-columns:1fr;}}
+  .pain{background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:16px 18px;font-size:.86rem;color:var(--text);}
+  .pain .emo{font-size:1.3rem;display:block;margin-bottom:6px;}
   .switch{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
   @media(max-width:600px){.switch{grid-template-columns:1fr;}}
-  .switch div{border-radius:14px;padding:18px 20px;font-weight:700;font-size:.92rem;}
+  .switch div{border-radius:14px;padding:18px 20px;font-weight:700;font-size:.95rem;}
   .switch .bad{background:#f7ece9;color:var(--no);}
   .switch .good{background:#e8f1f8;color:var(--navy);}
   .switch small{display:block;font-weight:600;font-size:.74rem;opacity:.75;margin-bottom:4px;}
 
-  /* table */
-  .tbl-wrap{overflow-x:auto;margin:14px 0 18px;border:1px solid var(--line);border-radius:14px;}
-  table{width:100%;border-collapse:collapse;font-size:.84rem;}
-  th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;}
-  th{background:var(--field-bg);color:var(--ink);font-size:.78rem;white-space:nowrap;}
-  tr:last-child td{border-bottom:none;}
-  td{color:var(--text);}
+  /* PARA cards */
+  .para-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0 8px;}
+  @media(max-width:860px){.para-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:460px){.para-grid{grid-template-columns:1fr;}}
+  .para{border-radius:18px;padding:20px 18px;color:#fff;display:flex;flex-direction:column;gap:6px;}
+  .para .letter{font-size:2.2rem;font-weight:900;line-height:1;}
+  .para .name{font-size:.82rem;font-weight:700;opacity:.9;}
+  .para .rule{background:rgba(255,255,255,.18);border-radius:999px;padding:4px 12px;font-size:.78rem;font-weight:700;align-self:flex-start;margin:4px 0;}
+  .para .desc{font-size:.8rem;opacity:.92;}
+  .para .ex{font-size:.76rem;opacity:.85;border-top:1px solid rgba(255,255,255,.25);padding-top:8px;margin-top:4px;}
+  .para.p{background:var(--p);} .para.a{background:var(--a);} .para.r{background:var(--r);} .para.ar{background:var(--ar);}
 
-  /* labels */
-  .labels{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:18px 0 8px;}
-  @media(max-width:860px){.labels{grid-template-columns:repeat(2,1fr);}}
-  @media(max-width:460px){.labels{grid-template-columns:1fr;}}
-  .lab{border-radius:18px;padding:18px 16px;color:#fff;display:flex;flex-direction:column;gap:6px;}
-  .lab .code{font-size:1.5rem;font-weight:900;line-height:1;}
-  .lab .name{font-size:.82rem;font-weight:700;opacity:.95;}
-  .lab .desc{font-size:.78rem;opacity:.92;}
-  .lab .ex{font-size:.74rem;opacity:.85;border-top:1px solid rgba(255,255,255,.28);padding-top:8px;margin-top:4px;}
-  .lab.qa{background:var(--l-qa);} .lab.lqa{background:var(--l-lqa);} .lab.ops{background:var(--l-ops);}
-  .lab.other{background:var(--l-other);} .lab.unsure{background:var(--l-unsure);}
+  .tips{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px;}
+  @media(max-width:720px){.tips{grid-template-columns:1fr;}}
+  .tip{background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+  .tip .n{display:inline-flex;width:26px;height:26px;border-radius:50%;background:var(--orange);color:#fff;font-weight:800;font-size:.8rem;align-items:center;justify-content:center;margin-bottom:8px;}
+  .tip h4{font-size:.88rem;color:var(--ink);margin-bottom:4px;}
+  .tip p{font-size:.8rem;margin:0;}
 
-  .callout{background:#eef3f8;border-radius:14px;padding:16px 18px;font-size:.88rem;color:var(--navy);margin:14px 0;}
-  .callout b{color:var(--navy);}
-
-  /* steps */
-  .step{border-left:3px solid var(--orange);padding:4px 0 4px 18px;margin:18px 0;}
-  .step .t{font-size:.95rem;font-weight:800;color:var(--ink);}
-  .step .time{font-size:.74rem;color:var(--text-faint);font-weight:700;margin-left:6px;}
-  pre.tree{background:var(--ink);color:#e6e9ef;border-radius:14px;padding:16px 18px;font-family:Consolas,'D2Coding',monospace;font-size:.8rem;line-height:1.6;overflow-x:auto;margin:10px 0 14px;}
-
-  /* copy box */
-  .copy-box{position:relative;background:var(--ink);color:#e6e9ef;border-radius:16px;padding:20px 20px 18px;margin:12px 0 18px;}
-  .copy-box pre{white-space:pre-wrap;word-break:keep-all;font-family:Consolas,'D2Coding',monospace;font-size:.8rem;line-height:1.65;max-height:520px;overflow:auto;}
-  .copy-box .copy-btn{position:absolute;top:12px;right:12px;background:var(--orange);color:#fff;border:none;border-radius:999px;padding:6px 14px;font-weight:700;font-size:.74rem;cursor:pointer;font-family:inherit;}
-  .copy-box .copy-btn.done{background:var(--ok);}
-  .prompt-title{font-size:.88rem;font-weight:800;color:var(--ink);margin-top:20px;}
-
-  /* quiz */
+  /* Quiz */
   .quiz{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
-  .qrow{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:12px 16px;}
-  @media(max-width:560px){.qrow{grid-template-columns:1fr;}}
-  .qrow .qt{font-size:.86rem;color:var(--text);}
-  .qrow .qb{display:flex;gap:6px;}
-  .qrow button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;font-weight:700;font-size:.78rem;cursor:pointer;font-family:inherit;color:var(--ink);}
-  .qrow.right{border-color:#bfe0cc;background:#eef8f2;}
-  .qrow.wrong{border-color:#f0c9bf;background:#fbf0ed;}
-  .qrow .why{grid-column:1/-1;font-size:.78rem;color:var(--text-light);display:none;}
-  .qrow.right .why,.qrow.wrong .why{display:block;}
-  .score{font-size:.86rem;font-weight:800;color:var(--navy);margin-top:10px;}
+  .q-row{display:grid;grid-template-columns:30px 1fr auto;gap:12px;align-items:center;background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:12px 14px;}
+  @media(max-width:640px){.q-row{grid-template-columns:30px 1fr;} .q-btns{grid-column:1 / -1;}}
+  .q-num{font-weight:800;color:var(--navy);font-size:.85rem;}
+  .q-text{font-size:.88rem;color:var(--text);}
+  .q-btns{display:flex;gap:6px;flex-wrap:wrap;}
+  .q-btns button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:.78rem;font-weight:700;color:var(--text-light);cursor:pointer;font-family:inherit;}
+  .q-btns button:hover{border-color:var(--navy);color:var(--navy);}
+  .q-btns button.right{background:var(--ok);border-color:var(--ok);color:#fff;}
+  .q-btns button.wrong{background:var(--no);border-color:var(--no);color:#fff;}
+  .q-score{margin-top:14px;font-size:.88rem;font-weight:700;color:var(--navy);}
 
-  /* label sheet */
-  .sheet td select{font-family:inherit;font-size:.8rem;padding:5px 6px;border:1px solid var(--line);border-radius:8px;background:#fff;}
-  .sheet td.title{min-width:260px;}
-  .sheet tr.diff td{background:#fff7e6;}
-  .sheet td.no{color:var(--text-faint);font-weight:700;}
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0;}
-  @media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr);}}
-  .stat{background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;}
-  .stat b{display:block;font-size:1.4rem;color:var(--navy);font-variant-numeric:tabular-nums;}
-  .stat span{font-size:.76rem;color:var(--text-light);font-weight:600;}
+  /* Folder tree */
+  .tree{background:var(--ink);color:#dce3ec;border-radius:16px;padding:22px 24px;font-family:'Consolas','Malgun Gothic',monospace;font-size:.86rem;line-height:1.9;white-space:pre;overflow-x:auto;margin:16px 0;}
+  .tree .c{color:#8fa3b8;}
+  .tree .o{color:var(--orange);font-weight:700;}
 
-  /* activity */
-  .act textarea,.act input[type=text]{width:100%;font-family:inherit;font-size:.86rem;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;color:var(--text);resize:vertical;}
-  .act label.f{display:block;font-size:.8rem;font-weight:700;color:var(--ink);margin:14px 0 6px;}
-  .act .chk{display:flex;gap:8px;align-items:center;font-size:.86rem;color:var(--text);margin:8px 0;}
+  /* Table */
+  table{width:100%;border-collapse:collapse;font-size:.85rem;margin:14px 0;}
+  th{color:var(--text-faint);font-size:.74rem;font-weight:700;letter-spacing:.03em;padding:8px 12px;text-align:left;border-bottom:2px solid var(--line);}
+  td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text-light);}
+  tr:last-child td{border-bottom:none;}
+  .table-wrap{overflow-x:auto;}
 
-  footer{text-align:center;font-size:.76rem;color:var(--text-faint);padding:20px 16px 40px;}
+  /* Timeline */
+  .timeline{position:relative;margin:24px 0 0;padding-left:6px;}
+  .t-item{display:grid;grid-template-columns:92px 22px 1fr;gap:4px 14px;position:relative;}
+  @media(max-width:480px){.t-item{grid-template-columns:78px 18px 1fr;gap:4px 8px;}}
+  .t-item .t-time{font-weight:800;color:var(--ink);font-size:.78rem;padding-top:2px;white-space:nowrap;}
+  .t-item .t-dotcol{display:flex;flex-direction:column;align-items:center;}
+  .t-item .t-dot{width:10px;height:10px;border-radius:50%;background:var(--orange);margin-top:5px;flex-shrink:0;}
+  .t-item .t-line{width:2px;flex:1;background:var(--line);margin-top:2px;}
+  .t-item:last-child .t-line{display:none;}
+  .t-item .t-body{padding-bottom:22px;}
+  .t-item .t-stage{font-weight:700;color:var(--navy);font-size:.86rem;margin-bottom:2px;}
+  .t-item .t-desc{font-size:.82rem;color:var(--text-light);}
+  .t-item .t-dur{display:inline-block;margin-top:4px;font-size:.72rem;color:var(--text-faint);background:var(--field-bg);padding:2px 9px;border-radius:999px;}
+
+  /* Prompt */
+  .warn{display:flex;gap:12px;background:#fdf6e6;border:1px solid #f1dfb2;border-radius:14px;padding:14px 16px;margin:14px 0;font-size:.86rem;color:var(--text);}
+  .warn .ic{font-weight:900;color:var(--r);}
+  .prompt-wrap{position:relative;margin:16px 0;}
+  .prompt-box{background:var(--ink);color:#dce3ec;border-radius:16px;padding:22px 24px;padding-top:56px;font-size:.82rem;line-height:1.75;white-space:pre-wrap;word-break:break-word;max-height:440px;overflow-y:auto;font-family:'Consolas','Malgun Gothic',monospace;}
+  .copy-btn{position:absolute;top:14px;right:14px;background:var(--orange);color:#fff;border:none;padding:8px 16px;border-radius:999px;font-size:.78rem;cursor:pointer;font-weight:700;transition:background .15s;font-family:inherit;}
+  .copy-btn:hover{background:var(--orange-hover);}
+  .copy-btn.copied{background:var(--ok);}
+  .redirect-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:14px;}
+  @media(max-width:720px){.redirect-grid{grid-template-columns:1fr;}}
+  .redirect-card{background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:16px 18px;font-size:.84rem;color:var(--text);font-style:italic;}
+
+  /* Worksheet */
+  .ws{background:var(--field-bg);border:1px solid var(--line);border-radius:18px;padding:24px 26px;margin:16px 0;}
+  @media(max-width:640px){.ws{padding:18px 16px;}}
+  .ws-files{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;}
+  @media(max-width:600px){.ws-files{grid-template-columns:1fr;}}
+  .ws-file{display:flex;align-items:center;gap:8px;}
+  .ws-file span{font-weight:800;color:var(--navy);font-size:.8rem;width:22px;text-align:right;}
+  .ws input[type=text], .ws select{width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:.86rem;font-family:inherit;color:var(--text);}
+  .ws-file select{width:110px;flex-shrink:0;}
+  .steps{counter-reset:s;list-style:none;margin:10px 0 0;}
+  .steps li{counter-increment:s;position:relative;padding-left:38px;margin-bottom:12px;color:var(--text);}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:0;width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-weight:800;font-size:.8rem;display:flex;align-items:center;justify-content:center;}
+  .routine{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:14px 0;}
+  @media(max-width:720px){.routine{grid-template-columns:1fr;}}
+  .routine div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;}
+  .routine .min{font-size:1.5rem;font-weight:900;color:var(--orange);line-height:1;}
+  .routine h4{font-size:.88rem;color:var(--ink);margin:6px 0 4px;}
+  .routine p{font-size:.8rem;margin:0;}
+  .save-note{font-size:.74rem;color:var(--text-faint);margin-top:10px;}
+
+  footer{text-align:center;padding:36px 20px 10px;color:var(--text-faint);font-size:.78rem;}
+  footer a{color:var(--blue);}
+  footer p{font-size:.78rem;color:var(--text-faint);}
+
+  @media print{
+    .navwrap,.copy-btn,.btn-row{display:none;}
+    body{background:#fff;}
+    .block{box-shadow:none;border-radius:0;break-inside:avoid;}
+    .prompt-box,.tree{max-height:none;color:#111;background:#f2f2f2;}
+  }
+
+  /* 3차시 추가 */
+  code{font-family:'Consolas',monospace;background:var(--field-bg);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:.84em;color:var(--navy);}
+  .cmp td:first-child{font-weight:700;color:var(--ink);white-space:nowrap;}
+  .cmp td.hl{color:var(--navy);font-weight:700;}
+  .formula{background:var(--field-bg);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:16px 0;font-size:.92rem;color:var(--text);line-height:1.9;}
+  .formula b{display:inline-block;border-radius:8px;padding:0 8px;color:#fff;font-weight:700;margin:2px 0;}
+  .formula .f1{background:var(--p);} .formula .f2{background:var(--a);} .formula .f3{background:var(--r);} .formula .f4{background:var(--ar);}
+  .cron-fields{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:18px 0 6px;text-align:center;}
+  .cron-fields div{background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:12px 6px;}
+  .cron-fields .v{font-family:'Consolas',monospace;font-size:1.6rem;font-weight:800;color:var(--navy);line-height:1.2;}
+  .cron-fields .k{font-size:.76rem;font-weight:700;color:var(--text);}
+  .cron-fields .r{font-size:.7rem;color:var(--text-faint);}
+  .cron-read{text-align:center;font-size:.9rem;font-weight:700;color:var(--navy);margin-bottom:14px;}
+  .q-row .q-text code{font-size:.95em;}
+  .cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0 4px;}
+  .cat-tabs button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-size:.8rem;font-weight:700;color:var(--text-light);cursor:pointer;font-family:inherit;}
+  .cat-tabs button.on{background:var(--navy);border-color:var(--navy);color:#fff;}
+  .req-list{display:flex;flex-direction:column;gap:10px;margin-top:12px;}
+  .req{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;}
+  .req .t{font-size:.88rem;color:var(--text);}
+  .req .t .star{display:inline-block;font-size:.7rem;font-weight:800;color:#fff;background:var(--orange);border-radius:999px;padding:1px 8px;margin-left:6px;vertical-align:1px;}
+  .req button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:.76rem;font-weight:700;color:var(--navy);cursor:pointer;font-family:inherit;white-space:nowrap;}
+  .req button.copied{background:var(--ok);border-color:var(--ok);color:#fff;}
+  .tool-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px;}
+  @media(max-width:780px){.tool-grid{grid-template-columns:1fr;}}
+  .tool{border:1px solid var(--line);border-radius:18px;padding:20px;}
+  .tool .tag{display:inline-block;font-size:.7rem;font-weight:700;border-radius:999px;padding:3px 10px;margin-bottom:8px;}
+  .tool .tag.go{background:#e6f1ea;color:var(--ok);} .tool .tag.paid{background:#fdf6e6;color:var(--r);} .tool .tag.later{background:#eef0f3;color:var(--ar);}
+  .tool h4{font-size:.95rem;color:var(--ink);margin-bottom:6px;}
+  .tool ul{font-size:.82rem;margin-bottom:0;}
+  .card-table input{width:100%;background:#fff;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:.82rem;font-family:inherit;color:var(--text);}
+  .card-table td{padding:6px 6px;}
+  .card-table td:first-child{font-weight:700;color:var(--ink);white-space:nowrap;font-size:.8rem;}
+  .checks label{display:flex;gap:8px;align-items:center;font-size:.86rem;color:var(--text);margin-bottom:8px;cursor:pointer;}
+
+  /* 4차시 추가 */
+  .para-grid.three{grid-template-columns:repeat(3,1fr);}
+  @media(max-width:780px){.para-grid.three{grid-template-columns:1fr;}}
+  .para-grid.three .para .letter{font-size:1.6rem;}
+  .state-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0;}
+  @media(max-width:720px){.state-grid{grid-template-columns:1fr;}}
+  .state{border-radius:16px;padding:18px 20px;border:1px solid var(--line);}
+  .state .mark{font-size:1.4rem;display:block;margin-bottom:6px;}
+  .state h4{font-size:.95rem;color:var(--ink);margin-bottom:4px;}
+  .state p{font-size:.82rem;margin:0;}
+  .state.draft{background:#fdf6e6;} .state.ok{background:#e6f1ea;} .state.no{background:#f7ece9;}
+  .lv{display:inline-block;font-size:.72rem;font-weight:800;border-radius:999px;padding:2px 10px;white-space:nowrap;}
+  .lv.l1{background:#eef0f3;color:var(--ar);} .lv.l2{background:#e8f1f8;color:var(--blue);}
+  .lv.l3{background:#fdf6e6;color:var(--r);} .lv.l4{background:#f7ece9;color:var(--no);}
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;}
+  @media(max-width:720px){.ba{grid-template-columns:1fr;}}
+  .ba div{border-radius:14px;padding:18px 20px;font-size:.86rem;line-height:1.75;color:var(--text);position:relative;}
+  .ba small{display:block;font-weight:700;font-size:.74rem;margin-bottom:6px;}
+  .ba .before{background:var(--field-bg);border:1px solid var(--line);}
+  .ba .before small{color:var(--text-faint);}
+  .ba .after{background:#e8f1f8;border:1px solid #cfe0ee;padding-bottom:52px;}
+  .ba .after small{color:var(--navy);}
+  .mini-copy{position:absolute;right:14px;bottom:12px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:.76rem;font-weight:700;color:var(--navy);cursor:pointer;font-family:inherit;}
+  .mini-copy.copied{background:var(--ok);border-color:var(--ok);color:#fff;}
+  .switch .good + .good{background:#eef3f8;}
+  /* 5·6차시 추가 */
+  .q-why{grid-column:1 / -1;font-size:.8rem;color:var(--text-light);display:none;padding-left:42px;}
+  .q-row.done .q-why{display:block;}
+  .fix-list .ba{margin-top:12px;}
+  .fix-list .ba .after{padding-bottom:18px;}
+  .tool-grid.two{grid-template-columns:repeat(2,1fr);}
+  @media(max-width:720px){.tool-grid.two{grid-template-columns:1fr;}}
+  .timer{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:14px;}
+  .timer .t-big{font-size:1.8rem;font-weight:900;color:var(--navy);min-width:90px;}
+  .timer .t-big.good{color:var(--ok);} .timer .t-big.over{color:var(--no);}
+  .timer .t-hint{font-size:.8rem;color:var(--text-faint);}
 </style>
 </head>
 <body>
 
 <div class="navwrap">
-<nav aria-label="차시 목차">
-  <a class="nav-logo" href="#top">AX특강 6차시)</a>
+<nav>
+  <a class="nav-logo" href="#top">AX특강 6차시</a>
   <ul class="nav-links">
-    <li><a href="#why">왜 라벨링</a></li>
-    <li><a href="#guide">좋은 가이드</a></li>
-    <li><a href="#agree">일치율</a></li>
-    <li><a href="#ai">AI와 나</a></li>
-    <li><a href="#labels">실습 라벨</a></li>
-    <li><a href="#steps">실습 순서</a></li>
-    <li><a href="#template">가이드 서식</a></li>
-    <li><a href="#prompts">프롬프트</a></li>
-    <li><a href="#sheet">라벨 시트</a></li>
-    <li><a href="#flow">진행흐름</a></li>
-    <li><a href="#activity">활동지</a></li>
+    <li><a href="#why">왜 티가 날까</a></li>
+    <li><a href="#quiz">퀴즈</a></li>
+    <li><a href="#rules">강사 원칙</a></li>
+    <li><a href="#fix">고친 문장</a></li>
+    <li><a href="#roles">AI와 나</a></li>
+    <li><a href="#steps">6단계</a></li>
+    <li><a href="#timeline">진행흐름</a></li>
+    <li><a href="#prompt">프롬프트</a></li>
+    <li><a href="#worksheet">활동지</a></li>
   </ul>
 </nav>
 </div>
 
-<main class="page" id="top">
+<div class="page" id="top">
 
-<!-- HERO -->
-<section class="block hero">
-  <div class="hero-grid">
-    <div>
-      <div class="dots"><div class="d"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span></span><span></span><span></span></div><span class="label">6 / 9회차 · 라벨링</span></div>
-      <h1>AI가 배우는 정답,<br>라벨링 가이드로 맞춘다</h1>
-      <p class="lead">같은 공고를 보고도 사람마다 "QA다", "운영이다"로 다르게 붙이면 AI는 헷갈립니다. 오늘은 라벨(정답 이름표)을 붙이는 기준을 글로 정리하고, 나와 AI가 얼마나 같게 붙이는지 재 보며 가이드를 고쳐 나갑니다.</p>
-      <div class="btn-row">
-        <a class="btn btn-orange" href="#template">가이드 서식 복사</a>
-        <a class="btn btn-dark" href="#sheet">라벨 시트 바로가기</a>
+  <section class="block hero">
+    <svg class="hero-waves" viewBox="0 0 600 420" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M40,360 C200,260 300,110 600,0" stroke="#e8eaef" stroke-width="1.4" fill="none"/>
+      <path d="M70,390 C230,290 330,140 600,40" stroke="#e8eaef" stroke-width="1.4" fill="none"/>
+      <path d="M100,420 C260,320 360,170 600,80" stroke="#e8eaef" stroke-width="1.4" fill="none"/>
+      <path d="M10,320 C170,230 270,90 560,-10" stroke="#eef1f5" stroke-width="1.2" fill="none"/>
+    </svg>
+    <div class="hero-grid">
+      <div>
+        <div class="dots">
+          <span class="d"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span></span><span></span><span></span></span>
+          <span class="label">6 / 9회차 · 취업 서류 ①</span>
+        </div>
+        <h1>AI 티 안 나는<br>이력서·자기소개서</h1>
+        <p class="lead">"자기소개서 써 줘" 대신, 공고를 읽고 내 경험을 끌어내는 일을 AI에게 맡깁니다. 문장과 사실은 내가 책임집니다. 오늘 한 문항을 완성합니다.</p>
+        <div class="btn-row">
+          <a class="btn btn-dark" href="#fix">고친 문장 사례</a>
+          <a class="btn btn-orange" href="#prompt">ChatGPT 프롬프트 바로가기</a>
+        </div>
+      </div>
+      <div class="meta-card">
+        <div class="field"><label>대상</label><div class="val">유한대학교 졸업생</div></div>
+        <div class="field"><label>오늘</label><div class="val">2026-11-13(금) · 6차시 · 16:00~20:00 (4시간)</div></div>
+        <div class="field"><label>준비물</label><div class="val">노트북, 휴대폰, ChatGPT 계정, 지원하고 싶은 채용 공고 1개, 지금 가진 이력서·자기소개서(있으면)</div></div>
+        <div class="field"><label>지난 시간</label><div class="val">5차시: 옵시디언 + AI 에이전트로 나만의 LLM 위키 만들기 (4차시: 지원서 = 위험도 "높음")</div></div>
       </div>
     </div>
-    <div class="meta-card">
-      <div class="field"><label>대상</label><div class="val">AX 부트캠프 수강생 (AI 데이터 오퍼레이션 과정 준비)</div></div>
-      <div class="field"><label>시간</label><div class="val">4시간 (16:00~20:00 기준) · 날짜는 실제 수업 일정에 맞춘다</div></div>
-      <div class="field"><label>준비물</label><div class="val">노트북, AI 에이전트(Codex 또는 Claude Code) 또는 ChatGPT 웹, 엑셀이나 구글 시트, 5차시에 만든 위키, 라벨링할 데이터 20~50개</div></div>
-      <div class="field"><label>지난 시간</label><div class="val">5차시: 내 지식이 쌓이는 LLM 위키 (원문 · 위키 · 규칙, 인제스트 · 쿼리 · 린트)</div></div>
+    <div class="big-line">
+      <div class="q">AI는 <em>재료를 정리</em>하고, 문장은 <em>내 경험</em>으로 쓴다</div>
+      <p>AI가 쓴 자기소개서는 누구나 낼 수 있는 글입니다. 서류에 필요한 건 나만 쓸 수 있는 장면입니다.</p>
     </div>
-  </div>
-  <div class="notice">이 페이지는 5차시 자료 형식을 참고해 <b>스스로 만든 예습 자료</b>입니다. 실제 6차시 수업 내용과 다를 수 있습니다.</div>
+    <div class="feature-grid">
+      <div class="feature"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg><h4>공고 읽기</h4><p>회사가 원하는 것을 뽑는다.</p></div>
+      <div class="feature"><svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16" y2="16"/></svg><h4>경험 캐내기</h4><p>상황 → 행동 → 결과(숫자)로 꺼낸다.</p></div>
+      <div class="feature"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16z"/><line x1="13" y1="7" x2="17" y2="11"/></svg><h4>AI 티 고치기</h4><p>티 나는 문장을 내 말로 바꾼다.</p></div>
+      <div class="feature"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><polyline points="9 15 11 17 15 13"/></svg><h4>제출 전 확인</h4><p>회사 이름·숫자·글자 수를 대조한다.</p></div>
+    </div>
+  </section>
 
-  <div class="big-line">
-    <div class="q">라벨은 <em>AI의 정답지</em>, 가이드는 <em>사람끼리의 약속</em></div>
-    <p>붙이는 일은 AI와 나누고, 기준을 정하고 애매한 것을 판정하는 일은 내가 합니다.</p>
-  </div>
-  <div class="feature-grid">
-    <div class="feature"><div class="num">01</div><h4>라벨 정의</h4><p>라벨마다 "넣는 것 / 빼는 것"을 적는다.</p></div>
-    <div class="feature"><div class="num">02</div><h4>애매한 사례</h4><p>헷갈리는 경우의 판정 규칙을 미리 정한다.</p></div>
-    <div class="feature"><div class="num">03</div><h4>일치율</h4><p>두 사람(나와 AI)이 얼마나 같게 붙였나 잰다.</p></div>
-    <div class="feature"><div class="num">04</div><h4>가이드 고치기</h4><p>어긋난 곳을 보고 가이드를 v0.2로 고친다.</p></div>
-  </div>
-</section>
+  <section class="block" id="why">
+    <span class="eyebrow">개념 1</span>
+    <h2>왜 AI가 쓴 자기소개서는 티가 날까</h2>
+    <p class="sub">AI는 "평균적으로 좋은 글"을 씁니다. 서류를 읽는 사람은 하루에 수십 장을 봅니다.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>티 나는 이유</th><th>예</th></tr></thead>
+        <tbody>
+          <tr><td><strong>누구나 쓸 수 있는 말</strong></td><td>"항상 배움의 자세로 성장하는 인재가 되겠습니다"</td></tr>
+          <tr><td><strong>근거 없는 큰 주장</strong></td><td>"~ 역량을 갖추고 있습니다", "~를 체득했습니다", "바로 적용할 수 있습니다"</td></tr>
+          <tr><td><strong>군더더기 연결어</strong></td><td>"결과적으로", "이와 함께", "앞서 말씀드린 것처럼"</td></tr>
+          <tr><td><strong>무슨 뜻인지 모를 추상어</strong></td><td>"저의 방식과 일치한다고 느꼈고, 그 일치감이 함께 일하고 싶은 마음으로 이어졌습니다"</td></tr>
+          <tr><td><strong>자신 없는 끝맺음</strong></td><td>"~라고 생각합니다"</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 
-<!-- WHY -->
-<section class="block" id="why">
-  <div class="eyebrow">개념 1</div>
-  <h2>라벨링이란, 왜 가이드가 필요할까</h2>
-  <p class="sub">라벨링은 데이터에 "이건 무엇이다"라는 정답 이름표를 붙이는 일입니다. AI는 이 이름표를 그대로 배우고, 그대로 따라 합니다.</p>
+  <section class="block" id="quiz">
+    <span class="eyebrow">미니 퀴즈</span>
+    <h2>이 문장, 괜찮을까?</h2>
+    <p class="sub">고르면 이유가 나옵니다.</p>
+    <div class="quiz" id="quizList"></div>
+    <div class="q-score" id="qScore">0 / 6 맞힘</div>
+  </section>
 
-  <div class="grid3">
-    <div class="card"><span class="emo">🧑‍🤝‍🧑</span><h4>사람마다 다르다</h4><p>"게임QA & 운영지원" 공고를 A는 QA, B는 운영으로 붙인다.</p></div>
-    <div class="card"><span class="emo">🤖</span><h4>AI는 그대로 배운다</h4><p>정답이 섞여 있으면 AI도 섞어서 답한다. 쓰레기가 들어가면 쓰레기가 나온다.</p></div>
-    <div class="card"><span class="emo">📏</span><h4>그래서 약속이 필요</h4><p>누가 붙여도 같은 답이 나오도록 기준을 글로 적은 것이 라벨링 가이드다.</p></div>
-  </div>
+  <section class="block" id="rules">
+    <span class="eyebrow">개념 2</span>
+    <h2>강사의 서류 원칙 6가지</h2>
+    <p class="sub">취업 지도를 하며 매번 짚는 기준입니다.</p>
+    <div class="tips six">
+      <div class="tip"><span class="n">1</span><h4>답은 첫 문장에</h4><p>질문의 답을 맨 앞에. 소제목이 있으면 내용과 맞는지 봅니다.</p></div>
+      <div class="tip"><span class="n">2</span><h4>회사마다 고쳐 쓴다</h4><p>한 장으로 여러 회사에 내지 않습니다.</p></div>
+      <div class="tip"><span class="n">3</span><h4>프로젝트는 알아볼 수 있게</h4><p>어떤 목적으로, 무엇을 써서, 무엇을 만들었는지. 같은 프로젝트면 에피소드를 겹치지 않게.</p></div>
+      <div class="tip"><span class="n">4</span><h4>할 말만</h4><p>"이와 함께", "그런 이유로", "앞서 주장한 것처럼"을 지웁니다.</p></div>
+      <div class="tip"><span class="n">5</span><h4>한 방향</h4><p>서류 전체의 주장이 일관된지 봅니다.</p></div>
+      <div class="tip"><span class="n">6</span><h4>"생각합니다" 금지</h4><p>자신 없어 보입니다. "하겠습니다", "했습니다"로.</p></div>
+    </div>
+  </section>
 
-  <div class="switch">
-    <div class="bad"><small>가이드 없이</small>"느낌상 QA 같으면 QA"</div>
-    <div class="good"><small>가이드로</small>"제목에 테스트·QA·검수가 있고, 게임을 대상으로 하면 QA. 단, 번역 검수는 LQA"</div>
-  </div>
+  <section class="block" id="fix">
+    <span class="eyebrow">실제 사례</span>
+    <h2>AI 티 나는 문장 → 고친 문장</h2>
+    <p class="sub">강사가 실제 지도에서 고친 문장입니다. 학생을 알아볼 수 있는 부분은 바꿨습니다.</p>
+    <div class="fix-list">
+      <div class="ba"><div class="before"><small>Before</small>"문제를 사전에 발견하는 테스팅 역량과, 완성도를 높이는 소통 역량을 가지고 있습니다."</div><div class="after"><small>After · "역량이 있다" → 해 온 일</small>"자격증을 준비하며 테스트 절차를 체계적으로 익혔고, 프로젝트를 끝내기 위해 팀원과 소통하는 방법을 배워 왔습니다."</div></div>
+      <div class="ba"><div class="before"><small>Before</small>"항상 배움의 자세로 새로운 것을 빠르게 받아들이며 회사에 기여하겠습니다."</div><div class="after"><small>After · 다짐 → 숫자로 보이는 노력</small>"버그리포트 100개, 테스트 케이스 7개를 준비해 온 것처럼 회사에서도 매일 조금씩 성장하는 모습을 보여드리겠습니다."</div></div>
+      <div class="ba"><div class="before"><small>Before</small>"실제 유저 흐름을 기준으로 연결된 시스템을 검증하는 방식을 체득했습니다."</div><div class="after"><small>After · "체득했다" 과장 → 해 본 일</small>"먼저 기능이 동작하는지 확인하고, 실제 유저의 플레이 흐름으로 시스템을 검증해 보았습니다."</div></div>
+      <div class="ba"><div class="before"><small>Before</small>"데이터를 구조화한 경험은 귀사의 데이터 검증 업무에 바로 적용할 수 있습니다."</div><div class="after"><small>After · 장담 → 기대</small>"데이터를 표 단위로 구조화하고 검증해 본 경험을 귀사의 데이터 업무에 활용할 수 있기를 기대합니다."</div></div>
+      <div class="ba"><div class="before"><small>Before</small>"단 하나의 오기입도 발생하지 않았습니다."</div><div class="after"><small>After · 확인하기 어려운 단정 → 받은 평가</small>"꼼꼼하게 업무를 처리해 일 잘하는 근로 학생이라는 평가를 받았습니다."</div></div>
+      <div class="ba"><div class="before"><small>Before</small>"해외 유학 실패 이후 방향을 잡는 데 3년이 걸렸습니다."</div><div class="after"><small>After · 굳이 "실패"라고 쓰지 않기</small>"유학 이후 방향을 다시 잡는 데 3년이 걸렸고, 그 시간을 채우기 위해 지금 두 프로젝트에 도전하고 있습니다."</div></div>
+    </div>
+    <p style="margin-top:12px;">그 밖에 "결과적으로 ~ 이해하게 되었습니다"는 <strong>"결과적으로"만 지워도</strong> 좋아지고, "~라고 생각합니다"는 "~하겠습니다"로 끝냅니다.</p>
+  </section>
 
-  <h3>라벨링의 종류 (게임 예시)</h3>
-  <div class="tbl-wrap"><table>
-    <tr><th>종류</th><th>하는 일</th><th>게임 회사 예시</th></tr>
-    <tr><td><strong>분류</strong></td><td>데이터 하나에 라벨 하나(또는 여러 개)</td><td>버그 리포트 심각도(치명·높음·보통·낮음), 공고 직무 유형</td></tr>
-    <tr><td><strong>감정·의도</strong></td><td>글의 기분이나 목적</td><td>스토어 리뷰 긍정·부정, 문의 유형(결제·계정·버그)</td></tr>
-    <tr><td><strong>유해성</strong></td><td>규칙 위반 여부</td><td>채팅 욕설·도배·사기 탐지</td></tr>
-    <tr><td><strong>구간·개체</strong></td><td>글 속 특정 부분에 표시</td><td>버그 리포트에서 "재현 단계", "기기 이름" 찾기</td></tr>
-    <tr><td><strong>이미지 영역</strong></td><td>그림 속 물체에 상자 그리기</td><td>스크린샷의 UI 버튼, 깨진 텍스트 위치</td></tr>
-    <tr><td><strong>AI 답변 평가</strong></td><td>AI 답을 기준에 따라 채점·비교</td><td>고객센터 AI 답변이 정확한지, 근거가 있는지</td></tr>
-  </table></div>
-  <div class="callout"><b>QA와 같은 일입니다.</b> 버그 리포트를 "누가 읽어도 똑같이 재현되게" 쓰듯, 라벨링 가이드는 "누가 붙여도 똑같은 라벨이 나오게" 씁니다.</div>
-</section>
+  <section class="block" id="roles">
+    <span class="eyebrow">개념 3 · 4차시 복습</span>
+    <h2>AI와 나의 역할 나누기</h2>
+    <div class="table-wrap">
+      <table class="cmp">
+        <thead><tr><th>AI가 할 일</th><th>내가 할 일</th></tr></thead>
+        <tbody>
+          <tr><td>공고에서 요구 역량·우대 사항 뽑기</td><td class="hl">그중 내가 정말 해 본 것 고르기</td></tr>
+          <tr><td>질문으로 내 경험 끌어내기</td><td class="hl">사실·숫자·날짜를 내 기록으로 확인</td></tr>
+          <tr><td>경험과 요구 역량 연결표 만들기</td><td class="hl">어떤 경험을 쓸지 결정</td></tr>
+          <tr><td>AI 티 나는 표현·군더더기 찾기</td><td class="hl">최종 문장 쓰기</td></tr>
+          <tr><td>글자 수 세기</td><td class="hl">제출하기</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="warn"><span class="ic">!</span><div><strong>AI에게 경험이나 숫자를 지어내게 하지 마세요.</strong> 서류에 쓴 문장은 7차시에서 배울 것처럼 전부 면접 질문이 됩니다. 해 보지 않은 일을 쓰면 면접에서 무너집니다.</div></div>
+  </section>
 
-<!-- GUIDE -->
-<section class="block" id="guide">
-  <div class="eyebrow">개념 2</div>
-  <h2>좋은 라벨링 가이드의 7칸</h2>
-  <p class="sub">처음부터 길게 쓰지 않습니다. v0.1을 짧게 쓰고, 실제로 붙여 보면서 고칩니다.</p>
+  <section class="block" id="steps">
+    <span class="eyebrow">오늘의 순서</span>
+    <h2>공고에서 제출까지 6단계</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>단계</th><th>할 일</th><th>결과물</th></tr></thead>
+        <tbody>
+          <tr><td><strong>① 공고 읽기</strong></td><td>하는 일 · 자격 요건 · 우대 사항 · 인재상 뽑기</td><td>공고 분석표</td></tr>
+          <tr><td><strong>② 경험 캐내기</strong></td><td>AI 질문에 답하며 상황 → 내가 한 행동 → 결과(숫자)로 정리</td><td>경험 카드 3장</td></tr>
+          <tr><td><strong>③ 연결하기</strong></td><td>공고 요구 하나에 경험 하나를 짝짓기</td><td>연결표</td></tr>
+          <tr><td><strong>④ 초안 쓰기</strong></td><td><strong>내가</strong> 먼저 쓴다. 첫 문장에 답</td><td>문항 초안</td></tr>
+          <tr><td><strong>⑤ AI 티 점검</strong></td><td>AI에게 "문제 문장만" 표시하게 한다</td><td>원문 / 문제 / 고칠 방향 표</td></tr>
+          <tr><td><strong>⑥ 제출 전 확인</strong></td><td>확인 행동 카드대로 원문 대조</td><td>제출본</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>제출 전 확인 행동 (언제 · 무엇을 · 통과 기준 · 안 맞으면)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>언제</th><th>무엇을 확인</th><th>통과 기준</th><th>안 맞으면</th></tr></thead>
+        <tbody>
+          <tr><td>제출 전</td><td>회사 이름·직무명</td><td>지원 공고와 같다. <strong>다른 회사 이름이 한 군데도 없다</strong></td><td>고치고 처음부터 다시 읽는다</td></tr>
+          <tr><td>제출 전</td><td>숫자·날짜·자격증 이름</td><td>내 자료(성적표, 자격증, 프로젝트 기록)와 같다</td><td>확인 못 한 숫자는 빼거나 고친다</td></tr>
+          <tr><td>제출 전</td><td>글자 수</td><td>제한 안에 든다 (공백 포함 여부도)</td><td>줄인다</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="warn"><span class="ic">TIP</span><div>여러 회사에 비슷한 서류를 낼 때 <strong>다른 회사 이름이 남는 사고</strong>가 가장 흔합니다. 첫 번째 확인은 꼭 지키세요.</div></div>
+  </section>
 
-  <div class="tbl-wrap"><table>
-    <tr><th>칸</th><th>적는 것</th><th>점검 질문</th></tr>
-    <tr><td><strong>1. 목적</strong></td><td>이 라벨을 어디에 쓰나</td><td>목적을 보면 어떤 라벨이 필요한지 떠오르나?</td></tr>
-    <tr><td><strong>2. 라벨 목록과 정의</strong></td><td>라벨 이름, 한 줄 정의, <b>넣는 것 / 빼는 것</b></td><td>라벨끼리 겹치지 않고, 빠지는 데이터가 없나?</td></tr>
-    <tr><td><strong>3. 예시</strong></td><td>라벨마다 좋은 예 2개, 헷갈리는 예 1개</td><td>정의보다 예시가 더 잘 통한다. 실제 데이터에서 골랐나?</td></tr>
-    <tr><td><strong>4. 애매한 경우 판정 규칙</strong></td><td>"두 업무가 함께 있으면…" 같은 우선순위</td><td>같은 고민을 두 번 하지 않도록 적어 두었나?</td></tr>
-    <tr><td><strong>5. 판단 불가 라벨</strong></td><td>정보가 부족할 때 쓰는 칸 (예: UNSURE)과 메모 규칙</td><td>억지로 고르지 않게 했나?</td></tr>
-    <tr><td><strong>6. 작업 방법</strong></td><td>무엇을 보고 붙이나(제목만? 본문까지?), 한 번에 몇 개</td><td>보는 범위가 사람마다 다르지 않나?</td></tr>
-    <tr><td><strong>7. 버전과 변경 기록</strong></td><td>v0.1 → v0.2에서 무엇을 왜 바꿨나</td><td>바뀐 규칙 때문에 다시 붙여야 할 데이터가 있나?</td></tr>
-  </table></div>
+  <section class="block" id="timeline">
+    <span class="eyebrow">진행 흐름</span>
+    <h2>오늘(4시간) 진행 흐름</h2>
+    <div class="timeline" id="tl"></div>
+  </section>
 
-  <h3>잘 쓰는 4가지 원칙</h3>
-  <div class="grid2">
-    <div class="card"><h4>겹치지 않고 빠짐없이</h4><p>모든 데이터가 라벨 하나에만 들어가게. 안 맞으면 "기타"·"판단 불가"를 둔다.</p></div>
-    <div class="card"><h4>느낌 대신 보이는 기준</h4><p>"중요해 보이면" ✗ → "제목에 ○○ 단어가 있으면" ✓</p></div>
-    <div class="card"><h4>한 라벨에 질문 하나</h4><p>"게임 QA인가?"는 질문이 두 개(게임인가 + QA인가). 필요하면 칸을 나눈다.</p></div>
-    <div class="card"><h4>예시가 정의를 이긴다</h4><p>애매했던 실제 사례를 가이드에 계속 모은다. 이것이 가이드의 재산이다.</p></div>
-  </div>
-</section>
+  <section class="block" id="prompt">
+    <span class="eyebrow">실습 1·2 · 학생 배포용</span>
+    <h2>ChatGPT용 "자소서 코치" 프롬프트</h2>
+    <p class="sub">새 대화창을 열고, 아래 내용을 통째로 복사해서 붙여넣은 뒤 전송하세요.</p>
+    <div class="warn"><span class="ic">!</span><div><strong>개인정보 주의</strong> — 이름·연락처·주소·주민번호·사진은 넣지 않습니다. 가진 서류를 붙여 넣을 때도 이름을 지우세요. 채용 공고는 공개된 내용이라 붙여 넣어도 됩니다.</div></div>
+    <div class="prompt-wrap">
+      <button class="copy-btn" id="copyBtn" type="button" onclick="copyPrompt()">복사하기</button>
+<div class="prompt-box" id="promptText">당신은 지금부터 저의 '자소서 코치'입니다. 저는 유한대학교 AX특강을 듣는 졸업생이고, 오늘은 AI가 대신 써 주는 자기소개서가 아니라 제 경험으로 쓰는 자기소개서를 준비합니다.
 
-<!-- AGREEMENT -->
-<section class="block" id="agree">
-  <div class="eyebrow">개념 3</div>
-  <h2>검수와 일치율: 가이드가 잘 작동하나 재기</h2>
-  <p class="sub">같은 데이터를 두 사람(오늘은 나와 AI)이 서로 보지 않고 따로 붙인 뒤, 얼마나 같은지 봅니다.</p>
+다음 규칙을 꼭 지켜주세요.
+1. 자기소개서 문장을 대신 써 주지 마세요. 제가 쓴 문장을 점검하는 것만 합니다.
+2. 제 경험·숫자·날짜를 지어내지 마세요. 모르면 저에게 물어보세요.
+3. 질문은 한 번에 하나씩 해 주세요.
 
-  <div class="grid3">
-    <div class="card"><h4>① 따로 붙이기</h4><p>나: 가이드만 보고 20개. AI: 같은 가이드로 같은 20개.</p></div>
-    <div class="card"><h4>② 비교하기</h4><p><b>일치율 = 같은 라벨 수 ÷ 전체 수</b>. 다른 줄만 모아 본다.</p></div>
-    <div class="card"><h4>③ 원인 찾고 고치기</h4><p>정의가 모호? 예시 부족? 규칙 없음? → 가이드 v0.2 → 다시 붙여 본다.</p></div>
-  </div>
+진행 순서는 이렇습니다.
+[1단계 공고 읽기] 제가 채용 공고를 붙여 넣으면 '하는 일 / 자격 요건 / 우대 사항 / 인재상'을 표로 정리하고, 이 회사가 가장 중요하게 볼 것 같은 것 3개를 공고 문장을 근거로 골라 주세요. 공고에 없는 회사 정보는 쓰지 말고, 필요하면 '공식 홈페이지에서 확인 필요'라고 적어 주세요.
+[2단계 경험 캐내기] 3개 각각에 대해 제 경험을 묻는 질문을 해 주세요. 제 답이 막연하면 "그때 어떤 상황이었나요? / 구체적으로 무엇을 했나요? / 결과가 숫자로 어땠나요?"처럼 더 물어봐 주세요. 다 끝나면 경험 카드(상황 / 내가 한 행동 / 결과)를 표로 정리해 주세요. 표에는 제가 말한 내용만 넣어 주세요.
+[3단계 연결하기] 공고 요구 하나와 경험 카드 하나를 짝지은 연결표를 보여 주세요. 어느 경험을 쓸지는 제가 정합니다.
+[4단계 점검] 제가 자기소개서 문항과 제 초안을 붙여 넣으면, 아래 기준에 걸리는 문장만 '원문 / 문제 / 고칠 방향' 표로 알려 주세요. 고친 문장을 통째로 써 주지 말고 방향만 알려 주세요.
+- 질문의 답이 첫 문장에 있는가
+- 누구나 쓸 수 있는 다짐이나 추상적인 말("배움의 자세로 기여", "역량을 갖추고 있다")
+- 근거 없는 과장("체득했다", "바로 적용할 수 있다")
+- 군더더기 연결어("결과적으로", "이와 함께", "앞서 말씀드린 것처럼")
+- "생각합니다"로 끝나는 문장
+- 숫자나 사실 중 제가 확인해야 할 것
+- 글자 수 (공백 포함 / 제외)
 
-  <h3>조금 더: 카파(κ) 값</h3>
-  <p>라벨이 거의 하나뿐이면 아무렇게나 붙여도 일치율이 높게 나옵니다. <strong>코헨의 카파</strong>는 이런 "우연히 맞은 몫"을 빼고 계산한 값입니다. 아래 라벨 시트가 자동으로 계산합니다.</p>
-  <div class="tbl-wrap"><table>
-    <tr><th>카파 값</th><th>대략적인 해석</th></tr>
-    <tr><td>0.8 이상</td><td>매우 잘 맞음. 가이드가 잘 작동한다</td></tr>
-    <tr><td>0.6 ~ 0.8</td><td>상당히 맞음. 어긋난 사례로 가이드를 다듬는다</td></tr>
-    <tr><td>0.4 ~ 0.6</td><td>보통. 정의나 판정 규칙에 빈칸이 있다</td></tr>
-    <tr><td>0.4 미만</td><td>가이드를 다시 써야 한다</td></tr>
-  </table></div>
-  <div class="callout"><b>다른 말로:</b> 어긋난 줄은 실패가 아니라 <b>가이드의 빈칸을 알려 주는 버그 리포트</b>입니다. 미리 정답을 정해 둔 "기준 세트(골드 세트)"를 만들어 두면 새 작업자나 AI를 시험할 때도 씁니다.</div>
-</section>
+준비되면 채용 공고를 붙여 넣어 달라고 말해 주세요.</div>
+    </div>
+    <h3>ChatGPT가 규칙을 어길 때 이렇게 말하세요</h3>
+    <div class="redirect-grid">
+      <div class="redirect-card">"문장을 대신 써 주지 말고, 고칠 방향만 알려 주세요."</div>
+      <div class="redirect-card">"제가 말하지 않은 경험이나 숫자는 지워 주세요."</div>
+      <div class="redirect-card">"질문은 한 번에 하나만 해 주세요."</div>
+    </div>
+  </section>
 
-<!-- AI & ME -->
-<section class="block" id="ai">
-  <div class="eyebrow">AI와 나</div>
-  <h2>먼저 붙이기는 AI, 기준과 판정은 나</h2>
-  <p class="sub">요즘 현장에서는 AI가 먼저 라벨을 붙이고(사전 라벨링) 사람이 검수합니다. 4차시 "역할로 맡기고 확인하기", 2026 트렌드 "휴먼인더루프"와 같은 구조입니다.</p>
+  <section class="block" id="worksheet">
+    <span class="eyebrow">활동지</span>
+    <h2>내 자기소개서 한 문항 완성하기</h2>
+    <p class="sub">입력 칸은 화면에서 바로 써도 됩니다.</p>
+    <h3>1단계 · 공고 분석표 (17:25~)</h3>
+    <div class="ws"><div class="table-wrap"><table class="card-table"><tbody id="jobRows"></tbody></table></div></div>
+    <h3>2단계 · 경험 카드 3장 (17:25~)</h3>
+    <div class="ws"><div class="table-wrap"><table class="card-table"><thead><tr><th></th><th>카드 1</th><th>카드 2</th><th>카드 3</th></tr></thead><tbody id="expRows"></tbody></table></div></div>
+    <h3>3단계 · 연결표와 첫 문장 (18:15~)</h3>
+    <div class="ws"><div class="table-wrap"><table class="card-table"><tbody id="linkRows"></tbody></table></div></div>
+    <h3>4단계 · 제출 전 확인 (19:35~)</h3>
+    <div class="ws">
+      <div class="checks">
+        <label><input type="checkbox"> 회사 이름·직무명이 지원 공고와 같고, 다른 회사 이름이 없다</label>
+        <label><input type="checkbox"> 숫자·날짜·자격증 이름을 내 자료와 대조했다</label>
+        <label><input type="checkbox"> 글자 수 제한 안에 든다</label>
+        <label><input type="checkbox"> "생각합니다"로 끝나는 문장이 없다</label>
+        <label><input type="checkbox"> 첫 문장만 읽어도 질문의 답이 보인다</label>
+      </div>
+      <p class="save-note">※ 입력 내용은 저장되지 않습니다. 오늘 쓴 문항과 공고는 꼭 따로 저장하세요 — 7차시(11/20) 면접 준비에 씁니다.</p>
+    </div>
+  </section>
 
-  <div class="tbl-wrap"><table>
-    <tr><th>AI에게 맡길 것</th><th>내가 할 것</th></tr>
-    <tr><td>가이드대로 1차 라벨 붙이기</td><td>라벨 목록과 정의 정하기</td></tr>
-    <tr><td>라벨마다 근거(제목의 어느 단어) 적기</td><td>애매한 사례 최종 판정</td></tr>
-    <tr><td>확신이 낮은 것에 표시하기</td><td>표시된 것과 무작위 일부 직접 검수</td></tr>
-    <tr><td>어긋난 사례를 유형별로 묶어 보고</td><td>가이드를 고칠지, 어떻게 고칠지 결정</td></tr>
-  </table></div>
-
-  <h3>미니 퀴즈 · 이 일은 누가 할까?</h3>
-  <div class="quiz" id="quiz"></div>
-  <div class="score" id="quizScore">0 / 8 맞힘</div>
-</section>
-
-<!-- LABELS -->
-<section class="block" id="labels">
-  <div class="eyebrow">실습 데이터</div>
-  <h2>오늘 붙일 라벨: 게임 공고 직무 유형</h2>
-  <p class="sub">내가 매일 모으는 게임잡·알바몬 공고 제목에 직무 유형 라벨을 붙입니다. 아래는 가이드 v0.1의 라벨 5개입니다.</p>
-
-  <div class="labels">
-    <div class="lab qa"><div class="code">QA</div><div class="name">게임 테스트</div><div class="desc">게임의 기능·성능·호환성을 테스트하고 버그를 찾는 일</div><div class="ex">예: 게임 QA (계약직), 디바이스 성능 측정 QA</div></div>
-    <div class="lab lqa"><div class="code">LQA</div><div class="name">현지화 검수</div><div class="desc">게임 번역·현지화 결과를 언어 관점에서 검수하는 일</div><div class="ex">예: 게임 LQA 담당자 (영어)</div></div>
-    <div class="lab ops"><div class="code">OPS</div><div class="name">운영·모니터링</div><div class="desc">라이브 게임 운영, 커뮤니티·불법 프로그램 모니터링</div><div class="ex">예: 게임 모니터링 담당자</div></div>
-    <div class="lab other"><div class="code">OTHER</div><div class="name">그 밖</div><div class="desc">데이터 분석, 개발, 게임이 아닌 제품의 QA 등</div><div class="ex">예: 게임 데이터 분석 담당자</div></div>
-    <div class="lab unsure"><div class="code">UNSURE</div><div class="name">판단 불가</div><div class="desc">제목만으로 정할 수 없을 때. 메모에 이유를 쓴다</div><div class="ex">예: 제목에 업무가 없음</div></div>
-  </div>
-  <div class="callout"><b>일부러 넣은 빈칸:</b> v0.1에는 "두 업무가 함께 있을 때", "번역만 하는 공고", "게임이 아닌 QA", "AI 관련 QA" 규칙이 없습니다. 붙이다가 막히는 곳을 찾아 v0.2에 채우는 것이 오늘의 목표입니다.</div>
-</section>
-
-<!-- STEPS -->
-<section class="block" id="steps">
-  <div class="eyebrow">실습 순서</div>
-  <h2>데이터 준비 → 가이드 → 따로 붙이기 → 비교 → 고치기</h2>
-
-  <div class="step"><div class="t">실습 0 · 데이터와 폴더 준비 <span class="time">16:50~</span></div>
-    <p>5차시 위키에 이어서 씁니다. 원문(데이터)은 고치지 않습니다.</p>
-<pre class="tree">내취업위키/
-├── AGENTS.md
-├── 원문/
-│   └── 공고제목_20개.md        ← 아래 라벨 시트의 20개 (번호 | 회사 | 제목)
-└── 위키/
-    ├── 개념/
-    │   └── 공고직무_라벨링가이드.md   ← 오늘 쓰는 가이드 (v0.1 → v0.2)
-    └── 종합/
-        └── 라벨링_결과_비교.md        ← 나 vs AI 결과와 고친 이유</pre>
-  </div>
-
-  <div class="step"><div class="t">실습 1 · 가이드 v0.1 쓰기 <span class="time">17:10~</span></div>
-    <ul><li><a href="#template">가이드 서식</a>을 복사해 위 라벨 5개의 정의·예시를 채웁니다. 15분 안에 짧게.</li></ul>
-  </div>
-
-  <div class="step"><div class="t">실습 2 · 혼자 붙이기 (AI 없이) <span class="time">17:30~</span></div>
-    <ul><li><a href="#sheet">라벨 시트</a>의 "내 라벨"을 20개 모두 고릅니다. 막힌 곳은 메모에 이유를 적습니다.</li>
-    <li>AI 결과를 먼저 보지 않습니다. 보면 따라가게 됩니다.</li></ul>
-  </div>
-
-  <div class="step"><div class="t">실습 3 · AI에게 같은 가이드로 붙이게 하기 <span class="time">18:00~</span></div>
-    <ul><li><a href="#prompts">사전 라벨링 프롬프트</a>로 AI 결과를 받아 "AI 라벨"에 옮깁니다.</li></ul>
-  </div>
-
-  <div class="step"><div class="t">실습 4 · 비교와 원인 찾기 <span class="time">18:40~</span></div>
-    <ul><li>시트가 일치율·카파를 계산하고, 다른 줄을 노랗게 표시합니다.</li>
-    <li>다른 줄마다 원인을 고릅니다: 정의가 모호 / 예시 부족 / 판정 규칙 없음 / 내가 틀림 / AI가 틀림.</li></ul>
-  </div>
-
-  <div class="step"><div class="t">실습 5 · 가이드 v0.2와 위키 기록 <span class="time">19:10~</span></div>
-    <ul><li>판정 규칙과 헷갈리는 예시를 더해 v0.2를 만들고, "변경 기록"에 무엇을 왜 바꿨는지 적습니다.</li>
-    <li>시간이 되면 다른 줄만 다시 붙여 일치율이 올랐는지 봅니다.</li>
-    <li>위키 로그에 한 줄: <code>- 날짜 [라벨링] 공고 20개, 일치율 ○%, 가이드 v0.2</code></li></ul>
-  </div>
-
-  <h3>안전 규칙</h3>
-  <div class="grid3">
-    <div class="card"><h4>1 · 개인정보는 빼고</h4><p>유저 채팅·리뷰를 쓸 때 닉네임·연락처는 지우거나 가린다.</p></div>
-    <div class="card"><h4>2 · 원본은 그대로</h4><p>라벨은 옆 칸에 붙인다. 원문 데이터를 고치지 않는다.</p></div>
-    <div class="card"><h4>3 · AI 라벨은 정답이 아니다</h4><p>AI 라벨은 "후보". 검수 전에는 결과로 쓰지 않는다.</p></div>
-  </div>
-</section>
-
-<!-- TEMPLATE -->
-<section class="block" id="template">
-  <div class="eyebrow">가이드 서식 · 복사용</div>
-  <h2>라벨링 가이드 서식</h2>
-  <p class="sub">[ ] 안을 바꿔 씁니다. 위키에 넣을 때는 <code>위키/개념/</code>에 저장합니다.</p>
-
-  <div class="copy-box"><button class="copy-btn" data-copy="tpl">복사하기</button><pre id="tpl"># [데이터 이름] 라벨링 가이드 v0.1
-
-&gt; 한 줄 요약: [무엇에, 어떤 라벨을, 왜 붙이는지]
-
-## 1. 목적
-- 이 라벨은 [어디에 쓰려고] 붙인다. (예: 매일 모은 게임 공고에서 내가 지원할 QA 공고만 골라 보기)
-
-## 2. 보는 범위
-- [제목만 / 제목 + 회사 이름 / 본문까지] 보고 붙인다.
-- 한 데이터에 라벨은 [하나만 / 여러 개 가능].
-
-## 3. 라벨 목록
-| 라벨 | 한 줄 정의 | 넣는 것 | 빼는 것 |
-| --- | --- | --- | --- |
-| [QA] | [게임을 테스트하고 버그를 찾는 일] | [테스트, QA, 버그, 성능 측정] | [번역 검수 → LQA] |
-| [LQA] | | | |
-| [OPS] | | | |
-| [OTHER] | | | |
-| [UNSURE] | 제목만으로 정할 수 없음 | 업무 단어가 없는 제목 | 정할 수 있는데 귀찮을 때 |
-
-## 4. 예시
-| 데이터 | 라벨 | 이유 |
-| --- | --- | --- |
-| [게임 QA (계약직)] | QA | 업무 단어 "QA", 게임 대상 |
-| [헷갈리는 예] | | |
-
-## 5. 애매한 경우 판정 규칙 (위에서부터 먼저 적용)
-1. [두 업무가 함께 있으면 → 제목에서 먼저 나온 업무 / 주 업무]
-2. [번역만 있고 검수가 없으면 → ]
-3. [게임이 아닌 제품의 QA면 → ]
-4. [그래도 못 정하면 → UNSURE, 메모에 이유]
-
-## 6. 작업 방법
-- 한 번에 [20]개씩 붙이고, 막힌 것은 메모에 적는다.
-- 확신이 낮으면 "확신: 낮음"을 표시한다.
-
-## 7. 변경 기록
-| 버전 | 날짜 | 바꾼 것 | 이유 (어긋난 사례) |
-| --- | --- | --- | --- |
-| v0.1 | [YYYY-MM-DD] | 처음 작성 | |
-
-&gt; 내 생각: [가이드를 쓰며 알게 된 것. AI는 고치지 않는다]</pre></div>
-</section>
-
-<!-- PROMPTS -->
-<section class="block" id="prompts">
-  <div class="eyebrow">프롬프트 · 복사용</div>
-  <h2>사전 라벨링 · 비교 · 개선 제안</h2>
-  <p class="sub">5차시처럼 모든 프롬프트는 "AGENTS.md를 먼저 읽어 줘"로 시작합니다. 웹 ChatGPT라면 가이드와 데이터를 붙여 넣습니다.</p>
-
-  <div class="prompt-title">① 사전 라벨링 (AI가 먼저 붙이기)</div>
-  <div class="copy-box"><button class="copy-btn" data-copy="p1">복사하기</button><pre id="p1">먼저 AGENTS.md를 읽어 줘. 그다음 위키/개념/공고직무_라벨링가이드.md만 기준으로 원문/공고제목_20개.md의 각 줄에 라벨을 하나씩 붙여 줘.
-가이드에 없는 기준은 만들지 마. 정하기 어려우면 UNSURE로 하고 이유를 써 줘.
-결과는 표로: | 번호 | 라벨 | 근거(제목의 어느 단어) | 확신(높음/낮음) |
-파일은 아직 만들지 마.</pre></div>
-
-  <div class="prompt-title">② 어긋난 사례 분석 (고치지 말고 보고만)</div>
-  <div class="copy-box"><button class="copy-btn" data-copy="p2">복사하기</button><pre id="p2">아래는 같은 가이드로 나와 네가 붙인 라벨이 다른 줄이야.
-줄마다 원인을 [정의가 모호 / 예시 부족 / 판정 규칙 없음 / 사람 실수 / AI 실수] 중 하나로 고르고, 가이드의 어느 칸 때문인지 알려 줘.
-누가 맞는지 정하지는 마. 판정은 내가 할게.
-[번호 | 제목 | 내 라벨 | AI 라벨]</pre></div>
-
-  <div class="prompt-title">③ 가이드 v0.2 제안 (내가 고른 것만 반영)</div>
-  <div class="copy-box"><button class="copy-btn" data-copy="p3">복사하기</button><pre id="p3">방금 분석을 바탕으로 가이드에 더할 "판정 규칙"과 "헷갈리는 예시"를 3개 이내로 제안해 줘. 각 제안이 어떤 어긋난 줄을 해결하는지 번호로 달아 줘.
-내가 고른 제안만 가이드에 반영하고, "변경 기록" 표에 v0.2 한 줄을 추가해 줘. "> 내 생각:" 블록은 건드리지 마.</pre></div>
-
-  <div class="prompt-title">AI가 규칙을 어길 때</div>
-  <ul>
-    <li>"가이드에 없는 기준이야. 가이드에 있는 칸만 써서 다시 붙여 줘."</li>
-    <li>"누가 맞는지는 내가 정할게. 원인만 알려 줘."</li>
-    <li>"원문 파일은 고치지 마. 방금 바꾼 것을 되돌려 줘."</li>
-  </ul>
-</section>
-
-<!-- SHEET -->
-<section class="block" id="sheet">
-  <div class="eyebrow">라벨 시트 · 화면에서 바로</div>
-  <h2>나 vs AI 라벨 비교</h2>
-  <p class="sub">2026-11-06 "취업준비"로 모은 실제 공고 제목 20개입니다. 고른 값은 이 브라우저에만 저장됩니다.</p>
-
-  <div class="stats">
-    <div class="stat"><b id="stDone">0 / 20</b><span>둘 다 붙인 줄</span></div>
-    <div class="stat"><b id="stAgree">–</b><span>일치율</span></div>
-    <div class="stat"><b id="stKappa">–</b><span>카파(κ)</span></div>
-    <div class="stat"><b id="stDiff">0</b><span>다른 줄 (노란 칸)</span></div>
-  </div>
-  <div class="tbl-wrap"><table class="sheet" id="sheetTable">
-    <thead><tr><th>#</th><th>회사</th><th>공고 제목</th><th>내 라벨</th><th>AI 라벨</th><th>원인 (다른 줄만)</th></tr></thead>
-    <tbody></tbody>
-  </table></div>
-  <div class="btn-row">
-    <button class="btn btn-ghost" id="exportBtn" type="button">결과 표 복사 (마크다운)</button>
-    <button class="btn btn-ghost" id="resetBtn" type="button">모두 지우기</button>
-  </div>
-</section>
-
-<!-- FLOW -->
-<section class="block" id="flow">
-  <div class="eyebrow">진행 흐름</div>
-  <h2>오늘(4시간) 진행 흐름</h2>
-  <div class="tbl-wrap"><table>
-    <tr><th>시간</th><th>내용</th></tr>
-    <tr><td>16:00~16:20</td><td>지난 시간 돌아보기: 위키에 원문 3개 더 넣었나, 린트 결과</td></tr>
-    <tr><td>16:20~16:50</td><td>개념 1·2: 라벨링이란, 좋은 가이드의 7칸</td></tr>
-    <tr><td>16:50~17:10</td><td>실습 0: 데이터와 폴더 준비</td></tr>
-    <tr><td>17:10~17:30</td><td>실습 1: 가이드 v0.1</td></tr>
-    <tr><td>17:30~18:00</td><td>실습 2: 혼자 20개 붙이기 (AI 없이)</td></tr>
-    <tr><td>18:00~18:20</td><td>개념 3: 일치율과 카파 · 실습 3: AI 사전 라벨링</td></tr>
-    <tr><td>18:20~18:40</td><td>쉬는 시간</td></tr>
-    <tr><td>18:40~19:10</td><td>실습 4: 비교와 원인 찾기</td></tr>
-    <tr><td>19:10~19:40</td><td>실습 5: 가이드 v0.2, 다시 붙이기, 위키 로그</td></tr>
-    <tr><td>19:40~20:00</td><td>발표: 가장 헷갈렸던 사례 하나와 내가 정한 규칙</td></tr>
-  </table></div>
-</section>
-
-<!-- ACTIVITY -->
-<section class="block act" id="activity">
-  <div class="eyebrow">활동지</div>
-  <h2>내 라벨링 기록</h2>
-  <p class="sub">입력한 내용은 이 브라우저에만 남습니다. 끝나면 위키의 <code>위키/종합/라벨링_결과_비교.md</code>에 옮겨 적으세요.</p>
-
-  <label class="f" for="a1">1단계 · 라벨을 붙일 데이터와 목적</label>
-  <textarea id="a1" rows="2" placeholder="예: 매일 모으는 게임 공고 제목 / 지원할 QA 공고만 골라 보려고"></textarea>
-
-  <label class="f" for="a2">2단계 · 가장 오래 고민한 공고와 그 이유</label>
-  <textarea id="a2" rows="3" placeholder="예: '게임QA & 운영지원' — QA와 운영이 함께 있어서"></textarea>
-
-  <label class="f" for="a3">3단계 · 일치율과 어긋난 원인 (가장 많았던 것)</label>
-  <textarea id="a3" rows="3" placeholder="예: 일치율 75%, 카파 0.66 / 판정 규칙 없음 3건"></textarea>
-
-  <label class="f" for="a4">4단계 · v0.2에 더한 규칙</label>
-  <textarea id="a4" rows="3" placeholder="예: 두 업무가 함께 있으면 제목에서 먼저 나온 업무로 붙인다"></textarea>
-
-  <label class="f" for="a5">내 생각 · 라벨링과 QA는 어디가 닮았나</label>
-  <textarea id="a5" rows="3"></textarea>
-
-  <div class="chk"><input type="checkbox" id="c1"><label for="c1">가이드를 위키/개념/에 저장하고 변경 기록에 v0.2를 적었다</label></div>
-  <div class="chk"><input type="checkbox" id="c2"><label for="c2">다음 주까지 공고 30개를 v0.2로 더 붙여 본다</label></div>
-</section>
-
-</main>
-
-<footer>
-  AX특강 6차시 예습 자료 · 5차시 "내 지식이 쌓이는 LLM 위키" 형식을 참고해 스스로 만든 페이지 · 실습 데이터: 2026-11-06 게임잡·알바몬 공개 공고 제목
-</footer>
+  <footer>
+    <p>유한대학교 AX특강 · 2026-11-13 6차시</p>
+    <p>바탕 자료: 강사의 취업 지도 기준 (수업용 예시는 학생을 알아볼 수 없게 바꿈)</p>
+  </footer>
+</div>
 
 <script>
-(function(){
-  var store = {
-    get: function(k){ try { return JSON.parse(localStorage.getItem(k)); } catch(e){ return null; } },
-    set: function(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
-  };
-
-  /* copy */
-  function copyText(text, btn){
-    function ok(){ btn.textContent = "복사됨"; btn.classList.add("done"); setTimeout(function(){ btn.textContent = btn.dataset.label || "복사하기"; btn.classList.remove("done"); }, 1500); }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(ok, function(){ fallback(); });
-    } else { fallback(); }
-    function fallback(){
-      var ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
-      try { document.execCommand("copy"); ok(); } catch(e){} document.body.removeChild(ta);
-    }
-  }
-  document.querySelectorAll(".copy-btn").forEach(function(b){
-    b.addEventListener("click", function(){ copyText(document.getElementById(b.dataset.copy).textContent, b); });
-  });
-
-  /* quiz */
-  var Q = [
-    ["라벨 목록과 각 라벨의 정의를 정한다", "me", "기준은 목적을 아는 사람이 정한다."],
-    ["가이드대로 공고 200개에 1차 라벨을 붙인다", "ai", "반복 작업은 AI가 빠르다. 단, 검수 전에는 후보일 뿐."],
-    ["'게임QA & 운영지원'을 어느 라벨로 할지 최종 판정한다", "me", "애매한 사례의 판정은 사람이 하고 가이드에 적는다."],
-    ["라벨마다 제목의 어느 단어가 근거인지 적는다", "ai", "근거를 함께 받으면 검수가 쉬워진다."],
-    ["확신이 낮은 줄과 무작위 일부를 직접 확인한다", "me", "샘플 검수는 사람의 몫이다."],
-    ["어긋난 줄을 원인별로 묶어 보고한다", "ai", "정리·분류는 AI에게 맡기고 결론은 내가 낸다."],
-    ["가이드에 새 판정 규칙을 넣을지 결정한다", "me", "가이드를 바꾸면 이전 라벨도 영향을 받는다. 결정은 사람이."],
-    ["두 결과의 일치율을 계산한다", "ai", "계산은 도구나 AI에게. 해석은 내가."]
-  ];
-  var qbox = document.getElementById("quiz"), right = 0;
-  Q.forEach(function(q){
-    var row = document.createElement("div"); row.className = "qrow";
-    row.innerHTML = '<div class="qt"></div><div class="qb"><button type="button" data-v="ai">AI</button><button type="button" data-v="me">나</button></div><div class="why"></div>';
-    row.querySelector(".qt").textContent = q[0];
-    row.querySelector(".why").textContent = q[2];
-    row.querySelectorAll("button").forEach(function(b){
-      b.addEventListener("click", function(){
-        if (row.dataset.done) return;
-        row.dataset.done = "1";
-        var ok = b.dataset.v === q[1];
-        row.classList.add(ok ? "right" : "wrong");
-        if (ok) right++;
-        document.getElementById("quizScore").textContent = right + " / " + Q.length + " 맞힘";
-      });
-    });
-    qbox.appendChild(row);
-  });
-
-  /* label sheet */
-  var DATA = [
-    ["㈜게임덱스", "게임 QA (계약직)"],
-    ["NC", "[NC][단기계약직][AION2] 게임 현지화 영어 번역 / 검수 (English Linguist & LQA)"],
-    ["NC", "[NC][단기계약직][AION2] 게임 현지화 포르투갈어(브라질) 번역 / 검수 (Brazilian Portuguese Translator)"],
-    ["스마일게이트", "[CROSSFIRE] Test Engineer 담당 (계약직) 모집"],
-    ["엔드나인게임즈", "(주)엔드나인게임즈에서 게임QA & 운영지원 담당자를 찾고 있어요"],
-    ["㈜매드엔진", "[매드엔진] 게임 데이터 분석 담당자 (경력)"],
-    ["히든몬스터", "[경력 1년 이상] 모바일 게임 운영 매니저 모집 (언어 가능자)"],
-    ["㈜그린맨파워", "[구로/대기업] 게임 보안솔루션 QA 및 보안 검수"],
-    ["리드커리어㈜", "[게임운영대행사 / 큐로드] 디바이스 성능 측정 QA 채용"],
-    ["㈜핸디커뮤니케이션즈", "단 2~3시간 스팀 게임 테스터 모집"],
-    ["메타엠", "[모니터링] ★배틀그라운드★ 게임 모니터링 담당자 채용"],
-    ["리드커리어㈜", "[게임운영대행사 / 큐로드] 차량용 App 품질검수(QA) 채용"],
-    ["큐로드", "[본사근무 / 게임 모니터링 ] 디바이스 QA 채용"],
-    ["스마일게이트", "[AI센터] AI QA 자동화 기술 R&D 담당 (인턴/6개월) 모집"],
-    ["스마일게이트", "[AI센터] AI 프로덕트 운영·품질 관리 담당"],
-    ["㈜큐로드", "[전남광주] 게임 LQA 담당자 채용 (영어번역)"],
-    ["큐로드", "[역삼역 / 게임 버그 테스트 ] 큐로드 QA 채용"],
-    ["국내 게임사", "[한달평균 15일근무] 게임 주간모니터링 담당자 채용"],
-    ["코스모스게이밍코리아", "웹게임 QA 테스터"],
-    ["㈜이엑스투게임즈", "[Ex2게임즈] QA"]
-  ];
-  var LABELS = ["QA", "LQA", "OPS", "OTHER", "UNSURE"];
-  var CAUSES = ["", "정의가 모호", "예시 부족", "판정 규칙 없음", "내가 틀림", "AI가 틀림"];
-  var state = store.get("ax6-sheet") || { me: {}, ai: {}, cause: {} };
-  var tbody = document.querySelector("#sheetTable tbody");
-
-  function sel(opts, val, ph){
-    var s = document.createElement("select");
-    var o0 = document.createElement("option"); o0.value = ""; o0.textContent = ph; s.appendChild(o0);
-    opts.forEach(function(v){ if (!v) return; var o = document.createElement("option"); o.value = v; o.textContent = v; if (v === val) o.selected = true; s.appendChild(o); });
-    return s;
-  }
-  DATA.forEach(function(d, i){
-    var tr = document.createElement("tr");
-    var tdNo = document.createElement("td"); tdNo.className = "no"; tdNo.textContent = i + 1;
-    var tdCo = document.createElement("td"); tdCo.textContent = d[0];
-    var tdT = document.createElement("td"); tdT.className = "title"; tdT.textContent = d[1];
-    var tdMe = document.createElement("td"); var sMe = sel(LABELS, state.me[i], "선택"); tdMe.appendChild(sMe);
-    var tdAi = document.createElement("td"); var sAi = sel(LABELS, state.ai[i], "선택"); tdAi.appendChild(sAi);
-    var tdC = document.createElement("td"); var sC = sel(CAUSES, state.cause[i], "–"); tdC.appendChild(sC);
-    sMe.addEventListener("change", function(){ state.me[i] = sMe.value; save(); });
-    sAi.addEventListener("change", function(){ state.ai[i] = sAi.value; save(); });
-    sC.addEventListener("change", function(){ state.cause[i] = sC.value; save(); });
-    [tdNo, tdCo, tdT, tdMe, tdAi, tdC].forEach(function(td){ tr.appendChild(td); });
-    tbody.appendChild(tr);
-  });
-
-  function save(){ store.set("ax6-sheet", state); calc(); }
-  function calc(){
-    var n = 0, agree = 0, diff = 0, cm = {}, ca = {};
-    var rows = tbody.querySelectorAll("tr");
-    DATA.forEach(function(d, i){
-      var a = state.me[i], b = state.ai[i];
-      rows[i].classList.remove("diff");
-      if (a && b) {
-        n++; cm[a] = (cm[a] || 0) + 1; ca[b] = (ca[b] || 0) + 1;
-        if (a === b) agree++; else { diff++; rows[i].classList.add("diff"); }
-      }
-    });
-    document.getElementById("stDone").textContent = n + " / " + DATA.length;
-    document.getElementById("stDiff").textContent = diff;
-    if (!n) { document.getElementById("stAgree").textContent = "–"; document.getElementById("stKappa").textContent = "–"; return; }
-    var po = agree / n, pe = 0;
-    LABELS.forEach(function(l){ pe += ((cm[l] || 0) / n) * ((ca[l] || 0) / n); });
-    document.getElementById("stAgree").textContent = Math.round(po * 100) + "%";
-    document.getElementById("stKappa").textContent = pe >= 1 ? "1.00" : ((po - pe) / (1 - pe)).toFixed(2);
-  }
-  calc();
-
-  document.getElementById("exportBtn").addEventListener("click", function(){
-    var lines = ["| # | 회사 | 공고 제목 | 내 라벨 | AI 라벨 | 원인 |", "| --- | --- | --- | --- | --- | --- |"];
-    DATA.forEach(function(d, i){
-      lines.push("| " + (i + 1) + " | " + d[0] + " | " + d[1].replace(/\|/g, "\\|") + " | " + (state.me[i] || "") + " | " + (state.ai[i] || "") + " | " + (state.cause[i] || "") + " |");
-    });
-    lines.push("", "일치율: " + document.getElementById("stAgree").textContent + " · 카파: " + document.getElementById("stKappa").textContent);
-    var b = document.getElementById("exportBtn"); b.dataset.label = "결과 표 복사 (마크다운)";
-    copyText(lines.join("\n"), b);
-  });
-  document.getElementById("resetBtn").addEventListener("click", function(){
-    if (!confirm("라벨 시트에 고른 값을 모두 지울까요?")) return;
-    state = { me: {}, ai: {}, cause: {} }; store.set("ax6-sheet", state);
-    tbody.querySelectorAll("select").forEach(function(s){ s.value = ""; }); calc();
-  });
-
-  /* activity */
-  var act = store.get("ax6-activity") || {};
-  ["a1","a2","a3","a4","a5"].forEach(function(id){
-    var el = document.getElementById(id); if (act[id]) el.value = act[id];
-    el.addEventListener("input", function(){ act[id] = el.value; store.set("ax6-activity", act); });
-  });
-  ["c1","c2"].forEach(function(id){
-    var el = document.getElementById(id); el.checked = !!act[id];
-    el.addEventListener("change", function(){ act[id] = el.checked; store.set("ax6-activity", act); });
-  });
-})();
+var QUIZ = [
+  ["“꼼꼼함과 책임감을 바탕으로 귀사의 발전에 기여하겠습니다.”", "고칠 것", "누구나 쓸 수 있는 다짐입니다. 꼼꼼했던 장면이 없습니다."],
+  ["“근로장학생으로 1년간 학과 행사 신청서 300여 건을 정리했고, 마감일을 한 번도 넘기지 않았습니다.”", "괜찮음", "상황·행동·숫자가 있습니다. 숫자는 내 기록과 확인하세요."],
+  ["“결과적으로 팀워크의 중요성을 깨닫게 되었습니다.”", "고칠 것", "군더더기 연결어에 누구나 깨닫는 교훈입니다."],
+  ["“고객 문의 답변 시간을 줄이고 싶어 자주 묻는 질문 20개를 정리해 팀에 공유했습니다.”", "괜찮음", "왜 · 무엇을 · 얼마나가 보입니다."],
+  ["“저는 소통 능력이 뛰어나다고 생각합니다.”", "고칠 것", "“생각합니다”에 근거도 없습니다."],
+  ["“이 경험으로 귀사의 업무에 바로 적용할 수 있는 실무 역량을 체득했습니다.”", "고칠 것", "신입이 장담하기 어려운 과장입니다."]
+];
+var OPTS = ["괜찮음", "고칠 것"];
+var TL = [
+  ["16:00~16:15","도입","5차시 위키 숙제(원문 3개 더 넣기) 확인 → “AI에게 자소서를 통째로 맡기면 무엇이 문제일까?”","15분"],
+  ["16:15~16:40","개념 1 — 왜 티가 날까","AI 티 나는 이유 + 미니 퀴즈","25분"],
+  ["16:40~17:00","개념 2 — 강사 원칙","서류 원칙 6가지 + 고친 문장 사례","20분"],
+  ["17:00~17:15","개념 3 — 역할과 순서","AI와 나의 역할, 6단계, 제출 전 확인 행동","15분"],
+  ["17:15~17:25","휴식","","10분"],
+  ["17:25~18:15","실습 1 · 공고 읽기 + 경험 캐내기","“자소서 코치”로 공고 분석표와 경험 카드 3장","50분"],
+  ["18:15~19:05","실습 2 · 초안 + AI 티 점검","연결표 → 한 문항 초안을 내가 쓰고 → 코치 점검 받아 고치기","50분"],
+  ["19:05~19:35","공유","2인 1조, 서로의 첫 문장 읽어 주기 → “첫 문장만 듣고 답이 보이나?”","30분"],
+  ["19:35~19:55","정리","제출 전 확인 카드","20분"],
+  ["19:55~20:00","마무리","7차시(11/20) 예고 — 오늘 쓴 문항과 공고로 면접 준비","5분"]
+];
+function init(){
+  renderRows('jobRows', [['회사 / 직무',''],['하는 일',''],['자격 요건',''],['우대 사항',''],['가장 중요하게 볼 것 3개','공고 문장을 근거로']], 1);
+  renderRows('expRows', [['상황','언제·어디서·무엇 때문에'],['내가 한 행동',''],['결과 (숫자로)',''],['확인할 자료','기록·증빙']], 3);
+  renderRows('linkRows', [['공고 요구 → 경험 카드',''],['쓸 문항 / 글자 수 제한',''],['첫 문장 (질문의 답)','']], 1);
+}
 </script>
+<script>
+function renderQuiz(){
+  var box = document.getElementById('quizList'), solved = {};
+  QUIZ.forEach(function(q, i){
+    var row = document.createElement('div');
+    row.className = 'q-row';
+    row.innerHTML = '<span class="q-num">' + (i+1) + '</span><span class="q-text"></span><span class="q-btns"></span><span class="q-why"></span>';
+    row.querySelector('.q-text').textContent = q[0];
+    row.querySelector('.q-why').textContent = q[2];
+    var btns = row.querySelector('.q-btns');
+    OPTS.forEach(function(opt){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = opt;
+      b.onclick = function(){
+        btns.querySelectorAll('button').forEach(function(x){ x.classList.remove('right','wrong'); });
+        row.classList.add('done');
+        if(opt === q[1]){ b.classList.add('right'); solved[i] = true; }
+        else { b.classList.add('wrong'); delete solved[i]; }
+        document.getElementById('qScore').textContent = Object.keys(solved).length + ' / ' + QUIZ.length + ' 맞힘';
+      };
+      btns.appendChild(b);
+    });
+    box.appendChild(row);
+  });
+}
+function renderTL(){
+  var box = document.getElementById('tl');
+  TL.forEach(function(t){
+    var d = document.createElement('div');
+    d.className = 't-item';
+    d.innerHTML = '<div class="t-time"></div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage"></div><div class="t-desc"></div><span class="t-dur"></span></div>';
+    d.querySelector('.t-time').textContent = t[0];
+    d.querySelector('.t-stage').textContent = t[1];
+    if(t[2]) d.querySelector('.t-desc').textContent = t[2]; else d.querySelector('.t-desc').remove();
+    d.querySelector('.t-dur').textContent = t[3];
+    box.appendChild(d);
+  });
+}
+function renderRows(id, rows, cols){
+  var body = document.getElementById(id);
+  rows.forEach(function(r){
+    var tr = document.createElement('tr');
+    var td = document.createElement('td'); td.textContent = r[0]; tr.appendChild(td);
+    for(var c = 0; c < cols; c++){
+      var cell = document.createElement('td'), inp = document.createElement('input');
+      inp.type = 'text'; if(c === 0 && r[1]) inp.placeholder = r[1];
+      cell.appendChild(inp); tr.appendChild(cell);
+    }
+    body.appendChild(tr);
+  });
+}
+function copyText(text, btn){
+  var label = btn.textContent;
+  function done(){
+    btn.textContent = '복사됨 ✓';
+    btn.classList.add('copied');
+    setTimeout(function(){ btn.textContent = label; btn.classList.remove('copied'); }, 1800);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text, done); });
+  } else { fallbackCopy(text, done); }
+}
+function copyPrompt(){
+  copyText(document.getElementById('promptText').innerText, document.getElementById('copyBtn'));
+}
+function fallbackCopy(text, cb){
+  var ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); } catch(e){}
+  document.body.removeChild(ta);
+  if(cb) cb();
+}
+renderQuiz();
+renderTL();
+if(typeof init === 'function') init();
+</script>
+
 </body>
 </html>
