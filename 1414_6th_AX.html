@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AX특강 6차시 — AI 티 안 나는 이력서·자기소개서</title>
+<style>
+  :root{
+    --navy:#1a3a5c;
+    --ink:#171b21;
+    --blue:#2e6da4;
+    --orange:#f0a500;
+    --orange-hover:#d4920a;
+    --canvas:#ececef;
+    --card:#ffffff;
+    --line:#e4e6eb;
+    --text:#2a2e35;
+    --text-light:#6b7280;
+    --text-faint:#9aa0aa;
+    --field-bg:#f4f5f7;
+    --p:#1a3a5c; --a:#2e6da4; --r:#c98a12; --ar:#7b8494;
+    --ok:#3a8a5c; --no:#b5523b;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Pretendard','Malgun Gothic','Apple SD Gothic Neo',sans-serif;color:var(--text);line-height:1.7;background:var(--canvas);}
+  .ico{width:22px;height:22px;stroke:var(--orange);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;}
+
+  /* Nav */
+  .navwrap{position:sticky;top:0;z-index:100;display:flex;justify-content:center;padding:14px 16px 0;}
+  nav{background:rgba(255,255,255,.88);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:999px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 10px 8px 20px;max-width:1040px;width:100%;box-shadow:0 4px 18px rgba(20,25,35,.06);overflow-x:auto;}
+  .nav-logo{color:var(--navy);font-weight:800;text-decoration:none;font-size:.86rem;white-space:nowrap;}
+  .nav-links{list-style:none;display:flex;gap:2px;white-space:nowrap;}
+  .nav-links a{color:var(--text-light);text-decoration:none;padding:7px 11px;border-radius:999px;font-size:.78rem;font-weight:600;transition:all .15s;}
+  .nav-links a:hover{background:var(--navy);color:#fff;}
+
+  /* Page */
+  .page{max-width:1040px;margin:0 auto;padding:28px 16px 60px;display:flex;flex-direction:column;gap:18px;}
+  .block{background:var(--card);border-radius:26px;border:1px solid var(--line);box-shadow:0 10px 28px rgba(20,25,35,.05);padding:44px 40px;position:relative;overflow:hidden;}
+  @media(max-width:640px){.block{padding:30px 22px;border-radius:20px;}}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.72rem;font-weight:700;letter-spacing:.04em;color:var(--navy);background:#eef3f8;padding:6px 14px;border-radius:999px;margin-bottom:18px;}
+  h2{font-size:1.28rem;color:var(--ink);margin-bottom:6px;letter-spacing:-.01em;}
+  h2 + .sub{color:var(--text-light);font-size:.88rem;margin-bottom:22px;}
+  h3{font-size:1rem;color:var(--ink);margin:26px 0 10px;}
+  p{color:var(--text-light);font-size:.92rem;margin-bottom:10px;}
+  ul,ol{margin:0 0 14px 20px;color:var(--text-light);font-size:.92rem;}
+  li{margin-bottom:7px;}
+  li::marker{color:var(--orange);}
+  strong{color:var(--text);}
+
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;}
+  .btn{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:12px 22px;text-decoration:none;font-weight:700;font-size:.84rem;border:none;cursor:pointer;transition:all .15s;}
+  .btn-dark{background:var(--ink);color:#fff;}
+  .btn-dark:hover{background:#000;}
+  .btn-orange{background:var(--orange);color:#fff;}
+  .btn-orange:hover{background:var(--orange-hover);}
+
+  /* Hero */
+  .hero-waves{position:absolute;top:0;right:0;width:58%;height:100%;opacity:.9;pointer-events:none;}
+  .hero-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:36px;position:relative;z-index:1;align-items:start;}
+  @media(max-width:780px){.hero-grid{grid-template-columns:1fr;}}
+  .dots{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+  .dots .d{display:flex;gap:3px;}
+  .dots .d span{width:7px;height:7px;border-radius:50%;background:var(--line);}
+  .dots .d span.on{background:var(--orange);}
+  .dots .label{font-size:.76rem;color:var(--text-faint);font-weight:600;}
+  .hero h1{font-size:2rem;font-weight:800;color:var(--ink);line-height:1.35;letter-spacing:-.02em;margin-bottom:16px;}
+  @media(max-width:480px){.hero h1{font-size:1.6rem;}}
+  .hero .lead{font-size:.95rem;color:var(--text-light);max-width:440px;}
+  .meta-card{background:var(--field-bg);border:1px solid var(--line);border-radius:18px;padding:22px;}
+  .field{margin-bottom:14px;}
+  .field:last-child{margin-bottom:0;}
+  .field label{display:block;font-size:.76rem;font-weight:700;color:var(--ink);margin-bottom:6px;}
+  .field .val{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:.82rem;color:var(--text-light);}
+
+  .big-line{margin-top:28px;padding:26px 24px;border-top:1px solid var(--line);position:relative;z-index:1;text-align:center;}
+  .big-line .q{font-size:1.4rem;font-weight:800;color:var(--navy);letter-spacing:-.01em;}
+  .big-line .q em{font-style:normal;color:var(--orange);}
+  .big-line p{margin:8px 0 0;}
+
+  .feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:10px;padding-top:26px;border-top:1px solid var(--line);position:relative;z-index:1;}
+  @media(max-width:860px){.feature-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:480px){.feature-grid{grid-template-columns:1fr;}}
+  .feature .ico{margin-bottom:10px;}
+  .feature h4{font-size:.9rem;color:var(--ink);margin-bottom:4px;}
+  .feature p{font-size:.8rem;color:var(--text-light);margin:0;}
+
+  /* Pain cards */
+  .pain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0 22px;}
+  @media(max-width:720px){.pain-grid{grid-template-columns:1fr;}}
+  .pain{background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:16px 18px;font-size:.86rem;color:var(--text);}
+  .pain .emo{font-size:1.3rem;display:block;margin-bottom:6px;}
+  .switch{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:600px){.switch{grid-template-columns:1fr;}}
+  .switch div{border-radius:14px;padding:18px 20px;font-weight:700;font-size:.95rem;}
+  .switch .bad{background:#f7ece9;color:var(--no);}
+  .switch .good{background:#e8f1f8;color:var(--navy);}
+  .switch small{display:block;font-weight:600;font-size:.74rem;opacity:.75;margin-bottom:4px;}
+
+  /* PARA cards */
+  .para-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0 8px;}
+  @media(max-width:860px){.para-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:460px){.para-grid{grid-template-columns:1fr;}}
+  .para{border-radius:18px;padding:20px 18px;color:#fff;display:flex;flex-direction:column;gap:6px;}
+  .para .letter{font-size:2.2rem;font-weight:900;line-height:1;}
+  .para .name{font-size:.82rem;font-weight:700;opacity:.9;}
+  .para .rule{background:rgba(255,255,255,.18);border-radius:999px;padding:4px 12px;font-size:.78rem;font-weight:700;align-self:flex-start;margin:4px 0;}
+  .para .desc{font-size:.8rem;opacity:.92;}
+  .para .ex{font-size:.76rem;opacity:.85;border-top:1px solid rgba(255,255,255,.25);padding-top:8px;margin-top:4px;}
+  .para.p{background:var(--p);} .para.a{background:var(--a);} .para.r{background:var(--r);} .para.ar{background:var(--ar);}
+
+  .tips{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px;}
+  @media(max-width:720px){.tips{grid-template-columns:1fr;}}
+  .tip{background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+  .tip .n{display:inline-flex;width:26px;height:26px;border-radius:50%;background:var(--orange);color:#fff;font-weight:800;font-size:.8rem;align-items:center;justify-content:center;margin-bottom:8px;}
+  .tip h4{font-size:.88rem;color:var(--ink);margin-bottom:4px;}
+  .tip p{font-size:.8rem;margin:0;}
+
+  /* Quiz */
+  .quiz{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
+  .q-row{display:grid;grid-template-columns:30px 1fr auto;gap:12px;align-items:center;background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:12px 14px;}
+  @media(max-width:640px){.q-row{grid-template-columns:30px 1fr;} .q-btns{grid-column:1 / -1;}}
+  .q-num{font-weight:800;color:var(--navy);font-size:.85rem;}
+  .q-text{font-size:.88rem;color:var(--text);}
+  .q-btns{display:flex;gap:6px;flex-wrap:wrap;}
+  .q-btns button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:.78rem;font-weight:700;color:var(--text-light);cursor:pointer;font-family:inherit;}
+  .q-btns button:hover{border-color:var(--navy);color:var(--navy);}
+  .q-btns button.right{background:var(--ok);border-color:var(--ok);color:#fff;}
+  .q-btns button.wrong{background:var(--no);border-color:var(--no);color:#fff;}
+  .q-score{margin-top:14px;font-size:.88rem;font-weight:700;color:var(--navy);}
+
+  /* Folder tree */
+  .tree{background:var(--ink);color:#dce3ec;border-radius:16px;padding:22px 24px;font-family:'Consolas','Malgun Gothic',monospace;font-size:.86rem;line-height:1.9;white-space:pre;overflow-x:auto;margin:16px 0;}
+  .tree .c{color:#8fa3b8;}
+  .tree .o{color:var(--orange);font-weight:700;}
+
+  /* Table */
+  table{width:100%;border-collapse:collapse;font-size:.85rem;margin:14px 0;}
+  th{color:var(--text-faint);font-size:.74rem;font-weight:700;letter-spacing:.03em;padding:8px 12px;text-align:left;border-bottom:2px solid var(--line);}
+  td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text-light);}
+  tr:last-child td{border-bottom:none;}
+  .table-wrap{overflow-x:auto;}
+
+  /* Timeline */
+  .timeline{position:relative;margin:24px 0 0;padding-left:6px;}
+  .t-item{display:grid;grid-template-columns:92px 22px 1fr;gap:4px 14px;position:relative;}
+  @media(max-width:480px){.t-item{grid-template-columns:78px 18px 1fr;gap:4px 8px;}}
+  .t-item .t-time{font-weight:800;color:var(--ink);font-size:.78rem;padding-top:2px;white-space:nowrap;}
+  .t-item .t-dotcol{display:flex;flex-direction:column;align-items:center;}
+  .t-item .t-dot{width:10px;height:10px;border-radius:50%;background:var(--orange);margin-top:5px;flex-shrink:0;}
+  .t-item .t-line{width:2px;flex:1;background:var(--line);margin-top:2px;}
+  .t-item:last-child .t-line{display:none;}
+  .t-item .t-body{padding-bottom:22px;}
+  .t-item .t-stage{font-weight:700;color:var(--navy);font-size:.86rem;margin-bottom:2px;}
+  .t-item .t-desc{font-size:.82rem;color:var(--text-light);}
+  .t-item .t-dur{display:inline-block;margin-top:4px;font-size:.72rem;color:var(--text-faint);background:var(--field-bg);padding:2px 9px;border-radius:999px;}
+
+  /* Prompt */
+  .warn{display:flex;gap:12px;background:#fdf6e6;border:1px solid #f1dfb2;border-radius:14px;padding:14px 16px;margin:14px 0;font-size:.86rem;color:var(--text);}
+  .warn .ic{font-weight:900;color:var(--r);}
+  .prompt-wrap{position:relative;margin:16px 0;}
+  .prompt-box{background:var(--ink);color:#dce3ec;border-radius:16px;padding:22px 24px;padding-top:56px;font-size:.82rem;line-height:1.75;white-space:pre-wrap;word-break:break-word;max-height:440px;overflow-y:auto;font-family:'Consolas','Malgun Gothic',monospace;}
+  .copy-btn{position:absolute;top:14px;right:14px;background:var(--orange);color:#fff;border:none;padding:8px 16px;border-radius:999px;font-size:.78rem;cursor:pointer;font-weight:700;transition:background .15s;font-family:inherit;}
+  .copy-btn:hover{background:var(--orange-hover);}
+  .copy-btn.copied{background:var(--ok);}
+  .redirect-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:14px;}
+  @media(max-width:720px){.redirect-grid{grid-template-columns:1fr;}}
+  .redirect-card{background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:16px 18px;font-size:.84rem;color:var(--text);font-style:italic;}
+
+  /* Worksheet */
+  .ws{background:var(--field-bg);border:1px solid var(--line);border-radius:18px;padding:24px 26px;margin:16px 0;}
+  @media(max-width:640px){.ws{padding:18px 16px;}}
+  .ws-files{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;}
+  @media(max-width:600px){.ws-files{grid-template-columns:1fr;}}
+  .ws-file{display:flex;align-items:center;gap:8px;}
+  .ws-file span{font-weight:800;color:var(--navy);font-size:.8rem;width:22px;text-align:right;}
+  .ws input[type=text], .ws select{width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:.86rem;font-family:inherit;color:var(--text);}
+  .ws-file select{width:110px;flex-shrink:0;}
+  .steps{counter-reset:s;list-style:none;margin:10px 0 0;}
+  .steps li{counter-increment:s;position:relative;padding-left:38px;margin-bottom:12px;color:var(--text);}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:0;width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-weight:800;font-size:.8rem;display:flex;align-items:center;justify-content:center;}
+  .routine{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:14px 0;}
+  @media(max-width:720px){.routine{grid-template-columns:1fr;}}
+  .routine div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;}
+  .routine .min{font-size:1.5rem;font-weight:900;color:var(--orange);line-height:1;}
+  .routine h4{font-size:.88rem;color:var(--ink);margin:6px 0 4px;}
+  .routine p{font-size:.8rem;margin:0;}
+  .save-note{font-size:.74rem;color:var(--text-faint);margin-top:10px;}
+
+  footer{text-align:center;padding:36px 20px 10px;color:var(--text-faint);font-size:.78rem;}
+  footer a{color:var(--blue);}
+  footer p{font-size:.78rem;color:var(--text-faint);}
+
+  @media print{
+    .navwrap,.copy-btn,.btn-row{display:none;}
+    body{background:#fff;}
+    .block{box-shadow:none;border-radius:0;break-inside:avoid;}
+    .prompt-box,.tree{max-height:none;color:#111;background:#f2f2f2;}
+  }
+
+  /* 3차시 추가 */
+  code{font-family:'Consolas',monospace;background:var(--field-bg);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:.84em;color:var(--navy);}
+  .cmp td:first-child{font-weight:700;color:var(--ink);white-space:nowrap;}
+  .cmp td.hl{color:var(--navy);font-weight:700;}
+  .formula{background:var(--field-bg);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:16px 0;font-size:.92rem;color:var(--text);line-height:1.9;}
+  .formula b{display:inline-block;border-radius:8px;padding:0 8px;color:#fff;font-weight:700;margin:2px 0;}
+  .formula .f1{background:var(--p);} .formula .f2{background:var(--a);} .formula .f3{background:var(--r);} .formula .f4{background:var(--ar);}
+  .cron-fields{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:18px 0 6px;text-align:center;}
+  .cron-fields div{background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:12px 6px;}
+  .cron-fields .v{font-family:'Consolas',monospace;font-size:1.6rem;font-weight:800;color:var(--navy);line-height:1.2;}
+  .cron-fields .k{font-size:.76rem;font-weight:700;color:var(--text);}
+  .cron-fields .r{font-size:.7rem;color:var(--text-faint);}
+  .cron-read{text-align:center;font-size:.9rem;font-weight:700;color:var(--navy);margin-bottom:14px;}
+  .q-row .q-text code{font-size:.95em;}
+  .cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0 4px;}
+  .cat-tabs button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-size:.8rem;font-weight:700;color:var(--text-light);cursor:pointer;font-family:inherit;}
+  .cat-tabs button.on{background:var(--navy);border-color:var(--navy);color:#fff;}
+  .req-list{display:flex;flex-direction:column;gap:10px;margin-top:12px;}
+  .req{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--field-bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;}
+  .req .t{font-size:.88rem;color:var(--text);}
+  .req .t .star{display:inline-block;font-size:.7rem;font-weight:800;color:#fff;background:var(--orange);border-radius:999px;padding:1px 8px;margin-left:6px;vertical-align:1px;}
+  .req button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:.76rem;font-weight:700;color:var(--navy);cursor:pointer;font-family:inherit;white-space:nowrap;}
+  .req button.copied{background:var(--ok);border-color:var(--ok);color:#fff;}
+  .tool-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px;}
+  @media(max-width:780px){.tool-grid{grid-template-columns:1fr;}}
+  .tool{border:1px solid var(--line);border-radius:18px;padding:20px;}
+  .tool .tag{display:inline-block;font-size:.7rem;font-weight:700;border-radius:999px;padding:3px 10px;margin-bottom:8px;}
+  .tool .tag.go{background:#e6f1ea;color:var(--ok);} .tool .tag.paid{background:#fdf6e6;color:var(--r);} .tool .tag.later{background:#eef0f3;color:var(--ar);}
+  .tool h4{font-size:.95rem;color:var(--ink);margin-bottom:6px;}
+  .tool ul{font-size:.82rem;margin-bottom:0;}
+  .card-table input{width:100%;background:#fff;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:.82rem;font-family:inherit;color:var(--text);}
+  .card-table td{padding:6px 6px;}
+  .card-table td:first-child{font-weight:700;color:var(--ink);white-space:nowrap;font-size:.8rem;}
+  .checks label{display:flex;gap:8px;align-items:center;font-size:.86rem;color:var(--text);margin-bottom:8px;cursor:pointer;}
+
+  /* 4차시 추가 */
+  .para-grid.three{grid-template-columns:repeat(3,1fr);}
+  @media(max-width:780px){.para-grid.three{grid-template-columns:1fr;}}
+  .para-grid.three .para .letter{font-size:1.6rem;}
+  .state-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0;}
+  @media(max-width:720px){.state-grid{grid-template-columns:1fr;}}
+  .state{border-radius:16px;padding:18px 20px;border:1px solid var(--line);}
+  .state .mark{font-size:1.4rem;display:block;margin-bottom:6px;}
+  .state h4{font-size:.95rem;color:var(--ink);margin-bottom:4px;}
+  .state p{font-size:.82rem;margin:0;}
+  .state.draft{background:#fdf6e6;} .state.ok{background:#e6f1ea;} .state.no{background:#f7ece9;}
+  .lv{display:inline-block;font-size:.72rem;font-weight:800;border-radius:999px;padding:2px 10px;white-space:nowrap;}
+  .lv.l1{background:#eef0f3;color:var(--ar);} .lv.l2{background:#e8f1f8;color:var(--blue);}
+  .lv.l3{background:#fdf6e6;color:var(--r);} .lv.l4{background:#f7ece9;color:var(--no);}
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;}
+  @media(max-width:720px){.ba{grid-template-columns:1fr;}}
+  .ba div{border-radius:14px;padding:18px 20px;font-size:.86rem;line-height:1.75;color:var(--text);position:relative;}
+  .ba small{display:block;font-weight:700;font-size:.74rem;margin-bottom:6px;}
+  .ba .before{background:var(--field-bg);border:1px solid var(--line);}
+  .ba .before small{color:var(--text-faint);}
+  .ba .after{background:#e8f1f8;border:1px solid #cfe0ee;padding-bottom:52px;}
+  .ba .after small{color:var(--navy);}
+  .mini-copy{position:absolute;right:14px;bottom:12px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:.76rem;font-weight:700;color:var(--navy);cursor:pointer;font-family:inherit;}
+  .mini-copy.copied{background:var(--ok);border-color:var(--ok);color:#fff;}
+  .switch .good + .good{background:#eef3f8;}
+  /* 5·6차시 추가 */
+  .q-why{grid-column:1 / -1;font-size:.8rem;color:var(--text-light);display:none;padding-left:42px;}
+  .q-row.done .q-why{display:block;}
+  .fix-list .ba{margin-top:12px;}
+  .fix-list .ba .after{padding-bottom:18px;}
+  .tool-grid.two{grid-template-columns:repeat(2,1fr);}
+  @media(max-width:720px){.tool-grid.two{grid-template-columns:1fr;}}
+  .timer{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:14px;}
+  .timer .t-big{font-size:1.8rem;font-weight:900;color:var(--navy);min-width:90px;}
+  .timer .t-big.good{color:var(--ok);} .timer .t-big.over{color:var(--no);}
+  .timer .t-hint{font-size:.8rem;color:var(--text-faint);}
+</style>
+</head>
+<body>
+
+<div class="navwrap">
+<nav>
+  <a class="nav-logo" href="#top">AX특강 6차시</a>
+  <ul class="nav-links">
+    <li><a href="#why">왜 티가 날까</a></li>
+    <li><a href="#quiz">퀴즈</a></li>
+    <li><a href="#rules">강사 원칙</a></li>
+    <li><a href="#fix">고친 문장</a></li>
+    <li><a href="#roles">AI와 나</a></li>
+    <li><a href="#steps">6단계</a></li>
+    <li><a href="#timeline">진행흐름</a></li>
+    <li><a href="#prompt">프롬프트</a></li>
+    <li><a href="#worksheet">활동지</a></li>
+  </ul>
+</nav>
+</div>
+
+<div class="page" id="top">
+
+  <section class="block hero">
+    <svg class="hero-waves" viewBox="0 0 600 420" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M40,360 C200,260 300,110 600,0" stroke="#e8eaef" stroke-width="1.4" fill="none"/>
+      <path d="M70,390 C230,290 330,140 600,40" stroke="#e8eaef" stroke-width="1.4" fill="none"/>
+      <path d="M100,420 C260,320 360,170 600,80" stroke="#e8eaef" stroke-width="1.4" fill="none"/>
+      <path d="M10,320 C170,230 270,90 560,-10" stroke="#eef1f5" stroke-width="1.2" fill="none"/>
+    </svg>
+    <div class="hero-grid">
+      <div>
+        <div class="dots">
+          <span class="d"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span></span><span></span><span></span></span>
+          <span class="label">6 / 9회차 · 취업 서류 ①</span>
+        </div>
+        <h1>AI 티 안 나는<br>이력서·자기소개서</h1>
+        <p class="lead">"자기소개서 써 줘" 대신, 공고를 읽고 내 경험을 끌어내는 일을 AI에게 맡깁니다. 문장과 사실은 내가 책임집니다. 오늘 한 문항을 완성합니다.</p>
+        <div class="btn-row">
+          <a class="btn btn-dark" href="#fix">고친 문장 사례</a>
+          <a class="btn btn-orange" href="#prompt">ChatGPT 프롬프트 바로가기</a>
+        </div>
+      </div>
+      <div class="meta-card">
+        <div class="field"><label>대상</label><div class="val">유한대학교 졸업생</div></div>
+        <div class="field"><label>오늘</label><div class="val">2026-11-13(금) · 6차시 · 16:00~20:00 (4시간)</div></div>
+        <div class="field"><label>준비물</label><div class="val">노트북, 휴대폰, ChatGPT 계정, 지원하고 싶은 채용 공고 1개, 지금 가진 이력서·자기소개서(있으면)</div></div>
+        <div class="field"><label>지난 시간</label><div class="val">5차시: 옵시디언 + AI 에이전트로 나만의 LLM 위키 만들기 (4차시: 지원서 = 위험도 "높음")</div></div>
+      </div>
+    </div>
+    <div class="big-line">
+      <div class="q">AI는 <em>재료를 정리</em>하고, 문장은 <em>내 경험</em>으로 쓴다</div>
+      <p>AI가 쓴 자기소개서는 누구나 낼 수 있는 글입니다. 서류에 필요한 건 나만 쓸 수 있는 장면입니다.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg><h4>공고 읽기</h4><p>회사가 원하는 것을 뽑는다.</p></div>
+      <div class="feature"><svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16" y2="16"/></svg><h4>경험 캐내기</h4><p>상황 → 행동 → 결과(숫자)로 꺼낸다.</p></div>
+      <div class="feature"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16z"/><line x1="13" y1="7" x2="17" y2="11"/></svg><h4>AI 티 고치기</h4><p>티 나는 문장을 내 말로 바꾼다.</p></div>
+      <div class="feature"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><polyline points="9 15 11 17 15 13"/></svg><h4>제출 전 확인</h4><p>회사 이름·숫자·글자 수를 대조한다.</p></div>
+    </div>
+  </section>
+
+  <section class="block" id="why">
+    <span class="eyebrow">개념 1</span>
+    <h2>왜 AI가 쓴 자기소개서는 티가 날까</h2>
+    <p class="sub">AI는 "평균적으로 좋은 글"을 씁니다. 서류를 읽는 사람은 하루에 수십 장을 봅니다.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>티 나는 이유</th><th>예</th></tr></thead>
+        <tbody>
+          <tr><td><strong>누구나 쓸 수 있는 말</strong></td><td>"항상 배움의 자세로 성장하는 인재가 되겠습니다"</td></tr>
+          <tr><td><strong>근거 없는 큰 주장</strong></td><td>"~ 역량을 갖추고 있습니다", "~를 체득했습니다", "바로 적용할 수 있습니다"</td></tr>
+          <tr><td><strong>군더더기 연결어</strong></td><td>"결과적으로", "이와 함께", "앞서 말씀드린 것처럼"</td></tr>
+          <tr><td><strong>무슨 뜻인지 모를 추상어</strong></td><td>"저의 방식과 일치한다고 느꼈고, 그 일치감이 함께 일하고 싶은 마음으로 이어졌습니다"</td></tr>
+          <tr><td><strong>자신 없는 끝맺음</strong></td><td>"~라고 생각합니다"</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" id="quiz">
+    <span class="eyebrow">미니 퀴즈</span>
+    <h2>이 문장, 괜찮을까?</h2>
+    <p class="sub">고르면 이유가 나옵니다.</p>
+    <div class="quiz" id="quizList"></div>
+    <div class="q-score" id="qScore">0 / 6 맞힘</div>
+  </section>
+
+  <section class="block" id="rules">
+    <span class="eyebrow">개념 2</span>
+    <h2>강사의 서류 원칙 6가지</h2>
+    <p class="sub">취업 지도를 하며 매번 짚는 기준입니다.</p>
+    <div class="tips six">
+      <div class="tip"><span class="n">1</span><h4>답은 첫 문장에</h4><p>질문의 답을 맨 앞에. 소제목이 있으면 내용과 맞는지 봅니다.</p></div>
+      <div class="tip"><span class="n">2</span><h4>회사마다 고쳐 쓴다</h4><p>한 장으로 여러 회사에 내지 않습니다.</p></div>
+      <div class="tip"><span class="n">3</span><h4>프로젝트는 알아볼 수 있게</h4><p>어떤 목적으로, 무엇을 써서, 무엇을 만들었는지. 같은 프로젝트면 에피소드를 겹치지 않게.</p></div>
+      <div class="tip"><span class="n">4</span><h4>할 말만</h4><p>"이와 함께", "그런 이유로", "앞서 주장한 것처럼"을 지웁니다.</p></div>
+      <div class="tip"><span class="n">5</span><h4>한 방향</h4><p>서류 전체의 주장이 일관된지 봅니다.</p></div>
+      <div class="tip"><span class="n">6</span><h4>"생각합니다" 금지</h4><p>자신 없어 보입니다. "하겠습니다", "했습니다"로.</p></div>
+    </div>
+  </section>
+
+  <section class="block" id="fix">
+    <span class="eyebrow">실제 사례</span>
+    <h2>AI 티 나는 문장 → 고친 문장</h2>
+    <p class="sub">강사가 실제 지도에서 고친 문장입니다. 학생을 알아볼 수 있는 부분은 바꿨습니다.</p>
+    <div class="fix-list">
+      <div class="ba"><div class="before"><small>Before</small>"문제를 사전에 발견하는 테스팅 역량과, 완성도를 높이는 소통 역량을 가지고 있습니다."</div><div class="after"><small>After · "역량이 있다" → 해 온 일</small>"자격증을 준비하며 테스트 절차를 체계적으로 익혔고, 프로젝트를 끝내기 위해 팀원과 소통하는 방법을 배워 왔습니다."</div></div>
+      <div class="ba"><div class="before"><small>Before</small>"항상 배움의 자세로 새로운 것을 빠르게 받아들이며 회사에 기여하겠습니다."</div><div class="after"><small>After · 다짐 → 숫자로 보이는 노력</small>"버그리포트 100개, 테스트 케이스 7개를 준비해 온 것처럼 회사에서도 매일 조금씩 성장하는 모습을 보여드리겠습니다."</div></div>
+      <div class="ba"><div class="before"><small>Before</small>"실제 유저 흐름을 기준으로 연결된 시스템을 검증하는 방식을 체득했습니다."</div><div class="after"><small>After · "체득했다" 과장 → 해 본 일</small>"먼저 기능이 동작하는지 확인하고, 실제 유저의 플레이 흐름으로 시스템을 검증해 보았습니다."</div></div>
+      <div class="ba"><div class="before"><small>Before</small>"데이터를 구조화한 경험은 귀사의 데이터 검증 업무에 바로 적용할 수 있습니다."</div><div class="after"><small>After · 장담 → 기대</small>"데이터를 표 단위로 구조화하고 검증해 본 경험을 귀사의 데이터 업무에 활용할 수 있기를 기대합니다."</div></div>
+      <div class="ba"><div class="before"><small>Before</small>"단 하나의 오기입도 발생하지 않았습니다."</div><div class="after"><small>After · 확인하기 어려운 단정 → 받은 평가</small>"꼼꼼하게 업무를 처리해 일 잘하는 근로 학생이라는 평가를 받았습니다."</div></div>
+      <div class="ba"><div class="before"><small>Before</small>"해외 유학 실패 이후 방향을 잡는 데 3년이 걸렸습니다."</div><div class="after"><small>After · 굳이 "실패"라고 쓰지 않기</small>"유학 이후 방향을 다시 잡는 데 3년이 걸렸고, 그 시간을 채우기 위해 지금 두 프로젝트에 도전하고 있습니다."</div></div>
+    </div>
+    <p style="margin-top:12px;">그 밖에 "결과적으로 ~ 이해하게 되었습니다"는 <strong>"결과적으로"만 지워도</strong> 좋아지고, "~라고 생각합니다"는 "~하겠습니다"로 끝냅니다.</p>
+  </section>
+
+  <section class="block" id="roles">
+    <span class="eyebrow">개념 3 · 4차시 복습</span>
+    <h2>AI와 나의 역할 나누기</h2>
+    <div class="table-wrap">
+      <table class="cmp">
+        <thead><tr><th>AI가 할 일</th><th>내가 할 일</th></tr></thead>
+        <tbody>
+          <tr><td>공고에서 요구 역량·우대 사항 뽑기</td><td class="hl">그중 내가 정말 해 본 것 고르기</td></tr>
+          <tr><td>질문으로 내 경험 끌어내기</td><td class="hl">사실·숫자·날짜를 내 기록으로 확인</td></tr>
+          <tr><td>경험과 요구 역량 연결표 만들기</td><td class="hl">어떤 경험을 쓸지 결정</td></tr>
+          <tr><td>AI 티 나는 표현·군더더기 찾기</td><td class="hl">최종 문장 쓰기</td></tr>
+          <tr><td>글자 수 세기</td><td class="hl">제출하기</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="warn"><span class="ic">!</span><div><strong>AI에게 경험이나 숫자를 지어내게 하지 마세요.</strong> 서류에 쓴 문장은 7차시에서 배울 것처럼 전부 면접 질문이 됩니다. 해 보지 않은 일을 쓰면 면접에서 무너집니다.</div></div>
+  </section>
+
+  <section class="block" id="steps">
+    <span class="eyebrow">오늘의 순서</span>
+    <h2>공고에서 제출까지 6단계</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>단계</th><th>할 일</th><th>결과물</th></tr></thead>
+        <tbody>
+          <tr><td><strong>① 공고 읽기</strong></td><td>하는 일 · 자격 요건 · 우대 사항 · 인재상 뽑기</td><td>공고 분석표</td></tr>
+          <tr><td><strong>② 경험 캐내기</strong></td><td>AI 질문에 답하며 상황 → 내가 한 행동 → 결과(숫자)로 정리</td><td>경험 카드 3장</td></tr>
+          <tr><td><strong>③ 연결하기</strong></td><td>공고 요구 하나에 경험 하나를 짝짓기</td><td>연결표</td></tr>
+          <tr><td><strong>④ 초안 쓰기</strong></td><td><strong>내가</strong> 먼저 쓴다. 첫 문장에 답</td><td>문항 초안</td></tr>
+          <tr><td><strong>⑤ AI 티 점검</strong></td><td>AI에게 "문제 문장만" 표시하게 한다</td><td>원문 / 문제 / 고칠 방향 표</td></tr>
+          <tr><td><strong>⑥ 제출 전 확인</strong></td><td>확인 행동 카드대로 원문 대조</td><td>제출본</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>제출 전 확인 행동 (언제 · 무엇을 · 통과 기준 · 안 맞으면)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>언제</th><th>무엇을 확인</th><th>통과 기준</th><th>안 맞으면</th></tr></thead>
+        <tbody>
+          <tr><td>제출 전</td><td>회사 이름·직무명</td><td>지원 공고와 같다. <strong>다른 회사 이름이 한 군데도 없다</strong></td><td>고치고 처음부터 다시 읽는다</td></tr>
+          <tr><td>제출 전</td><td>숫자·날짜·자격증 이름</td><td>내 자료(성적표, 자격증, 프로젝트 기록)와 같다</td><td>확인 못 한 숫자는 빼거나 고친다</td></tr>
+          <tr><td>제출 전</td><td>글자 수</td><td>제한 안에 든다 (공백 포함 여부도)</td><td>줄인다</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="warn"><span class="ic">TIP</span><div>여러 회사에 비슷한 서류를 낼 때 <strong>다른 회사 이름이 남는 사고</strong>가 가장 흔합니다. 첫 번째 확인은 꼭 지키세요.</div></div>
+  </section>
+
+  <section class="block" id="timeline">
+    <span class="eyebrow">진행 흐름</span>
+    <h2>오늘(4시간) 진행 흐름</h2>
+    <div class="timeline" id="tl"></div>
+  </section>
+
+  <section class="block" id="prompt">
+    <span class="eyebrow">실습 1·2 · 학생 배포용</span>
+    <h2>ChatGPT용 "자소서 코치" 프롬프트</h2>
+    <p class="sub">새 대화창을 열고, 아래 내용을 통째로 복사해서 붙여넣은 뒤 전송하세요.</p>
+    <div class="warn"><span class="ic">!</span><div><strong>개인정보 주의</strong> — 이름·연락처·주소·주민번호·사진은 넣지 않습니다. 가진 서류를 붙여 넣을 때도 이름을 지우세요. 채용 공고는 공개된 내용이라 붙여 넣어도 됩니다.</div></div>
+    <div class="prompt-wrap">
+      <button class="copy-btn" id="copyBtn" type="button" onclick="copyPrompt()">복사하기</button>
+<div class="prompt-box" id="promptText">당신은 지금부터 저의 '자소서 코치'입니다. 저는 유한대학교 AX특강을 듣는 졸업생이고, 오늘은 AI가 대신 써 주는 자기소개서가 아니라 제 경험으로 쓰는 자기소개서를 준비합니다.
+
+다음 규칙을 꼭 지켜주세요.
+1. 자기소개서 문장을 대신 써 주지 마세요. 제가 쓴 문장을 점검하는 것만 합니다.
+2. 제 경험·숫자·날짜를 지어내지 마세요. 모르면 저에게 물어보세요.
+3. 질문은 한 번에 하나씩 해 주세요.
+
+진행 순서는 이렇습니다.
+[1단계 공고 읽기] 제가 채용 공고를 붙여 넣으면 '하는 일 / 자격 요건 / 우대 사항 / 인재상'을 표로 정리하고, 이 회사가 가장 중요하게 볼 것 같은 것 3개를 공고 문장을 근거로 골라 주세요. 공고에 없는 회사 정보는 쓰지 말고, 필요하면 '공식 홈페이지에서 확인 필요'라고 적어 주세요.
+[2단계 경험 캐내기] 3개 각각에 대해 제 경험을 묻는 질문을 해 주세요. 제 답이 막연하면 "그때 어떤 상황이었나요? / 구체적으로 무엇을 했나요? / 결과가 숫자로 어땠나요?"처럼 더 물어봐 주세요. 다 끝나면 경험 카드(상황 / 내가 한 행동 / 결과)를 표로 정리해 주세요. 표에는 제가 말한 내용만 넣어 주세요.
+[3단계 연결하기] 공고 요구 하나와 경험 카드 하나를 짝지은 연결표를 보여 주세요. 어느 경험을 쓸지는 제가 정합니다.
+[4단계 점검] 제가 자기소개서 문항과 제 초안을 붙여 넣으면, 아래 기준에 걸리는 문장만 '원문 / 문제 / 고칠 방향' 표로 알려 주세요. 고친 문장을 통째로 써 주지 말고 방향만 알려 주세요.
+- 질문의 답이 첫 문장에 있는가
+- 누구나 쓸 수 있는 다짐이나 추상적인 말("배움의 자세로 기여", "역량을 갖추고 있다")
+- 근거 없는 과장("체득했다", "바로 적용할 수 있다")
+- 군더더기 연결어("결과적으로", "이와 함께", "앞서 말씀드린 것처럼")
+- "생각합니다"로 끝나는 문장
+- 숫자나 사실 중 제가 확인해야 할 것
+- 글자 수 (공백 포함 / 제외)
+
+준비되면 채용 공고를 붙여 넣어 달라고 말해 주세요.</div>
+    </div>
+    <h3>ChatGPT가 규칙을 어길 때 이렇게 말하세요</h3>
+    <div class="redirect-grid">
+      <div class="redirect-card">"문장을 대신 써 주지 말고, 고칠 방향만 알려 주세요."</div>
+      <div class="redirect-card">"제가 말하지 않은 경험이나 숫자는 지워 주세요."</div>
+      <div class="redirect-card">"질문은 한 번에 하나만 해 주세요."</div>
+    </div>
+  </section>
+
+  <section class="block" id="worksheet">
+    <span class="eyebrow">활동지</span>
+    <h2>내 자기소개서 한 문항 완성하기</h2>
+    <p class="sub">입력 칸은 화면에서 바로 써도 됩니다.</p>
+    <h3>1단계 · 공고 분석표 (17:25~)</h3>
+    <div class="ws"><div class="table-wrap"><table class="card-table"><tbody id="jobRows"></tbody></table></div></div>
+    <h3>2단계 · 경험 카드 3장 (17:25~)</h3>
+    <div class="ws"><div class="table-wrap"><table class="card-table"><thead><tr><th></th><th>카드 1</th><th>카드 2</th><th>카드 3</th></tr></thead><tbody id="expRows"></tbody></table></div></div>
+    <h3>3단계 · 연결표와 첫 문장 (18:15~)</h3>
+    <div class="ws"><div class="table-wrap"><table class="card-table"><tbody id="linkRows"></tbody></table></div></div>
+    <h3>4단계 · 제출 전 확인 (19:35~)</h3>
+    <div class="ws">
+      <div class="checks">
+        <label><input type="checkbox"> 회사 이름·직무명이 지원 공고와 같고, 다른 회사 이름이 없다</label>
+        <label><input type="checkbox"> 숫자·날짜·자격증 이름을 내 자료와 대조했다</label>
+        <label><input type="checkbox"> 글자 수 제한 안에 든다</label>
+        <label><input type="checkbox"> "생각합니다"로 끝나는 문장이 없다</label>
+        <label><input type="checkbox"> 첫 문장만 읽어도 질문의 답이 보인다</label>
+      </div>
+      <p class="save-note">※ 입력 내용은 저장되지 않습니다. 오늘 쓴 문항과 공고는 꼭 따로 저장하세요 — 7차시(11/20) 면접 준비에 씁니다.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>유한대학교 AX특강 · 2026-11-13 6차시</p>
+    <p>바탕 자료: 강사의 취업 지도 기준 (수업용 예시는 학생을 알아볼 수 없게 바꿈)</p>
+  </footer>
+</div>
+
+<script>
+var QUIZ = [
+  ["“꼼꼼함과 책임감을 바탕으로 귀사의 발전에 기여하겠습니다.”", "고칠 것", "누구나 쓸 수 있는 다짐입니다. 꼼꼼했던 장면이 없습니다."],
+  ["“근로장학생으로 1년간 학과 행사 신청서 300여 건을 정리했고, 마감일을 한 번도 넘기지 않았습니다.”", "괜찮음", "상황·행동·숫자가 있습니다. 숫자는 내 기록과 확인하세요."],
+  ["“결과적으로 팀워크의 중요성을 깨닫게 되었습니다.”", "고칠 것", "군더더기 연결어에 누구나 깨닫는 교훈입니다."],
+  ["“고객 문의 답변 시간을 줄이고 싶어 자주 묻는 질문 20개를 정리해 팀에 공유했습니다.”", "괜찮음", "왜 · 무엇을 · 얼마나가 보입니다."],
+  ["“저는 소통 능력이 뛰어나다고 생각합니다.”", "고칠 것", "“생각합니다”에 근거도 없습니다."],
+  ["“이 경험으로 귀사의 업무에 바로 적용할 수 있는 실무 역량을 체득했습니다.”", "고칠 것", "신입이 장담하기 어려운 과장입니다."]
+];
+var OPTS = ["괜찮음", "고칠 것"];
+var TL = [
+  ["16:00~16:15","도입","5차시 위키 숙제(원문 3개 더 넣기) 확인 → “AI에게 자소서를 통째로 맡기면 무엇이 문제일까?”","15분"],
+  ["16:15~16:40","개념 1 — 왜 티가 날까","AI 티 나는 이유 + 미니 퀴즈","25분"],
+  ["16:40~17:00","개념 2 — 강사 원칙","서류 원칙 6가지 + 고친 문장 사례","20분"],
+  ["17:00~17:15","개념 3 — 역할과 순서","AI와 나의 역할, 6단계, 제출 전 확인 행동","15분"],
+  ["17:15~17:25","휴식","","10분"],
+  ["17:25~18:15","실습 1 · 공고 읽기 + 경험 캐내기","“자소서 코치”로 공고 분석표와 경험 카드 3장","50분"],
+  ["18:15~19:05","실습 2 · 초안 + AI 티 점검","연결표 → 한 문항 초안을 내가 쓰고 → 코치 점검 받아 고치기","50분"],
+  ["19:05~19:35","공유","2인 1조, 서로의 첫 문장 읽어 주기 → “첫 문장만 듣고 답이 보이나?”","30분"],
+  ["19:35~19:55","정리","제출 전 확인 카드","20분"],
+  ["19:55~20:00","마무리","7차시(11/20) 예고 — 오늘 쓴 문항과 공고로 면접 준비","5분"]
+];
+function init(){
+  renderRows('jobRows', [['회사 / 직무',''],['하는 일',''],['자격 요건',''],['우대 사항',''],['가장 중요하게 볼 것 3개','공고 문장을 근거로']], 1);
+  renderRows('expRows', [['상황','언제·어디서·무엇 때문에'],['내가 한 행동',''],['결과 (숫자로)',''],['확인할 자료','기록·증빙']], 3);
+  renderRows('linkRows', [['공고 요구 → 경험 카드',''],['쓸 문항 / 글자 수 제한',''],['첫 문장 (질문의 답)','']], 1);
+}
+</script>
+<script>
+function renderQuiz(){
+  var box = document.getElementById('quizList'), solved = {};
+  QUIZ.forEach(function(q, i){
+    var row = document.createElement('div');
+    row.className = 'q-row';
+    row.innerHTML = '<span class="q-num">' + (i+1) + '</span><span class="q-text"></span><span class="q-btns"></span><span class="q-why"></span>';
+    row.querySelector('.q-text').textContent = q[0];
+    row.querySelector('.q-why').textContent = q[2];
+    var btns = row.querySelector('.q-btns');
+    OPTS.forEach(function(opt){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = opt;
+      b.onclick = function(){
+        btns.querySelectorAll('button').forEach(function(x){ x.classList.remove('right','wrong'); });
+        row.classList.add('done');
+        if(opt === q[1]){ b.classList.add('right'); solved[i] = true; }
+        else { b.classList.add('wrong'); delete solved[i]; }
+        document.getElementById('qScore').textContent = Object.keys(solved).length + ' / ' + QUIZ.length + ' 맞힘';
+      };
+      btns.appendChild(b);
+    });
+    box.appendChild(row);
+  });
+}
+function renderTL(){
+  var box = document.getElementById('tl');
+  TL.forEach(function(t){
+    var d = document.createElement('div');
+    d.className = 't-item';
+    d.innerHTML = '<div class="t-time"></div><div class="t-dotcol"><div class="t-dot"></div><div class="t-line"></div></div><div class="t-body"><div class="t-stage"></div><div class="t-desc"></div><span class="t-dur"></span></div>';
+    d.querySelector('.t-time').textContent = t[0];
+    d.querySelector('.t-stage').textContent = t[1];
+    if(t[2]) d.querySelector('.t-desc').textContent = t[2]; else d.querySelector('.t-desc').remove();
+    d.querySelector('.t-dur').textContent = t[3];
+    box.appendChild(d);
+  });
+}
+function renderRows(id, rows, cols){
+  var body = document.getElementById(id);
+  rows.forEach(function(r){
+    var tr = document.createElement('tr');
+    var td = document.createElement('td'); td.textContent = r[0]; tr.appendChild(td);
+    for(var c = 0; c < cols; c++){
+      var cell = document.createElement('td'), inp = document.createElement('input');
+      inp.type = 'text'; if(c === 0 && r[1]) inp.placeholder = r[1];
+      cell.appendChild(inp); tr.appendChild(cell);
+    }
+    body.appendChild(tr);
+  });
+}
+function copyText(text, btn){
+  var label = btn.textContent;
+  function done(){
+    btn.textContent = '복사됨 ✓';
+    btn.classList.add('copied');
+    setTimeout(function(){ btn.textContent = label; btn.classList.remove('copied'); }, 1800);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text, done); });
+  } else { fallbackCopy(text, done); }
+}
+function copyPrompt(){
+  copyText(document.getElementById('promptText').innerText, document.getElementById('copyBtn'));
+}
+function fallbackCopy(text, cb){
+  var ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); } catch(e){}
+  document.body.removeChild(ta);
+  if(cb) cb();
+}
+renderQuiz();
+renderTL();
+if(typeof init === 'function') init();
+</script>
+
+</body>
+</html>
